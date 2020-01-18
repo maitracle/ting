@@ -1,0 +1,6 @@
+# env 세팅 파일
+.python-version
+
+# cache 파일
+__pycache__
+
