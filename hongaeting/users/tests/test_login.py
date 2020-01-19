@@ -1,5 +1,6 @@
 from assertpy import assert_that
 from django.contrib.auth.models import User
+from rest_framework import status
 from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -20,6 +21,7 @@ class JwtTestCase(APITestCase):
         response = self.client.post('/api/users/tokens/', data=payload)
 
         # Then: access token, refresh token이 반환된다.
+        assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
         assert_that('refresh' in response.data).is_true()
         assert_that('access' in response.data).is_true()
 
@@ -38,4 +40,5 @@ class JwtTestCase(APITestCase):
         response = self.client.post('/api/users/tokens/refresh/', data=payload)
 
         # Then: access token이 반환된다.
+        assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
         assert_that('access' in response.data).is_true()
