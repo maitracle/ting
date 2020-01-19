@@ -6,3 +6,6 @@ __pycache__
 
 # environ
 .env
+
+# pycharm setting
+.idea
