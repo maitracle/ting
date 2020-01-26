@@ -6,10 +6,8 @@ from dotenv import load_dotenv, find_dotenv
 # Import env variables
 load_dotenv(find_dotenv())
 
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
@@ -21,7 +19,6 @@ SECRET_KEY = '0^$6^+=rvk7!3qaih$wm7z%8-wxf7pm1t5d&70bx+#yy!(a92k'
 DEBUG = False
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -65,7 +62,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'hongaeting.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
@@ -80,6 +76,26 @@ DATABASES = {
     }
 }
 
+
+def get_redis_location(name):
+    name = name.upper()
+    cache_host = os.environ[f'CACHE_{name}_HOST']
+    cache_port = os.environ[f'CACHE_{name}_PORT']
+    cache_db_number = os.environ[f'CACHE_{name}_DB_NUMBER']
+
+    return f'redis://{cache_host}:{cache_port}/{cache_db_number}'
+
+
+# Cache
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": get_redis_location('DEFAULT'),  # 1번 DB
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -98,7 +114,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 
 # django rest framework
 REST_FRAMEWORK = {
@@ -128,7 +143,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
