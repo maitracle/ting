@@ -1,8 +1,9 @@
 from assertpy import assert_that
-from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
+
+from users.models import User
 
 
 class JwtTestCase(APITestCase):
