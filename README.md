@@ -36,7 +36,7 @@ hongaeting_test=# ALTER ROLE postgres CREATEDB;
 ```
 # db client 관련 문제
 # https://stackoverflow.com/questions/44084846/cannot-connect-to-the-docker-daemon-on-macos
-env LDFLAGS="-I/usr/local/opt/openssl/include -L/usr/local/opt/openssl/lib" pip install psycopg2
+env LDFLAGS="-I/usr/local/opt/openssl/include -L/usr/local/opt/openssl/lib" pip install psycopg2==2.8.4
 ```
 
 #### pyenv 설치 (with pyenv-installer)
