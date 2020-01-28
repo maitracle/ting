@@ -28,7 +28,7 @@ jobs:
     - name: django test
       run: |
         cd hongaeting
-        python manage.py test --settings=hongaeting.settings.test.py
+        python manage.py test --settings=hongaeting.settings.test
       env:
         ENVIRONMENT: LOCAL
         RELEASE: Undefined
