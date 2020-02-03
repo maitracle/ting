@@ -1,0 +1,55 @@
+name: Python application
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:12.1
+        env:
+          POSTGRES_USER: ci_default_user
+          POSTGRES_PASSWORD: ci_default_password
+          POSTGRES_DB: ci_default_db_name
+        ports:
+          - 5432:5432
+        # needed because the postgres container does not provide a healthcheck
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.7
+    - name: Install dependencies
+      run: |
+        sudo apt-get install libpq-dev python-dev
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Lint with flake8
+      run: |
+        pip install flake8
+        # stop the build if there are Python syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    - name: django test
+      run: |
+        cd hongaeting
+        python manage.py test --settings=hongaeting.settings.test
+      env:
+        ENVIRONMENT: LOCAL
+        RELEASE: Undefined
+        SECRET_KEY: b%!vr)t_t8l-ep&7a+ir()2ysk6qd_0)wk2(8-pe$7e3p3c&5*
+        DEFAULT_DATABASE_NAME: ci_default_db_name
+        DEFAULT_DATABASE_USER: ci_default_user
+        DEFAULT_DATABASE_PASSWORD: ci_default_password
+        DEFAULT_DATABASE_HOST: localhost
+        DEFAULT_DATABASE_PORT: 5432
+        CACHE_DEFAULT_HOST: 127.0.0.1
+        CACHE_DEFAULT_PORT: 6379
+        CACHE_DEFAULT_DB_NUMBER: 1
