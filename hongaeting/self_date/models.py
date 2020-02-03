@@ -6,10 +6,10 @@ from common.models import BaseModel
 # Create your models here.
 class CoinHistory(BaseModel):
     CHANGE_REASON = (
-        ('Signup'),
-        ('Consume'),
-        ('Refund'),
+        ('Signup', 'SignUp'),
+        ('Consume', 'Consume'),
+        ('Refund', 'Refund'),
     )
-    user = models.ForeignKey('User', on_delete=models.DO_NOTHING)
+    user = models.ForeignKey('users.User', on_delete=models.DO_NOTHING)
     rest_coin = models.IntegerField()
     reason = models.CharField(max_length=50, choices=CHANGE_REASON)
