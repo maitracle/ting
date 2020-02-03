@@ -10,7 +10,7 @@ from users.serializers import CreateUserSerializer
 
 class UserViewSet(
     PermissionMixin,
-    CreateModelMixin, UpdateModelMixin, RetrieveModelMixin, DestroyModelMixin,
+    CreateModelMixin, UpdateModelMixin, DestroyModelMixin,
     viewsets.GenericViewSet,
 ):
     queryset = User.objects.all()

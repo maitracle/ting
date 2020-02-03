@@ -28,7 +28,25 @@ class UserViewSetTestCase(APITestCase):
         assert_that(user.email).is_equal_to(user_data['email'])
 
     def test_should_update_user(self):
-        pass
+        # Given: user와 바꿀 user data가 주어진다
+        user = baker.make('users.User',
+                          username='origin_user_name')
+
+        user_id = user.id
+
+        changed_data = {
+            'username': 'changed_user_name'
+        }
+
+        # When: user update api를 호출한다.
+        response = self.client.patch(f'/api/users/users/{user_id}/', data=changed_data)
+
+        # Then: user data가 수정된다.
+        assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
+
+        user = User.objects.get(id=user_id)
+        assert_that(user.username).is_equal_to(changed_data['username'])
+
 
     def test_should_delete_user(self):
         # Given: user가 주어진다
@@ -41,6 +59,3 @@ class UserViewSetTestCase(APITestCase):
 
         # Then: user가 삭제된다.
         assert_that(response.status_code).is_equal_to(status.HTTP_204_NO_CONTENT)
-
-    def test_should_not_delete_user(self):
-        pass
