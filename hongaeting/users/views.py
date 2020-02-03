@@ -22,7 +22,7 @@ class UserViewSet(
     }
 
     def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        instance.deactivate()
+        user = self.get_object()
+        user.deactivate()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
