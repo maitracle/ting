@@ -10,3 +10,4 @@ class User(BaseModel, AbstractUser):
 
     def deactivate(self):
         self.is_active = False
+        self.save()
