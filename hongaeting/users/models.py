@@ -31,12 +31,13 @@ class UserManager(BaseUserManager):
 
 class User(BaseModel, AbstractBaseUser):
     email = models.EmailField(max_length=100, unique=True)
-    nickname = models.CharField(max_length=20)
-    is_confirmed_student = models.BooleanField(default=False, help_text='학교 인증을 받았는지 여부')
 
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
+
+    university_email = models.EmailField(max_length=100, blank=True, help_text='학교 인증을 위한 메일')
+    is_confirmed_student = models.BooleanField(default=False, help_text='학교 인증을 받았는지 여부')
 
     user_code = models.CharField(max_length=10, blank=True)
 

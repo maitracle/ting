@@ -10,13 +10,13 @@ class JwtTestCase(APITestCase):
 
     def test_should_get_jwt_token(self):
         # Given: user가 주어진다.
-        username = 'test_username'
+        email = 'test_email@email.com'
         password = 'test_password'
-        User.objects.create_user(username=username, password=password)
+        User.objects.create_user(email=email, password=password)
 
         # When: jwt token을 요청한다.
         payload = {
-            'username': username,
+            'email': email,
             'password': password,
         }
         response = self.client.post('/api/tokens/', data=payload)
@@ -28,9 +28,9 @@ class JwtTestCase(APITestCase):
 
     def test_should_refresh_jwt_token(self):
         # Given: user와 user의 refresh token이 주어진다.
-        username = 'test_username'
+        email = 'test_email@email.com'
         password = 'test_password'
-        user = User.objects.create_user(username=username, password=password)
+        user = User.objects.create_user(email=email, password=password)
 
         refresh_token = str(RefreshToken.for_user(user))
 

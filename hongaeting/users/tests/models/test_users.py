@@ -10,7 +10,8 @@ class UserTestCase(TestCase):
     def test_deactivate(self):
         # Given: user가 주어진다.
         user = baker.make('users.User',
-                          username='origin_user_name')
+                          email='origin_user_email@mail.com',
+                          is_active=True)
 
         # When: user의 deactivate 함수를 실행한다.
         user.deactivate()
