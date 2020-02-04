@@ -17,7 +17,7 @@ class UserViewSetTestCase(APITestCase):
         }
 
         # When: user create api를 호출한다.
-        response = self.client.post('/api/users/users/', data=user_data)
+        response = self.client.post('/api/users/', data=user_data)
 
         # Then: 요청한 data로 user가 만들어진다.
         assert_that(response.status_code).is_equal_to(status.HTTP_201_CREATED)
@@ -39,7 +39,7 @@ class UserViewSetTestCase(APITestCase):
         }
 
         # When: user update api를 호출한다.
-        response = self.client.patch(f'/api/users/users/{user_id}/', data=changed_data)
+        response = self.client.patch(f'/api/users/{user_id}/', data=changed_data)
 
         # Then: user data가 수정된다.
         assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
@@ -55,7 +55,7 @@ class UserViewSetTestCase(APITestCase):
 
         # When: 주어진 user로 로그인 한 후, user delete api를 호출한다.
         self.client.force_authenticate(user=user)
-        response = self.client.delete(f'/api/users/users/{user_id}/')
+        response = self.client.delete(f'/api/users/{user_id}/')
 
         # Then: user가 삭제된다.
         assert_that(response.status_code).is_equal_to(status.HTTP_204_NO_CONTENT)
