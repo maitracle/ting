@@ -10,6 +10,6 @@ class CoinHistory(BaseModel):
         ('Consume', 'Consume'),
         ('Refund', 'Refund'),
     )
-    user = models.ForeignKey('users.User', on_delete=models.DO_NOTHING)
+    user = models.ForeignKey('users.User', on_delete=models.CASCADE)
     rest_coin = models.IntegerField()
     reason = models.CharField(max_length=50, choices=CHANGE_REASON)
