@@ -5,5 +5,5 @@ from users.models import User
 
 
 @register(User)
-class GemShopSettingAdmin(admin.ModelAdmin):
+class UserAdmin(admin.ModelAdmin):
     pass
