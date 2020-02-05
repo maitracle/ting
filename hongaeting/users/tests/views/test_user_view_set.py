@@ -11,9 +11,8 @@ class UserViewSetTestCase(APITestCase):
     def test_should_create_user(self):
         # Given: user data가 주어진다.
         user_data = {
-            'username': 'test_username',
-            'password': 'test_password',
             'email': 'test_email@email.com',
+            'password': 'test_password',
         }
 
         # When: user create api를 호출한다.
@@ -22,20 +21,19 @@ class UserViewSetTestCase(APITestCase):
         # Then: 요청한 data로 user가 만들어진다.
         assert_that(response.status_code).is_equal_to(status.HTTP_201_CREATED)
 
-        user = User.objects.get(username=user_data['username'])
-        assert_that(user.username).is_equal_to(user_data['username'])
-        assert_that(user.password).is_equal_to(user_data['password'])
+        user = User.objects.get(email=user_data['email'])
         assert_that(user.email).is_equal_to(user_data['email'])
+        assert_that(user.password).is_equal_to(user_data['password'])
 
     def test_should_update_user(self):
         # Given: user와 바꿀 user data가 주어진다
         user = baker.make('users.User',
-                          username='origin_user_name')
+                          email='origin_user_email@email.com')
 
         user_id = user.id
 
         changed_data = {
-            'username': 'changed_user_name'
+            'email': 'changed_user_email@email.com'
         }
 
         # When: user update api를 호출한다.
@@ -45,8 +43,7 @@ class UserViewSetTestCase(APITestCase):
         assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
 
         user = User.objects.get(id=user_id)
-        assert_that(user.username).is_equal_to(changed_data['username'])
-
+        assert_that(user.email).is_equal_to(changed_data['email'])
 
     def test_should_delete_user(self):
         # Given: user가 주어진다
