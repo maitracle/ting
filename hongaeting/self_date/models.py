@@ -2,16 +2,15 @@ from django.db import models
 from model_utils import Choices
 
 from common.models import BaseModel
-
-
-from users.models import User
 from common.models import BaseModel
+from users.models import User
+
 
 class Like(BaseModel):
-    user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
-    liked_user = models.ForeignKey(User, related_name='liked_user', on_delete=models.DO_NOTHING)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    liked_user = models.ForeignKey(User, related_name='liked_user', on_delete=models.CASCADE)
 
-# Create your models here.
+
 class CoinHistory(BaseModel):
     CHANGE_REASON = Choices('SIGNUP', 'CONSUME', 'REFUND', )
 

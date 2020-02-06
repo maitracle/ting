@@ -1,12 +1,12 @@
 from django_rest_framework_mango.mixins import QuerysetMixin, SerializerMixin
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
-from rest_framework.mixins import ListModelMixin
+from rest_framework.mixins import ListModelMixin, CreateModelMixin, DestroyModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from self_date.models import CoinHistory
-from self_date.serializer import CreateCoinHistorySerializer, ListCoinHistorySerializer
+from self_date.models import CoinHistory, Like
+from self_date.serializer import CreateCoinHistorySerializer, ListCoinHistorySerializer, LikeSerializer
 
 
 class CoinHistoryViewSet(
@@ -61,3 +61,15 @@ class CoinHistoryViewSet(
         headers = self.get_success_headers(serializer.data)
 
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+
+class LikeViewSet(
+    CreateModelMixin, DestroyModelMixin, ListModelMixin,
+    viewsets.GenericViewSet
+):
+    queryset = Like.objects.all()
+    permission_classes = (IsAuthenticated,)
+    serializer_class = LikeSerializer
+
+    def get_queryset(self):
+        return super().get_queryset().filter(user=self.request.user)
