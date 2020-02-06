@@ -1,7 +1,7 @@
 from django_rest_framework_mango.mixins import QuerysetMixin, SerializerMixin
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
-from rest_framework.mixins import CreateModelMixin, ListModelMixin
+from rest_framework.mixins import ListModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -11,7 +11,7 @@ from self_date.serializer import CreateCoinHistorySerializer, ListCoinHistorySer
 
 class CoinHistoryViewSet(
     QuerysetMixin, SerializerMixin,
-    CreateModelMixin, ListModelMixin,
+    ListModelMixin,
     viewsets.GenericViewSet,
 ):
     queryset = CoinHistory.objects.all()
