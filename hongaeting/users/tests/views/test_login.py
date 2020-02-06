@@ -10,16 +10,16 @@ class JwtTestCase(APITestCase):
 
     def test_should_get_jwt_token(self):
         # Given: user가 주어진다.
-        username = 'test_username'
+        email = 'test_email@email.com'
         password = 'test_password'
-        User.objects.create_user(username=username, password=password)
+        User.objects.create_user(email=email, password=password)
 
         # When: jwt token을 요청한다.
         payload = {
-            'username': username,
+            'email': email,
             'password': password,
         }
-        response = self.client.post('/api/users/tokens/', data=payload)
+        response = self.client.post('/api/tokens/', data=payload)
 
         # Then: access token, refresh token이 반환된다.
         assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
@@ -28,9 +28,9 @@ class JwtTestCase(APITestCase):
 
     def test_should_refresh_jwt_token(self):
         # Given: user와 user의 refresh token이 주어진다.
-        username = 'test_username'
+        email = 'test_email@email.com'
         password = 'test_password'
-        user = User.objects.create_user(username=username, password=password)
+        user = User.objects.create_user(email=email, password=password)
 
         refresh_token = str(RefreshToken.for_user(user))
 
@@ -38,7 +38,7 @@ class JwtTestCase(APITestCase):
         payload = {
             'refresh': refresh_token,
         }
-        response = self.client.post('/api/users/tokens/refresh/', data=payload)
+        response = self.client.post('/api/tokens/refresh/', data=payload)
 
         # Then: access token이 반환된다.
         assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
