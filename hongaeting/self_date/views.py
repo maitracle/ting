@@ -64,6 +64,7 @@ class CoinHistoryViewSet(
 
 
 class LikeViewSet(
+    QuerysetMixin,
     CreateModelMixin, DestroyModelMixin, ListModelMixin,
     viewsets.GenericViewSet
 ):
@@ -71,5 +72,15 @@ class LikeViewSet(
     permission_classes = (IsAuthenticated,)
     serializer_class = LikeSerializer
 
-    def get_queryset(self):
-        return super().get_queryset().filter(user=self.request.user)
+    def list_queryset(self, queryset):
+        return queryset.filter(user=self.request.user)
+
+    def get_liked_queryset(self, queryset):
+        return queryset.filter(liked_user=self.request.user)
+
+    @action(detail=False, methods=['get'], url_path='liked')
+    def get_liked(self, request):
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset, many=True)
+
+        return Response(serializer.data)
