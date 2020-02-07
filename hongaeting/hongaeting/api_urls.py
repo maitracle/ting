@@ -16,5 +16,3 @@ urlpatterns = [
 ]
 
 urlpatterns += router.urls
-
-[print(a) for a in urlpatterns]

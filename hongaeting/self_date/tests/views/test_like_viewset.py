@@ -8,7 +8,7 @@ from self_date.models import Like
 
 class LikeTestCase(APITestCase):
     def test_should_get_like_list(self):
-        # Given: user가 명과 like 1개가 주어진다.
+        # Given: user 1명, liked_user 3명, like 3개가 주어진다.
         user = baker.make('users.User')
         liked_user_quantity = 3
         liked_user_list = baker.make('users.User', _quantity=liked_user_quantity)
@@ -16,7 +16,7 @@ class LikeTestCase(APITestCase):
             baker.make('self_date.Like', user=user, liked_user=liked_user) for liked_user in liked_user_list
         ]
 
-        # When: user가 like_list api를 호출한다
+        # When: like_list api를 호출한다
         self.client.force_authenticate(user=user)
         response = self.client.get('/api/likes/')
 
@@ -28,7 +28,7 @@ class LikeTestCase(APITestCase):
             assert_that(response_item['liked_user']).is_equal_to(expected_item.liked_user.id)
 
     def test_should_get_liked_list(self):
-        # Given : user가 3명과 like 3개가 주어진다.
+        # Given: user가 3명과 like 3개가 주어진다.
         liked_user = baker.make('users.User')
         user_quantity = 3
         user_list = baker.make('users.User', _quantity=user_quantity)
@@ -50,25 +50,25 @@ class LikeTestCase(APITestCase):
 
     def test_should_create_like(self):
         # Given : user가 2명 주어진다.
-        user = baker.make('users.User', _quantity=2)
+        user = baker.make('users.User')
+        liked_user = baker.make('users.User')
         like_data = {
-            "user": user[0].id,
-            "liked_user": user[1].id,
+            "liked_user": liked_user.id,
         }
 
         # When: user가 like_create api를 호출한다.
-        self.client.force_authenticate(user=user[0])
+        self.client.force_authenticate(user=user)
         response = self.client.post('/api/likes/', data=like_data)
 
         # Then: like 모델이 정상적으로 생성
         assert_that(response.status_code).is_equal_to(status.HTTP_201_CREATED)
-        assert_that(response.data["user"]).is_equal_to(user[0].id)
-        assert_that(response.data["liked_user"]).is_equal_to(user[1].id)
+        assert_that(response.data["user"]).is_equal_to(user.id)
+        assert_that(response.data["liked_user"]).is_equal_to(liked_user.id)
 
     def test_should_destroy_test(self):
         # Given: like 모델이 하나 주어진다.
         user = baker.make('users.User')
-        like = baker.make('self_date.Like')
+        like = baker.make('self_date.Like', user=user)
         like_id = like.id
 
         # When: user가 destroy api를 호출한다.

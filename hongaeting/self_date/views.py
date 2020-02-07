@@ -95,6 +95,3 @@ class LikeViewSet(
         serializer.save()
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-    def filtered_queryset_by_user(self, queryset):
-        return queryset.filter(user=self.request.user, liked_user=self.request.data['liked_user'])
