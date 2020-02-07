@@ -57,7 +57,7 @@ class CoinHistoryViewSet(
     def _create_coin_history(self, data):
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
+        serializer.save(serializer)
         headers = self.get_success_headers(serializer.data)
 
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
@@ -65,7 +65,7 @@ class CoinHistoryViewSet(
 
 class LikeViewSet(
     QuerysetMixin,
-    CreateModelMixin, DestroyModelMixin, ListModelMixin,
+    ListModelMixin, DestroyModelMixin,
     viewsets.GenericViewSet
 ):
     queryset = Like.objects.all()
@@ -84,3 +84,26 @@ class LikeViewSet(
         serializer = self.get_serializer(queryset, many=True)
 
         return Response(serializer.data)
+
+    # @action(detail=False, methods=['post'], url_path='create-like')
+    def create(self, request, *args, **kwargs):
+        data = {
+            'user': request.user.id,
+            'liked_user': request.data['liked_user'],
+        }
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def filtered_queryset_by_user(self, queryset):
+        return queryset.filter(user=self.request.user, liked_user=self.request.data['liked_user'])
+
+    # @action(detail=False, methods=['delete'], url_path='delete-like')
+    # def destroy(self, request, *args, **kwargs):
+    #     instance = self.filtered_queryset_by_user(self.queryset)
+    #     instance.delete()
+    #     return Response(status=status.HTTP_204_NO_CONTENT)
+
+
