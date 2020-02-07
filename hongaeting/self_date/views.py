@@ -85,7 +85,6 @@ class LikeViewSet(
 
         return Response(serializer.data)
 
-    # @action(detail=False, methods=['post'], url_path='create-like')
     def create(self, request, *args, **kwargs):
         data = {
             'user': request.user.id,
@@ -99,11 +98,3 @@ class LikeViewSet(
 
     def filtered_queryset_by_user(self, queryset):
         return queryset.filter(user=self.request.user, liked_user=self.request.data['liked_user'])
-
-    # @action(detail=False, methods=['delete'], url_path='delete-like')
-    # def destroy(self, request, *args, **kwargs):
-    #     instance = self.filtered_queryset_by_user(self.queryset)
-    #     instance.delete()
-    #     return Response(status=status.HTTP_204_NO_CONTENT)
-
-
