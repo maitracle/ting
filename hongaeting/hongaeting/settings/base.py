@@ -163,10 +163,3 @@ STATIC_URL = '/static/'
 
 # user model setting
 AUTH_USER_MODEL = 'users.User'
-
-# email setting
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'hongaeting@gmail.com'
-EMAIL_HOST_PASSWORD = 'kghdroxldt5!'
-EMAIL_USE_TLS = True
