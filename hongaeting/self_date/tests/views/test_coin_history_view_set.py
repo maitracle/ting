@@ -11,22 +11,25 @@ class CoinHistoryTestCase(APITestCase):
         # Given: user 1명이 생성되고 그 유저의 coin-history가 생성된다.
         user = baker.make('users.User')
         coin_history_quantity = 3
-        baker.make('self_date.CoinHistory', user=user, reason=CoinHistory.CHANGE_REASON.SIGNUP, rest_coin=2, _quantity=coin_history_quantity)
+        baker.make('self_date.CoinHistory', user=user, _quantity=coin_history_quantity)
 
         # When: user가 coin_history_list api 호출
         self.client.force_authenticate(user=user)
         response = self.client.get('/api/coin-histories/')
 
         # Then: response값이 정상적으로 온다.
-        assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
-        assert_that(response.data[0]['user']).is_equal_to(user.id)
-        assert_that(response.data).is_length(coin_history_quantity)
+        for i in range(coin_history_quantity):
+            assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
+            assert_that(response.data[i]['user']).is_equal_to(user.id)
+            assert_that(response.data).is_length(coin_history_quantity)
+            print(response.data[i])
 
-    def test_should_consume_coin_history(self):
+    def test_should_consume(self):
         # Given: user 1명과 그의 Signup coin_history가 생성된다.
         user = baker.make('users.User')
         user_rest_coin = 2
-        baker.make('self_date.CoinHistory', user=user, reason=CoinHistory.CHANGE_REASON.SIGNUP, rest_coin=user_rest_coin)
+        baker.make('self_date.CoinHistory', user=user, reason=CoinHistory.CHANGE_REASON.SIGNUP,
+                   rest_coin=user_rest_coin)
 
         # When: user가 consume api를 호출한다.
         self.client.force_authenticate(user=user)
@@ -41,7 +44,8 @@ class CoinHistoryTestCase(APITestCase):
         # Given: user 1명과 그의 Signup coin_history가 생성된다.
         user = baker.make('users.User')
         user_rest_coin = 2
-        baker.make('self_date.CoinHistory', user=user, reason=CoinHistory.CHANGE_REASON.SIGNUP, rest_coin=user_rest_coin)
+        baker.make('self_date.CoinHistory', user=user, reason=CoinHistory.CHANGE_REASON.SIGNUP,
+                   rest_coin=user_rest_coin)
 
         # When: user가 refund api를 호출한다.
         self.client.force_authenticate(user=user)
