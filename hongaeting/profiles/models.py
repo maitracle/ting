@@ -1,7 +1,7 @@
 from django.core.validators import MinValueValidator
 from django.db import models
 
-from common.constants import UNIVERSITY_CHOICE, GENDER_CHOICE, BODY_TYPE
+from common.constants import UNIVERSITY_CHOICE, GENDER_CHOICE, BODY_TYPE, MAX_CHARFIELD_LENGTH
 from common.models import BaseModel
 
 
@@ -28,6 +28,16 @@ class Profile(BaseModel):
     age = models.PositiveSmallIntegerField(validators=[MinValueValidator(19)])
     height = models.PositiveSmallIntegerField()
     body_type = models.CharField(max_length=10, choices=BODY_TYPE)
+
     tag = models.CharField(max_length=100)
     image = models.CharField(max_length=100)
+
+    appearance = models.CharField(max_length=MAX_CHARFIELD_LENGTH, validators=[MinValueValidator(120)])
+    personality = models.CharField(max_length=MAX_CHARFIELD_LENGTH, validators=[MinValueValidator(120)])
+    hobby = models.CharField(max_length=MAX_CHARFIELD_LENGTH, validators=[MinValueValidator(120)])
+    ideal_type = models.CharField(max_length=MAX_CHARFIELD_LENGTH, validators=[MinValueValidator(120)])
+    last_tempting_word = models.CharField(max_length=MAX_CHARFIELD_LENGTH, validators=[MinValueValidator(120)])
+
+
+
     is_active = models.BooleanField(default=True)
