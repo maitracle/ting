@@ -57,7 +57,7 @@ class CoinHistoryViewSet(
     def _create_coin_history(self, data):
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
+        serializer.save(serializer)
         headers = self.get_success_headers(serializer.data)
 
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
@@ -65,7 +65,7 @@ class CoinHistoryViewSet(
 
 class LikeViewSet(
     QuerysetMixin,
-    CreateModelMixin, DestroyModelMixin, ListModelMixin,
+    ListModelMixin, DestroyModelMixin,
     viewsets.GenericViewSet
 ):
     queryset = Like.objects.all()
@@ -84,3 +84,14 @@ class LikeViewSet(
         serializer = self.get_serializer(queryset, many=True)
 
         return Response(serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        data = {
+            'user': request.user.id,
+            'liked_user': request.data['liked_user'],
+        }
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
