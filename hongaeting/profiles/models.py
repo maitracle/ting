@@ -1,6 +1,7 @@
+from django.core.validators import MinValueValidator
 from django.db import models
 
-from common.constants import UNIVERSITY_CHOICE, GENDER_CHOICE
+from common.constants import UNIVERSITY_CHOICE, GENDER_CHOICE, BODY_TYPE
 from common.models import BaseModel
 
 
@@ -22,10 +23,11 @@ class QuestionItem(BaseModel):
 
 class Profile(BaseModel):
     user = models.OneToOneField('users.User', on_delete=models.CASCADE)
-    nickname = models.CharField()
-    gender = models.CharField(choices=GENDER_CHOICE)
-    age = models.PositiveSmallIntegerField()
+    nickname = models.CharField(max_length=8, unique=True)
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICE)
+    age = models.PositiveSmallIntegerField(validators=[MinValueValidator(19)])
     height = models.PositiveSmallIntegerField()
-    body_shape = models.CharField()
-    tag = models.CharField()
-    image = models.CharField()
+    body_type = models.CharField(max_length=10, choices=BODY_TYPE)
+    tag = models.CharField(max_length=100)
+    image = models.CharField(max_length=100)
+    is_active = models.BooleanField(default=True)

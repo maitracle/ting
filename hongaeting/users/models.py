@@ -1,6 +1,7 @@
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.db import models
 
+from common.constants import UNIVERSITY_CHOICE
 from common.models import BaseModel
 
 
@@ -40,6 +41,8 @@ class User(BaseModel, AbstractBaseUser):
     is_confirmed_student = models.BooleanField(default=False, help_text='학교 인증을 받았는지 여부')
 
     user_code = models.CharField(max_length=10, blank=True)
+
+    university = models.CharField(max_length=10, blank=True, null=True, choices=UNIVERSITY_CHOICE)
 
     objects = UserManager()
 
