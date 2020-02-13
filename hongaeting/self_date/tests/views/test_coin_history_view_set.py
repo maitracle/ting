@@ -18,11 +18,11 @@ class CoinHistoryTestCase(APITestCase):
         response = self.client.get('/api/coin-histories/')
 
         # Then: response값이 정상적으로 온다.
+        assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
+        assert_that(response.data).is_length(coin_history_quantity)
         for i in range(coin_history_quantity):
-            assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
             assert_that(response.data[i]['user']).is_equal_to(user.id)
-            assert_that(response.data).is_length(coin_history_quantity)
-            print(response.data[i])
+
 
     def test_should_consume(self):
         # Given: user 1명과 그의 Signup coin_history가 생성된다.
