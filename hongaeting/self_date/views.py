@@ -57,10 +57,9 @@ class CoinHistoryViewSet(
     def _create_coin_history(self, data):
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(serializer)
-        headers = self.get_success_headers(serializer.data)
+        serializer.save()
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class LikeViewSet(
