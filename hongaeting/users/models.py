@@ -1,5 +1,6 @@
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.db import models
+from model_utils import Choices
 
 from common.constants import UNIVERSITY_CHOICE
 from common.models import BaseModel
@@ -31,18 +32,18 @@ class UserManager(BaseUserManager):
 
 
 class User(BaseModel, AbstractBaseUser):
+
     email = models.EmailField(max_length=100, unique=True)
 
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
 
+    university = models.CharField(max_length=10, blank=True, null=True, choices=UNIVERSITY_CHOICE)
     university_email = models.EmailField(max_length=100, blank=True, help_text='학교 인증을 위한 메일')
     is_confirmed_student = models.BooleanField(default=False, help_text='학교 인증을 받았는지 여부')
 
     user_code = models.CharField(max_length=10, blank=True)
-
-    university = models.CharField(max_length=10, blank=True, null=True, choices=UNIVERSITY_CHOICE)
 
     objects = UserManager()
 

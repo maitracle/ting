@@ -1,7 +1,8 @@
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MinLengthValidator
 from django.db import models
+from model_utils import Choices
 
-from common.constants import UNIVERSITY_CHOICE, GENDER_CHOICE, BODY_TYPE, MAX_CHARFIELD_LENGTH
+from common.constants import MAX_CHARFIELD_LENGTH, UNIVERSITY_CHOICE
 from common.models import BaseModel
 
 
@@ -22,6 +23,9 @@ class QuestionItem(BaseModel):
 
 
 class Profile(BaseModel):
+    BODY_TYPE = Choices('SKINNY', 'SLIM', 'NORMAL', 'CHUBBY', 'FAT')
+    GENDER_CHOICE = Choices('MALE', 'FEMALE')
+
     user = models.OneToOneField('users.User', on_delete=models.CASCADE)
     nickname = models.CharField(max_length=8, unique=True)
     gender = models.CharField(max_length=10, choices=GENDER_CHOICE)
@@ -32,11 +36,11 @@ class Profile(BaseModel):
     tag = models.CharField(max_length=100)
     image = models.CharField(max_length=100)
 
-    appearance = models.CharField(max_length=MAX_CHARFIELD_LENGTH, validators=[MinValueValidator(120)])
-    personality = models.CharField(max_length=MAX_CHARFIELD_LENGTH, validators=[MinValueValidator(120)])
-    hobby = models.CharField(max_length=MAX_CHARFIELD_LENGTH, validators=[MinValueValidator(120)])
-    ideal_type = models.CharField(max_length=MAX_CHARFIELD_LENGTH, validators=[MinValueValidator(120)])
-    last_tempting_word = models.CharField(max_length=MAX_CHARFIELD_LENGTH, validators=[MinValueValidator(120)])
+    appearance = models.CharField(max_length=MAX_CHARFIELD_LENGTH, validators=[MinLengthValidator(120)])
+    personality = models.CharField(max_length=MAX_CHARFIELD_LENGTH, validators=[MinLengthValidator(120)])
+    hobby = models.CharField(max_length=MAX_CHARFIELD_LENGTH, validators=[MinLengthValidator(120)])
+    ideal_type = models.CharField(max_length=MAX_CHARFIELD_LENGTH, validators=[MinLengthValidator(120)])
+    last_tempting_word = models.CharField(max_length=MAX_CHARFIELD_LENGTH, validators=[MinLengthValidator(120)])
 
 
 
