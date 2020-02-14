@@ -5,6 +5,7 @@ django-json-field==0.5.7
 django-model-utils==4.0.0
 django-redis==4.11.0
 djangorestframework==3.10.3
+djangorestframework-camel-case==1.1.2
 djangorestframework-mango==0.1.1
 djangorestframework-simplejwt==4.4.0
 model-bakery==1.0.2
