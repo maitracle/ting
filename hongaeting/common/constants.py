@@ -1,5 +1,3 @@
 from model_utils import Choices
 
-UNIVERSITY_CHOICE = Choices('HONGIK', 'KYUNGHEE', 'YONSEI', )
-
-MAX_CHARFIELD_LENGTH = 300
+UNIVERSITY_LIST = Choices('HONGIK', 'KYUNGHEE', 'YONSEI', )

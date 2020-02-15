@@ -2,13 +2,13 @@ from django.core.validators import MinValueValidator, MinLengthValidator
 from django.db import models
 from model_utils import Choices
 
-from common.constants import MAX_CHARFIELD_LENGTH, UNIVERSITY_CHOICE
+from common.constants import UNIVERSITY_LIST
 from common.models import BaseModel
 
 
 class QuestionList(BaseModel):
     name = models.CharField(max_length=30)
-    university = models.CharField(max_length=30, choices=UNIVERSITY_CHOICE)
+    university = models.CharField(max_length=30, choices=UNIVERSITY_LIST)
     season = models.IntegerField()
     version = models.IntegerField()
 
@@ -23,6 +23,7 @@ class QuestionItem(BaseModel):
 
 
 class Profile(BaseModel):
+    MAX_CHARFIELD_LENGTH = 300
     BODY_TYPE = Choices('SKINNY', 'SLIM', 'NORMAL', 'CHUBBY', 'FAT')
     GENDER_CHOICE = Choices('MALE', 'FEMALE')
 
