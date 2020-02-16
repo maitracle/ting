@@ -41,6 +41,6 @@ class Profile(BaseModel):
     personality = models.CharField(max_length=MAX_CHARFIELD_LENGTH, validators=[MinLengthValidator(120)])
     hobby = models.CharField(max_length=MAX_CHARFIELD_LENGTH, validators=[MinLengthValidator(120)])
     ideal_type = models.CharField(max_length=MAX_CHARFIELD_LENGTH, validators=[MinLengthValidator(120)])
-    last_tempting_word = models.CharField(max_length=MAX_CHARFIELD_LENGTH, validators=[MinLengthValidator(120)])
+    last_tempting_word = models.CharField(max_length=MAX_CHARFIELD_LENGTH)
 
     is_active = models.BooleanField(default=True)
