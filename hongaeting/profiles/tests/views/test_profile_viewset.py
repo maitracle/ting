@@ -71,8 +71,8 @@ class ProfileTestCase(APITestCase):
         filtered_profile_quantity = 1
         assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
         assert_that(response.data).is_length(filtered_profile_quantity)
-        for i in range(filtered_profile_quantity):
-            check_response_and_expected(response.data[i], expected_profile)
+        for response in response.data:
+            check_response_and_expected(response, expected_profile)
 
     def test_should_update_profile(self):
         # Given: user 1명과 그의 profile, 수정할 데이터가 주어진다.
