@@ -14,31 +14,31 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='profile',
             name='appearance',
-            field=models.CharField(default='a', max_length=300, validators=[django.core.validators.MinLengthValidator(120)]),
+            field=models.CharField(max_length=300, validators=[django.core.validators.MinLengthValidator(120)]),
             preserve_default=False,
         ),
         migrations.AddField(
             model_name='profile',
             name='hobby',
-            field=models.CharField(default='a', max_length=300, validators=[django.core.validators.MinLengthValidator(120)]),
+            field=models.CharField(max_length=300, validators=[django.core.validators.MinLengthValidator(120)]),
             preserve_default=False,
         ),
         migrations.AddField(
             model_name='profile',
             name='ideal_type',
-            field=models.CharField(default='a', max_length=300, validators=[django.core.validators.MinLengthValidator(120)]),
+            field=models.CharField(max_length=300, validators=[django.core.validators.MinLengthValidator(120)]),
             preserve_default=False,
         ),
         migrations.AddField(
             model_name='profile',
             name='last_tempting_word',
-            field=models.CharField(default='a', max_length=300, validators=[django.core.validators.MinLengthValidator(120)]),
+            field=models.CharField(max_length=300, validators=[django.core.validators.MinLengthValidator(120)]),
             preserve_default=False,
         ),
         migrations.AddField(
             model_name='profile',
             name='personality',
-            field=models.CharField(default='a', max_length=300, validators=[django.core.validators.MinLengthValidator(120)]),
+            field=models.CharField(max_length=300, validators=[django.core.validators.MinLengthValidator(120)]),
             preserve_default=False,
         ),
     ]
