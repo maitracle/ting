@@ -7,22 +7,20 @@ from common.constants import UNIVERSITY_LIST
 from profiles.models import Profile
 
 
-def check_response_and_expected(dictionary, instance):
-    assert_that(dictionary['nickname']).is_equal_to(instance.nickname)
-    assert_that(dictionary['gender']).is_equal_to(instance.gender)
-    assert_that(dictionary['age']).is_equal_to(instance.age)
-    assert_that(dictionary['height']).is_equal_to(instance.height)
-    assert_that(dictionary['body_type']).is_equal_to(instance.body_type)
-    assert_that(dictionary['tag']).is_equal_to(instance.tag)
-    assert_that(dictionary['image']).is_equal_to(instance.image)
-    assert_that(dictionary['appearance']).is_equal_to(instance.appearance)
-    assert_that(dictionary['personality']).is_equal_to(instance.personality)
-    assert_that(dictionary['hobby']).is_equal_to(instance.hobby)
-    assert_that(dictionary['ideal_type']).is_equal_to(instance.ideal_type)
-    assert_that(dictionary['last_tempting_word']).is_equal_to(instance.last_tempting_word)
-
-
 class ProfileTestCase(APITestCase):
+    def _check_response_and_expected(self, dictionary, instance):
+        assert_that(dictionary['nickname']).is_equal_to(instance.nickname)
+        assert_that(dictionary['gender']).is_equal_to(instance.gender)
+        assert_that(dictionary['age']).is_equal_to(instance.age)
+        assert_that(dictionary['height']).is_equal_to(instance.height)
+        assert_that(dictionary['body_type']).is_equal_to(instance.body_type)
+        assert_that(dictionary['tag']).is_equal_to(instance.tag)
+        assert_that(dictionary['image']).is_equal_to(instance.image)
+        assert_that(dictionary['appearance']).is_equal_to(instance.appearance)
+        assert_that(dictionary['personality']).is_equal_to(instance.personality)
+        assert_that(dictionary['hobby']).is_equal_to(instance.hobby)
+        assert_that(dictionary['ideal_type']).is_equal_to(instance.ideal_type)
+        assert_that(dictionary['last_tempting_word']).is_equal_to(instance.last_tempting_word)
 
     def test_should_get_profile_list(self):
         # Given: user 1명과 그의 profile이 주어진다.
@@ -38,7 +36,7 @@ class ProfileTestCase(APITestCase):
         assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
         assert_that(response.data).is_length(profile_quantity)
         for response_profile, expected_profile in zip(response.data, expected_profile_list):
-            check_response_and_expected(response_profile, expected_profile)
+            self._check_response_and_expected(response_profile, expected_profile)
 
     def test_should_get_filtered_list(self):
         # Given: 로그인용 user 1명과 임의의 profile 1개가 주어진다.
@@ -72,7 +70,7 @@ class ProfileTestCase(APITestCase):
         assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
         assert_that(response.data).is_length(filtered_profile_quantity)
         for response in response.data:
-            check_response_and_expected(response, expected_profile)
+            self._check_response_and_expected(response, expected_profile)
 
     def test_should_update_profile(self):
         # Given: user 1명과 그의 profile, 수정할 데이터가 주어진다.
