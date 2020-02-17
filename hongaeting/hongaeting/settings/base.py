@@ -20,6 +20,9 @@ DEBUG = False
 
 ALLOWED_HOSTS = []
 
+TEST = False
+
+
 # Application definition
 
 DJANGO_APPS = [
@@ -147,6 +150,9 @@ REST_FRAMEWORK = {
         'djangorestframework_camel_case.parser.CamelCaseJSONParser',
     ),
 }
+
+# requests
+DEFAULT_TIMEOUT = 10
 
 # simple jwt
 SIMPLE_JWT = {
