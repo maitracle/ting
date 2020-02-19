@@ -49,15 +49,15 @@ class ProfileTestCase(APITestCase):
 
         expected_profile = baker.make('profiles.Profile', gender=expected_profile_data['gender'],
                                       user__university=expected_profile_data['university'])
-        baker.make('profiles.Profile', gender=Profile.GENDER_CHOICE.FEMALE,
+        baker.make('profiles.Profile', gender=Profile.GENDER_CHOICES.FEMALE,
                    user__university=UNIVERSITY_LIST.HONGIK)
-        baker.make('profiles.Profile', gender=Profile.GENDER_CHOICE.MALE,
+        baker.make('profiles.Profile', gender=Profile.GENDER_CHOICES.MALE,
                    user__university=UNIVERSITY_LIST.KYUNGHEE)
-        baker.make('profiles.Profile', gender=Profile.GENDER_CHOICE.FEMALE,
+        baker.make('profiles.Profile', gender=Profile.GENDER_CHOICES.FEMALE,
                    user__university=UNIVERSITY_LIST.KYUNGHEE)
-        baker.make('profiles.Profile', gender=Profile.GENDER_CHOICE.MALE,
+        baker.make('profiles.Profile', gender=Profile.GENDER_CHOICES.MALE,
                    user__university=UNIVERSITY_LIST.YONSEI)
-        baker.make('profiles.Profile', gender=Profile.GENDER_CHOICE.FEMALE,
+        baker.make('profiles.Profile', gender=Profile.GENDER_CHOICES.FEMALE,
                    user__university=UNIVERSITY_LIST.YONSEI)
 
         # When: user가 필터링 된 list api를 호출한다.
