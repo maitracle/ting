@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MinLengthValidator
 from django.db import models
 from model_utils import Choices
@@ -21,26 +22,46 @@ class QuestionItem(BaseModel):
     question_list = models.ForeignKey('profiles.QuestionList', on_delete=models.CASCADE)
     question_number = models.PositiveSmallIntegerField()
 
-
 class Profile(BaseModel):
+    def clean(self):
+        if self.user.university == 'HONGIK':
+            if not self.campus_location == 'SEOUL':
+                raise ValidationError('Not Valid Campus')
+        elif self.user.university == 'KYUNGHEE':
+            if not (self.campus_location == 'SEOUL' or self.campus_location == 'INTERNATIONAL'):
+                raise ValidationError('Not Valid Campus')
+        elif self.user.university == 'YONSEI':
+            if not (self.campus_location == 'SINCHON' or self.campus_location == 'INTERNATIONAL'):
+                raise ValidationError('Not Valid Campus')
+        if 'kakao' not in self.chat_link:
+            raise ValidationError('Not Valid chat link')
+
     MAX_CHARFIELD_LENGTH = 300
-    BODY_TYPE = Choices('SKINNY', 'SLIM', 'NORMAL', 'CHUBBY', 'FAT')
+    BODY_TYPE_CHOICE = Choices('SKINNY', 'SLIM', 'NORMAL', 'CHUBBY', 'GLAMOROUS', 'FIT')
     GENDER_CHOICE = Choices('MALE', 'FEMALE')
+    RELIGION_CHOICE = Choices('NOTHING', 'CHRISTIANITY', 'BUDDHISM', 'CATHOLIC', 'ETC')
+    IS_SMOKE_CHOICE = Choices('YES', 'NO', 'SOMETIMES')
+    CAMPUS_LOCATION_CHOICE = Choices('SEOUL', 'INTERNATIONAL', 'SINCHON')
 
     user = models.OneToOneField('users.User', on_delete=models.CASCADE)
     nickname = models.CharField(max_length=8, unique=True)
     gender = models.CharField(max_length=10, choices=GENDER_CHOICE)
-    age = models.PositiveSmallIntegerField(validators=[MinValueValidator(19)])
-    height = models.PositiveSmallIntegerField()
-    body_type = models.CharField(max_length=10, choices=BODY_TYPE)
+    age = models.PositiveSmallIntegerField(validators=[MinValueValidator(19)], null=True)
+    height = models.PositiveSmallIntegerField(null=True)
+    body_type = models.CharField(max_length=10, choices=BODY_TYPE_CHOICE, null=True)
+    religion = models.CharField(max_length=20, choices=RELIGION_CHOICE, null=True)
+    is_smoke = models.CharField(max_length=10, choices=IS_SMOKE_CHOICE, null=True)
+    campus_location = models.CharField(max_length=20, choices=CAMPUS_LOCATION_CHOICE, null=True)
 
-    tag = models.CharField(max_length=100)
-    image = models.CharField(max_length=100)
+    tag = models.CharField(max_length=100, null=True)
+    image = models.CharField(max_length=100, null=True)
+    last_tempting_word = models.CharField(max_length=MAX_CHARFIELD_LENGTH, null=True)
 
-    appearance = models.CharField(max_length=MAX_CHARFIELD_LENGTH, validators=[MinLengthValidator(120)])
-    personality = models.CharField(max_length=MAX_CHARFIELD_LENGTH, validators=[MinLengthValidator(120)])
-    hobby = models.CharField(max_length=MAX_CHARFIELD_LENGTH, validators=[MinLengthValidator(120)])
-    ideal_type = models.CharField(max_length=MAX_CHARFIELD_LENGTH, validators=[MinLengthValidator(120)])
-    last_tempting_word = models.CharField(max_length=MAX_CHARFIELD_LENGTH)
+    appearance = models.CharField(max_length=MAX_CHARFIELD_LENGTH, validators=[MinLengthValidator(120)], null=True)
+    personality = models.CharField(max_length=MAX_CHARFIELD_LENGTH, validators=[MinLengthValidator(120)], null=True)
+    hobby = models.CharField(max_length=MAX_CHARFIELD_LENGTH, validators=[MinLengthValidator(120)], null=True)
+    date_style = models.CharField(max_length=MAX_CHARFIELD_LENGTH, validators=[MinLengthValidator(120)], null=True)
+    ideal_type = models.CharField(max_length=MAX_CHARFIELD_LENGTH, validators=[MinLengthValidator(120)], null=True)
+    chat_link = models.URLField(null=True)
 
     is_active = models.BooleanField(default=True)
