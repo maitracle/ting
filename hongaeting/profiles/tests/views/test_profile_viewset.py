@@ -20,7 +20,7 @@ class ProfileTestCase(APITestCase):
         assert_that(dictionary['personality']).is_equal_to(instance.personality)
         assert_that(dictionary['hobby']).is_equal_to(instance.hobby)
         assert_that(dictionary['ideal_type']).is_equal_to(instance.ideal_type)
-        assert_that(dictionary['last_tempting_word']).is_equal_to(instance.last_tempting_word)
+        assert_that(dictionary['one_sentence']).is_equal_to(instance.one_sentence)
 
     def test_should_get_profile_list(self):
         # Given: user 1명과 그의 profile이 주어진다.

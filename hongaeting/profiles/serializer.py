@@ -21,7 +21,7 @@ class ListProfileSerializer(serializers.ModelSerializer):
             'personality',
             'hobby',
             'ideal_type',
-            'last_tempting_word',
+            'one_sentence',
         )
 
 
@@ -35,5 +35,5 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
             'personality',
             'hobby',
             'ideal_type',
-            'last_tempting_word',
+            'one_sentence',
         )
