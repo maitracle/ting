@@ -10,6 +10,7 @@ class CreateProfileSerializer(serializers.ModelSerializer):
             'id',
             'created_at',
             'updated_at',
+            'user',
             'nickname',
             'gender',
             'campus_location',

@@ -3,27 +3,40 @@ from model_bakery import baker
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from profiles.models import Profile
 from users.models import User
 
 
 class UserViewSetTestCase(APITestCase):
 
-    def test_should_create_user(self):
-        # Given: user data가 주어진다.
+    def test_should_create_profile_when_create_user(self):
+        # Given: 만들어질 user에 관한 데이터가 주어진다.
         user_data = {
-            'email': 'test_email@email.com',
-            'password': 'test_password',
+            "email": "testuser@test.com",
+            "password": "password123",
+            "nickname": "test",
+            "gender": "MALE",
+            "university": "HONGIK",
+            "campus_location": "SEOUL",
+            "university_email": "testuser@mail.hongik.ac.kr"
         }
 
-        # When: user create api를 호출한다.
+        # When: user create api를 호출하여 회원가입을 한다.
         response = self.client.post('/api/users/', data=user_data)
 
-        # Then: 요청한 data로 user가 만들어진다.
+        # Then: user와 profile이 만들어진다.
         assert_that(response.status_code).is_equal_to(status.HTTP_201_CREATED)
 
         user = User.objects.get(email=user_data['email'])
         assert_that(user.email).is_equal_to(user_data['email'])
         assert_that(user.password).is_equal_to(user_data['password'])
+        assert_that(user.university).is_equal_to(user_data['university'])
+        assert_that(user.university_email).is_equal_to(user_data['university_email'])
+
+        profile = Profile.objects.get(user=user.id)
+        assert_that(profile.nickname).is_equal_to(user_data['nickname'])
+        assert_that(profile.gender).is_equal_to(user_data['gender'])
+        assert_that(profile.campus_location).is_equal_to(user_data['campus_location'])
 
     def test_should_update_user(self):
         # Given: user와 바꿀 user data가 주어진다
