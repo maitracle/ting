@@ -84,7 +84,6 @@ class UserViewSetTestCase(APITestCase):
         profile = Profile.objects.filter(nickname=user_data['nickname'])
         assert_that(profile).is_empty()
 
-
     def test_should_update_user(self):
         # Given: user와 바꿀 user data가 주어진다
         user = baker.make('users.User',
