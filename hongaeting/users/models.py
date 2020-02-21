@@ -1,10 +1,8 @@
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.db import models
-from model_utils import Choices
 
 from common.constants import UNIVERSITY_LIST
 from common.models import BaseModel
-from common.requests import Request
 
 
 class UserManager(BaseUserManager):
@@ -71,12 +69,4 @@ class User(BaseModel, AbstractBaseUser):
         self.is_active = False
         self.save()
 
-    def check_kakao_link(self):
-        kakao_link = 'https://open.kakao.com/o/sUkG4BXb'
-        deleted_kakao_link = 'https://open.kakao.com/o/sqeK8BXb'
 
-        request = Request.instance()
-
-        response = request.get(deleted_kakao_link)
-
-        print(response.text.encode('utf8'))

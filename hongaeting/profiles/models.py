@@ -5,6 +5,7 @@ from model_utils import Choices
 
 from common.constants import UNIVERSITY_LIST
 from common.models import BaseModel
+from common.requests import Request
 
 
 class QuestionList(BaseModel):
@@ -66,3 +67,13 @@ class Profile(BaseModel):
                 raise ValidationError('Not Valid Campus')
         if 'kakao' not in self.chat_link:
             raise ValidationError('Not Valid chat link')
+
+    def check_kakao_link(self):
+        kakao_link = 'https://open.kakao.com/o/sUkG4BXb'
+        deleted_kakao_link = 'https://open.kakao.com/o/sqeK8BXb'
+
+        request = Request.instance()
+
+        response = request.get(deleted_kakao_link)
+
+        print(response.text.encode('utf8'))

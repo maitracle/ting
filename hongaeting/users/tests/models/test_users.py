@@ -19,28 +19,3 @@ class UserTestCase(TestCase):
         # Then: user가 비활성화된다.
         deactivated_user = User.objects.get(id=user.id)
         assert_that(deactivated_user.is_active).is_false()
-
-    def test_check_kakao_link(self):
-        user = baker.make('users.User')
-
-        user.check_kakao_link()
-
-    # def test_check_kakao_link_return_true(self):
-    #     # Given: 유효한 kakao talk open chat link를 가진 user가 주어진다.
-    #     user = baker.make('users.User')
-    #
-    #     # When: check_kakao_link method를 실행한다.
-    #     check_result = user.check_kakao_link()
-    #
-    #     # Then: True가 반환된다.
-    #     assert_that(check_result).is_true()
-    #
-    # def test_check_kakao_link_return_false(self):
-    #     # Given: 유효하지 않은 kakao talk open chat link를 가진 user가 주어진다.
-    #     user = baker.make('users.User')
-    #
-    #     # When: check_kakao_link method를 실행한다.
-    #     check_result = user.check_kakao_link()
-    #
-    #     # Then: True가 반환된다.
-    #     assert_that(check_result).is_false()
