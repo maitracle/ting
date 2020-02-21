@@ -42,6 +42,7 @@ PACKAGE_APPS = [
 PROJECT_APPS = [
     'users',
     'self_date',
+    'profiles',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + \
