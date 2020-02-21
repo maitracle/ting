@@ -20,11 +20,13 @@ class UserViewSetTestCase(APITestCase):
             "campus_location": "SEOUL",
             "university_email": "testuser@mail.hongik.ac.kr"
         }
+        user_code_length = 8
 
         # When: user create api를 호출하여 회원가입을 한다.
         response = self.client.post('/api/users/', data=user_data)
 
         # Then: user와 profile이 만들어진다.
+        #       user의 user_code가 정상적으로 만들어진다.
         assert_that(response.status_code).is_equal_to(status.HTTP_201_CREATED)
 
         user = User.objects.get(email=user_data['email'])
@@ -32,6 +34,8 @@ class UserViewSetTestCase(APITestCase):
         assert_that(user.password).is_equal_to(user_data['password'])
         assert_that(user.university).is_equal_to(user_data['university'])
         assert_that(user.university_email).is_equal_to(user_data['university_email'])
+        assert_that(type(user.user_code)).is_equal_to(str)
+        assert_that(user.user_code).is_length(user_code_length)
 
         profile = Profile.objects.get(user=user.id)
         assert_that(profile.nickname).is_equal_to(user_data['nickname'])
@@ -83,6 +87,18 @@ class UserViewSetTestCase(APITestCase):
         assert_that(user).is_empty()
         profile = Profile.objects.filter(nickname=user_data['nickname'])
         assert_that(profile).is_empty()
+
+    def test_set_user_code_method(self):
+        # Given: user가 1개 생성된다.
+        user = baker.make('users.User', user_code='')
+        user_code_length = 8
+
+        # When: set_user_code 메소드를 실행한다.
+        user.set_user_code()
+
+        # Then: user에게 user_code가 생성된다.
+        assert_that(type(user.user_code)).is_equal_to(str)
+        assert_that(user.user_code).is_length(user_code_length)
 
     def test_should_update_user(self):
         # Given: user와 바꿀 user data가 주어진다
