@@ -7,9 +7,6 @@ class CreateProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = (
-            'id',
-            'created_at',
-            'updated_at',
             'user',
             'nickname',
             'gender',

@@ -38,6 +38,53 @@ class UserViewSetTestCase(APITestCase):
         assert_that(profile.gender).is_equal_to(user_data['gender'])
         assert_that(profile.campus_location).is_equal_to(user_data['campus_location'])
 
+    def test_should_not_create_when_profile_invalid(self):
+        # Given: profile 관련 데이터가 invalid한 user 데이터가 주어진다.
+        user_data = {
+            "email": "testuser@test.com",
+            "password": "password123",
+            "nickname": "test",
+            "gender": "",
+            "university": "HONGIK",
+            "campus_location": "SEOUL",
+            "university_email": "testuser@mail.hongik.ac.kr"
+        }
+
+        # When: user create api를 호출하여 회원가입을 시도한다.
+        response = self.client.post('/api/users/', data=user_data)
+
+        # Then: user와 profile 둘 다 생성되지 않는다.
+        assert_that(response.status_code).is_equal_to(status.HTTP_400_BAD_REQUEST)
+
+        user = User.objects.filter(email=user_data['email'])
+        assert_that(user).is_empty()
+        profile = Profile.objects.filter(nickname=user_data['nickname'])
+        assert_that(profile).is_empty()
+
+    def test_should_not_create_when_user_invalid(self):
+        # Given: user 관련 데이터가 invalid한 user 데이터가 주어진다.
+        user_data = {
+            "email": "testuser@test.com",
+            "password": "",
+            "nickname": "test",
+            "gender": "MALE",
+            "university": "HONGIK",
+            "campus_location": "SEOUL",
+            "university_email": "testuser@mail.hongik.ac.kr"
+        }
+
+        # When: user create api를 호출하여 회원가입을 시도한다.
+        response = self.client.post('/api/users/', data=user_data)
+
+        # Then: user와 profile 둘 다 생성되지 않는다.
+        assert_that(response.status_code).is_equal_to(status.HTTP_400_BAD_REQUEST)
+
+        user = User.objects.filter(email=user_data['email'])
+        assert_that(user).is_empty()
+        profile = Profile.objects.filter(nickname=user_data['nickname'])
+        assert_that(profile).is_empty()
+
+
     def test_should_update_user(self):
         # Given: user와 바꿀 user data가 주어진다
         user = baker.make('users.User',
