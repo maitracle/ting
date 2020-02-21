@@ -55,7 +55,7 @@ class Profile(BaseModel):
     is_active = models.BooleanField(default=True)
 
     def clean(self):
-        # Todo: user를 create 할 때 atomic하게 profile도 만들어지는 상황에서 clean이 실행되지 않는 문제를 해결해야 한다.
+        # Todo(10000001a): user를 create 할 때 atomic하게 profile도 만들어지는 상황에서 clean이 실행되지 않는 문제를 해결해야 한다.
         if self.user.university == 'HONGIK':
             if not self.campus_location == 'SEOUL':
                 raise ValidationError('Not Valid Campus')
