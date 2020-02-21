@@ -3,6 +3,17 @@ from rest_framework import serializers
 from profiles.models import Profile
 
 
+class CreateProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = (
+            'user',
+            'nickname',
+            'gender',
+            'campus_location',
+        )
+
+
 class ListProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
