@@ -3,6 +3,7 @@ from django.core.validators import MinValueValidator, MinLengthValidator
 from django.db import models
 from model_utils import Choices
 
+from common.Kakao import Kakao
 from common.constants import UNIVERSITY_LIST
 from common.models import BaseModel
 
@@ -66,3 +67,7 @@ class Profile(BaseModel):
                 raise ValidationError('Not Valid Campus')
         if 'kakao' not in self.chat_link:
             raise ValidationError('Not Valid chat link')
+
+    @property
+    def is_valid_chat_link(self):
+        return Kakao.is_valid_kakao_link(self.chat_link)

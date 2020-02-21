@@ -1,6 +1,5 @@
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.db import models
-from model_utils import Choices
 
 from common.constants import UNIVERSITY_LIST
 from common.models import BaseModel
@@ -69,3 +68,5 @@ class User(BaseModel, AbstractBaseUser):
     def deactivate(self):
         self.is_active = False
         self.save()
+
+
