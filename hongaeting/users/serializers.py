@@ -9,4 +9,6 @@ class CreateUserSerializer(serializers.ModelSerializer):
         fields = (
             'email',
             'password',
+            'university',
+            'university_email',
         )

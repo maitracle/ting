@@ -5,7 +5,7 @@ from rest_framework.mixins import ListModelMixin, UpdateModelMixin
 from rest_framework.permissions import IsAuthenticated
 
 from profiles.models import Profile
-from profiles.serializer import ListProfileSerializer, UpdateProfileSerializer
+from profiles.serializers import ListProfileSerializer, UpdateProfileSerializer
 
 
 class ProfileViewSet(
