@@ -88,18 +88,6 @@ class UserViewSetTestCase(APITestCase):
         profile = Profile.objects.filter(nickname=user_data['nickname'])
         assert_that(profile).is_empty()
 
-    def test_set_user_code_method(self):
-        # Given: user가 1개 생성된다.
-        user = baker.make('users.User', user_code='')
-        user_code_length = 8
-
-        # When: set_user_code 메소드를 실행한다.
-        user.set_user_code()
-
-        # Then: user에게 user_code가 생성된다.
-        assert_that(type(user.user_code)).is_equal_to(str)
-        assert_that(user.user_code).is_length(user_code_length)
-
     def test_should_update_user(self):
         # Given: user와 바꿀 user data가 주어진다
         user = baker.make('users.User',
