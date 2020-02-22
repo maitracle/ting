@@ -21,7 +21,7 @@ class UserTestCase(TestCase):
         assert_that(deactivated_user.is_active).is_false()
 
     def test_set_user_code_method(self):
-        # Given: user가 1개 생성된다.
+        # Given: usercode가 없는 user가 1개 생성된다.
         user = baker.make('users.User', user_code='')
         user_code_length = 8
 

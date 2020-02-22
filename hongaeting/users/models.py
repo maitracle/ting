@@ -52,7 +52,7 @@ class User(BaseModel, AbstractBaseUser):
     def set_user_code(self):
         user_code = get_random_string(length=8)
         same_user_code_queryset = User.objects.filter(user_code=user_code)
-        if len(same_user_code_queryset) == 0:
+        if same_user_code_queryset.exists():
             self.user_code = user_code
         else:
             self.set_user_code()
