@@ -12,7 +12,7 @@ class Like(BaseModel):
 
 
 class CoinHistory(BaseModel):
-    CHANGE_REASON = Choices('SIGNUP', 'LOOKUP', 'SEND_MESSAGE',)
+    CHANGE_REASON = Choices('SIGNUP', 'VIEW_PROFILE', 'SEND_MESSAGE',)
 
     user = models.ForeignKey('users.User', on_delete=models.CASCADE)
     rest_coin = models.IntegerField()

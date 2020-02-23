@@ -15,6 +15,8 @@ class CreateProfileSerializer(serializers.ModelSerializer):
 
 
 class ListProfileSerializer(serializers.ModelSerializer):
+    is_viewed = serializers.BooleanField()
+
     class Meta:
         model = Profile
         fields = (
@@ -33,6 +35,7 @@ class ListProfileSerializer(serializers.ModelSerializer):
             'hobby',
             'ideal_type',
             'one_sentence',
+            'is_viewed',
         )
 
 
