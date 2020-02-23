@@ -3,16 +3,6 @@ from rest_framework import serializers
 from self_date.models import CoinHistory, Like
 
 
-class CreateCoinHistorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CoinHistory
-        fields = (
-            'user',
-            'rest_coin',
-            'reason',
-        )
-
-
 class ListCoinHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = CoinHistory
@@ -20,6 +10,7 @@ class ListCoinHistorySerializer(serializers.ModelSerializer):
             'user',
             'rest_coin',
             'reason',
+            'profile',
             'created_at',
             'updated_at',
         )
