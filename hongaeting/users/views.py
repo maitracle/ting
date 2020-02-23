@@ -34,7 +34,9 @@ class UserViewSet(
 
         user_serializer = self.get_serializer(data=user_data)
         user_serializer.is_valid(raise_exception=True)
-        user_serializer.save()
+        user_instance = user_serializer.save()
+        user_instance.set_user_code()
+        user_instance.save()
 
         created_user = User.objects.get(email=user_data['email']).id
         profile_data = {
