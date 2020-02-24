@@ -137,3 +137,26 @@ class ProfileTestCase(APITestCase):
         # Then: response가 정상적으로 오고, 수정할 데이터가 정상적으로 수정된다.
         assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
         assert_that(response.data['appearance']).is_equal_to(update_data['appearance'])
+
+    def test_should_fail_update_profile(self):
+        # Given: user 1명과 다른 user의 profile, 수정할 데이터가 주어진다.
+        user = baker.make('users.User')
+        profile = baker.make('profiles.Profile', is_active=True)
+        update_data = {
+            "appearance": """가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가
+                    나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타
+                    파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자
+                    차카타파하"""
+        }
+
+        # When: user가 update api를 호출한다.
+        self.client.force_authenticate(user=user)
+        response = self.client.patch(f'/api/profiles/{profile.id}/', data=update_data)
+
+        # Then: 권한없음으로 update를 실패한다.
+        assert_that(response.status_code).is_equal_to(status.HTTP_403_FORBIDDEN)
+
+        error_message = 'You do not have permission to perform this action.'
+        error_code = 'permission_denied'
+        assert_that(response.data['detail']).is_equal_to(error_message)
+        assert_that(response.data['detail'].code).is_equal_to(error_code)
