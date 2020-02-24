@@ -4,8 +4,8 @@ from django_rest_framework_mango.mixins import QuerysetMixin, SerializerMixin
 from rest_framework import viewsets
 from rest_framework.mixins import ListModelMixin, UpdateModelMixin, RetrieveModelMixin
 
+from common.permissions import IsOwnerUserOrReadonly
 from profiles.models import Profile
-from profiles.permissions import IsOwnerUserOrReadonly
 from profiles.serializers import ListProfileSerializer, UpdateProfileSerializer, RetrieveProfileSerializer
 from self_date.models import CoinHistory
 

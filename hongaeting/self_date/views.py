@@ -5,6 +5,7 @@ from rest_framework.mixins import ListModelMixin, DestroyModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from common.permissions import IsOwnerUserOrReadonly
 from self_date.models import CoinHistory, Like
 from self_date.serializer import ListCoinHistorySerializer, LikeSerializer
 
@@ -31,7 +32,7 @@ class LikeViewSet(
     viewsets.GenericViewSet
 ):
     queryset = Like.objects.all()
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsOwnerUserOrReadonly,)
     serializer_class = LikeSerializer
 
     def list_queryset(self, queryset):

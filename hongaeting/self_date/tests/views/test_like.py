@@ -65,7 +65,7 @@ class LikeTestCase(APITestCase):
         assert_that(response.data["user"]).is_equal_to(user.id)
         assert_that(response.data["liked_user"]).is_equal_to(liked_user.id)
 
-    def test_should_destroy_test(self):
+    def test_should_destroy(self):
         # Given: user와 like가 하나 주어진다.
         user = baker.make('users.User')
         like = baker.make('self_date.Like', user=user)
@@ -78,3 +78,22 @@ class LikeTestCase(APITestCase):
         # Then: like 모델이 삭제된다.
         assert_that(response.status_code).is_equal_to(status.HTTP_204_NO_CONTENT)
         assert_that(Like.objects.filter(id=like_id)).is_empty()
+
+    def test_should_fail_destroy(self):
+        # Given: user와 다른 user의 like가 하나 주어진다.
+        user = baker.make('users.User')
+
+        like = baker.make('self_date.Like')
+        like_id = like.id
+
+        # When: user가 destroy api를 호출한다.
+        self.client.force_authenticate(user=user)
+        response = self.client.delete(f'/api/likes/{like_id}/')
+
+        # Then: like 모델이 삭제된다.
+        assert_that(response.status_code).is_equal_to(status.HTTP_403_FORBIDDEN)
+
+        error_message = 'You do not have permission to perform this action.'
+        error_code = 'permission_denied'
+        assert_that(response.data['detail']).is_equal_to(error_message)
+        assert_that(response.data['detail'].code).is_equal_to(error_code)
