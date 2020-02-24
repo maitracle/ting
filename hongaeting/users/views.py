@@ -7,6 +7,7 @@ from rest_framework.response import Response
 
 from profiles.serializers import CreateProfileSerializer
 from users.models import User
+from users.permissions import IsSameUserWithRequestUser
 from users.serializers import CreateUserSerializer
 
 
@@ -17,10 +18,9 @@ class UserViewSet(
 ):
     queryset = User.objects.all()
     serializer_class = CreateUserSerializer
-    permission_classes = (AllowAny,)
+    permission_classes = (IsSameUserWithRequestUser,)
     permission_by_actions = {
         'create': (AllowAny,),
-        'destroy': (AllowAny,),
     }
 
     @transaction.atomic
