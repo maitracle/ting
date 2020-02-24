@@ -4,6 +4,7 @@ from rest_framework import viewsets, status
 from rest_framework.mixins import UpdateModelMixin, DestroyModelMixin
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework.decorators import action
 
 from profiles.serializers import CreateProfileSerializer
 from users.models import User
@@ -17,6 +18,9 @@ class UserViewSet(
 ):
     queryset = User.objects.all()
     serializer_class = CreateUserSerializer
+    # serializer_class_by_actions = {
+    #     'check_email':
+    # }
     permission_classes = (AllowAny,)
     permission_by_actions = {
         'create': (AllowAny,),
@@ -51,6 +55,25 @@ class UserViewSet(
         profile_serializer.save()
 
         return Response(user_serializer.data, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=['patch'], url_path='check-email')
+    def check_email(self, request, *arg, **kwargs):
+        print(1)
+        kwargs['partial']=True
+        update_response = self.update(request)
+        print(2)
+        user.send_email()
+
+        return update_response
+
+    # def update(self, request, *args, **kwargs):
+    #     partial = kwargs.pop('partial', False)
+    #     instance = self.get_object()
+    #     serializer = self.get_serializer(instance, data=request.data, partial=partial)
+    #     serializer.is_valid(raise_exception=True)
+    #     serializer.save()
+    #
+    #     return Response(serializer.data)
 
     def destroy(self, request, *args, **kwargs):
         user = self.get_object()
