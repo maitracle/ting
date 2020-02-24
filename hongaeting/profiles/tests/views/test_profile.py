@@ -26,7 +26,8 @@ class ProfileTestCase(APITestCase):
 
         expected_is_viewed_value = False
         for response_profile, expected_profile in zip(response.data, expected_profile_list):
-            self._check_response_and_expected(response_profile, expected_profile, expected_is_viewed_value)
+            self._check_response_and_expected(response_profile, expected_profile)
+            assert_that(response_profile['is_viewed']).is_equal_to(expected_is_viewed_value)
 
     def test_should_get_filtered_list(self):
         # Given: 로그인용 user 1명과 임의의 profile 1개가 주어진다.
@@ -62,7 +63,8 @@ class ProfileTestCase(APITestCase):
 
         expected_is_viewed_value = False
         for response in response.data:
-            self._check_response_and_expected(response, expected_profile, expected_is_viewed_value)
+            self._check_response_and_expected(response, expected_profile)
+            assert_that(response['is_viewed']).is_equal_to(expected_is_viewed_value)
 
     def test_is_viewed_in_list(self):
         # Given: user 하나와 여러 조합의 coin_history가 주어진다.
@@ -90,7 +92,20 @@ class ProfileTestCase(APITestCase):
         for response_profile, expected_is_viewed in zip(response.data, expected_is_viewed_list):
             assert_that(response_profile['is_viewed']).is_equal_to(expected_is_viewed)
 
-    def _check_response_and_expected(self, dictionary, instance, expected_is_viewed):
+    def test_should_get_profile_retrieve(self):
+        # Given: user 1명과 profile이 주어진다.
+        user = baker.make('users.User')
+        expected_profile = baker.make('profiles.Profile')
+
+        # When: user가 retrieve api를 호출한다.
+        self.client.force_authenticate(user=user)
+        response = self.client.get(f'/api/profiles/{expected_profile.id}/')
+
+        # Then: response가 정상적으로 온다.
+        assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
+        self._check_response_and_expected(response.data, expected_profile)
+
+    def _check_response_and_expected(self, dictionary, instance):
         assert_that(dictionary['nickname']).is_equal_to(instance.nickname)
         assert_that(dictionary['gender']).is_equal_to(instance.gender)
         assert_that(dictionary['age']).is_equal_to(instance.age)
@@ -103,7 +118,6 @@ class ProfileTestCase(APITestCase):
         assert_that(dictionary['hobby']).is_equal_to(instance.hobby)
         assert_that(dictionary['ideal_type']).is_equal_to(instance.ideal_type)
         assert_that(dictionary['one_sentence']).is_equal_to(instance.one_sentence)
-        assert_that(dictionary['is_viewed']).is_equal_to(expected_is_viewed)
 
     def test_should_update_profile(self):
         # Given: user 1명과 그의 profile, 수정할 데이터가 주어진다.

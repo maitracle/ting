@@ -2,25 +2,26 @@ from django.db.models import Count, Case, When, Value, BooleanField, Subquery, O
 from django_filters.rest_framework import DjangoFilterBackend
 from django_rest_framework_mango.mixins import QuerysetMixin, SerializerMixin
 from rest_framework import viewsets
-from rest_framework.mixins import ListModelMixin, UpdateModelMixin
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.mixins import ListModelMixin, UpdateModelMixin, RetrieveModelMixin
 
 from profiles.models import Profile
-from profiles.serializers import ListProfileSerializer, UpdateProfileSerializer
+from profiles.permissions import IsOwnerUserOrReadonly
+from profiles.serializers import ListProfileSerializer, UpdateProfileSerializer, RetrieveProfileSerializer
 from self_date.models import CoinHistory
 
 
 class ProfileViewSet(
     QuerysetMixin, SerializerMixin,
-    UpdateModelMixin, ListModelMixin,
+    UpdateModelMixin, ListModelMixin, RetrieveModelMixin,
     viewsets.GenericViewSet,
 ):
     queryset = Profile.objects.all()
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsOwnerUserOrReadonly,)
     serializer_class = UpdateProfileSerializer
     serializer_class_by_actions = {
         'list': ListProfileSerializer,
         'update': UpdateProfileSerializer,
+        'retrieve': RetrieveProfileSerializer,
     }
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('gender', 'user__university',)
