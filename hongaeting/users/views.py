@@ -56,24 +56,13 @@ class UserViewSet(
 
         return Response(user_serializer.data, status=status.HTTP_201_CREATED)
 
-    @action(detail=True, methods=['patch'], url_path='check-email')
+    @action(detail=True, methods=['patch'], url_path='check-univ')
     def check_email(self, request, *arg, **kwargs):
-        print(1)
-        kwargs['partial']=True
-        update_response = self.update(request)
-        print(2)
+        user = self.get_object()
+        update_response = self.partial_update(request, *arg, **kwargs)
         user.send_email()
 
         return update_response
-
-    # def update(self, request, *args, **kwargs):
-    #     partial = kwargs.pop('partial', False)
-    #     instance = self.get_object()
-    #     serializer = self.get_serializer(instance, data=request.data, partial=partial)
-    #     serializer.is_valid(raise_exception=True)
-    #     serializer.save()
-    #
-    #     return Response(serializer.data)
 
     def destroy(self, request, *args, **kwargs):
         user = self.get_object()
