@@ -181,3 +181,23 @@ class UserViewSetTestCase(APITestCase):
         assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
         assert_that(user.university_email).is_equal_to(data['university_email'])
         send_email.assert_called_once()
+
+    @patch.object(Email, 'send_email')
+    def test_should_fail_check_university(self, send_email):
+        # Given: user와 등록할 user의 학교 이메일이 주어진다.
+        user = baker.make('users.User')
+        another_user = baker.make('users.User')
+        data = {
+            "university_email": "test@test.com"
+        }
+
+        # When: 주어진 user로 로그인 한 후, 학교 이메일 정보로 check-univ api를 호출한다.
+        self.client.force_authenticate(user=another_user)
+        response = self.client.patch(f'/api/users/{user.id}/check-univ/', data)
+
+        # Then: user의 학교 이메일이 update되고 학교 이메일로 메일이 전송된다.
+        user = User.objects.get(id=user.id)
+        send_email.assert_not_called()
+        assert_that(response.status_code).is_equal_to(status.HTTP_403_FORBIDDEN)
+        assert_that(user.university_email).is_equal_to(user.university_email)
+
