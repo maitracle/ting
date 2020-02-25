@@ -57,6 +57,7 @@ class UserViewSet(
     def check_email(self, request, *arg, **kwargs):
         user = self.get_object()
         update_response = self.partial_update(request, *arg, **kwargs)
+        # Todo(10000001a): 성공과 실패를 분기하면 더 좋을 것 같다.
         user.send_email()
 
         return update_response
