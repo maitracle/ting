@@ -20,6 +20,7 @@ class UserTestCase(TestCase):
         deactivated_user = User.objects.get(id=user.id)
         assert_that(deactivated_user.is_active).is_false()
 
+    # Todo(10000001a): user_code가 중복 되었을 때에 정상적으로 user_code를 재지정하는지 테스트 아직 미구현.
     def test_set_user_code_method(self):
         # Given: usercode가 없는 user가 1개 생성된다.
         user = baker.make('users.User', user_code='')
