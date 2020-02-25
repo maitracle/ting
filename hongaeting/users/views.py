@@ -4,6 +4,7 @@ from rest_framework import viewsets, status
 from rest_framework.mixins import UpdateModelMixin, DestroyModelMixin
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework.decorators import action
 
 from profiles.serializers import CreateProfileSerializer
 from users.models import User
@@ -51,6 +52,15 @@ class UserViewSet(
         profile_serializer.save()
 
         return Response(user_serializer.data, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=['patch'], url_path='check-univ')
+    def check_email(self, request, *arg, **kwargs):
+        user = self.get_object()
+        update_response = self.partial_update(request, *arg, **kwargs)
+        # Todo(10000001a): 성공과 실패를 분기하면 더 좋을 것 같다.
+        user.send_email()
+
+        return update_response
 
     def destroy(self, request, *args, **kwargs):
         user = self.get_object()

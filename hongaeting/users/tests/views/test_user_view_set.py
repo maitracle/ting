@@ -1,8 +1,11 @@
+from unittest.mock import patch
+
 from assertpy import assert_that
 from model_bakery import baker
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from common.utils import Email
 from profiles.models import Profile
 from users.models import User
 
@@ -119,3 +122,22 @@ class UserViewSetTestCase(APITestCase):
 
         # Then: user가 삭제된다.
         assert_that(response.status_code).is_equal_to(status.HTTP_204_NO_CONTENT)
+
+    @patch.object(Email, 'send_email')
+    def test_should_check_university(self, send_email):
+        # Given: user와 등록할 user의 학교 이메일이 주어진다.
+        user = baker.make('users.User')
+        user_id = user.id
+        data = {
+            "university_email": "test@test.com"
+        }
+
+        # When: 주어진 user로 로그인 한 후, 학교 이메일 정보로 check-univ api를 호출한다.
+        self.client.force_authenticate(user=user)
+        response = self.client.patch(f'/api/users/{user_id}/check-univ/', data)
+
+        # Then: user의 학교 이메일이 update되고 학교 이메일로 메일이 전송된다.
+        user = User.objects.get(university_email=data['university_email'])
+        assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
+        assert_that(user.university_email).is_equal_to(data['university_email'])
+        send_email.assert_called_once()

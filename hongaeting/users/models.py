@@ -1,9 +1,11 @@
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.db import models
+from django.template.loader import render_to_string
 from django.utils.crypto import get_random_string
 
 from common.constants import UNIVERSITY_LIST
 from common.models import BaseModel
+from common.utils import Email
 
 
 class UserManager(BaseUserManager):
@@ -49,14 +51,6 @@ class User(BaseModel, AbstractBaseUser):
 
     USERNAME_FIELD = 'email'
 
-    def set_user_code(self):
-        user_code = get_random_string(length=8)
-        same_user_code_queryset = User.objects.filter(user_code=user_code)
-        if not same_user_code_queryset.exists():
-            self.user_code = user_code
-        else:
-            self.set_user_code()
-
     def __str__(self):
         return self.email
 
@@ -78,4 +72,15 @@ class User(BaseModel, AbstractBaseUser):
         self.is_active = False
         self.save()
 
+    def send_email(self):
+        # Todo(10000001a): Email template 다시 작업해야함
+        html_content = render_to_string('mail_template.html', {'user_code': self.user_code})
+        Email.send_email('title', html_content, [self.university_email])
 
+    def set_user_code(self):
+        user_code = get_random_string(length=8)
+        same_user_code_queryset = User.objects.filter(user_code=user_code)
+        if not same_user_code_queryset.exists():
+            self.user_code = user_code
+        else:
+            self.set_user_code()
