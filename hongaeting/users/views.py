@@ -18,9 +18,6 @@ class UserViewSet(
 ):
     queryset = User.objects.all()
     serializer_class = CreateUserSerializer
-    # serializer_class_by_actions = {
-    #     'check_email':
-    # }
     permission_classes = (AllowAny,)
     permission_by_actions = {
         'create': (AllowAny,),
