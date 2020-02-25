@@ -19,6 +19,7 @@ class UserViewSetTestCase(APITestCase):
             "password": "password123",
             "nickname": "test",
             "gender": "MALE",
+            "status": "ATTENDING",
             "university": "HONGIK",
             "campus_location": "SEOUL",
             "university_email": "testuser@mail.hongik.ac.kr"
@@ -43,6 +44,7 @@ class UserViewSetTestCase(APITestCase):
         profile = Profile.objects.get(user=user.id)
         assert_that(profile.nickname).is_equal_to(user_data['nickname'])
         assert_that(profile.gender).is_equal_to(user_data['gender'])
+        assert_that(profile.status).is_equal_to(user_data['status'])
         assert_that(profile.campus_location).is_equal_to(user_data['campus_location'])
 
     def test_should_not_create_when_profile_invalid(self):
@@ -52,6 +54,7 @@ class UserViewSetTestCase(APITestCase):
             "password": "password123",
             "nickname": "test",
             "gender": "",
+            "status": "ATTENDING",
             "university": "HONGIK",
             "campus_location": "SEOUL",
             "university_email": "testuser@mail.hongik.ac.kr"
@@ -75,6 +78,7 @@ class UserViewSetTestCase(APITestCase):
             "password": "",
             "nickname": "test",
             "gender": "MALE",
+            "status": "ATTENDING",
             "university": "HONGIK",
             "campus_location": "SEOUL",
             "university_email": "testuser@mail.hongik.ac.kr"
