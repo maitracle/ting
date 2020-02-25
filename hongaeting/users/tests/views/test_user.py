@@ -19,7 +19,7 @@ class UserViewSetTestCase(APITestCase):
             "password": "password123",
             "nickname": "test",
             "gender": "MALE",
-            "status": "ATTENDING",
+            "scholarly_status": "ATTENDING",
             "university": "HONGIK",
             "campus_location": "SEOUL",
             "university_email": "testuser@mail.hongik.ac.kr"
@@ -44,7 +44,7 @@ class UserViewSetTestCase(APITestCase):
         profile = Profile.objects.get(user=user.id)
         assert_that(profile.nickname).is_equal_to(user_data['nickname'])
         assert_that(profile.gender).is_equal_to(user_data['gender'])
-        assert_that(profile.status).is_equal_to(user_data['status'])
+        assert_that(profile.scholarly_status).is_equal_to(user_data['scholarly_status'])
         assert_that(profile.campus_location).is_equal_to(user_data['campus_location'])
 
     def test_should_not_create_when_profile_invalid(self):
@@ -54,7 +54,7 @@ class UserViewSetTestCase(APITestCase):
             "password": "password123",
             "nickname": "test",
             "gender": "",
-            "status": "ATTENDING",
+            "scholarly_status": "ATTENDING",
             "university": "HONGIK",
             "campus_location": "SEOUL",
             "university_email": "testuser@mail.hongik.ac.kr"
@@ -78,7 +78,7 @@ class UserViewSetTestCase(APITestCase):
             "password": "",
             "nickname": "test",
             "gender": "MALE",
-            "status": "ATTENDING",
+            "scholarly_status": "ATTENDING",
             "university": "HONGIK",
             "campus_location": "SEOUL",
             "university_email": "testuser@mail.hongik.ac.kr"
@@ -99,7 +99,6 @@ class UserViewSetTestCase(APITestCase):
         # Given: user와 바꿀 user data가 주어진다
         user = baker.make('users.User',
                           email='origin_user_email@email.com')
-
         user_id = user.id
 
         changed_data = {
@@ -107,6 +106,7 @@ class UserViewSetTestCase(APITestCase):
         }
 
         # When: user update api를 호출한다.
+        self.client.force_authenticate(user=user)
         response = self.client.patch(f'/api/users/{user_id}/', data=changed_data)
 
         # Then: user data가 수정된다.
@@ -115,9 +115,30 @@ class UserViewSetTestCase(APITestCase):
         user = User.objects.get(id=user_id)
         assert_that(user.email).is_equal_to(changed_data['email'])
 
+    def test_should_fail_update_user(self):
+        # Given: user 2개와 바꿀 user data가 주어진다
+        original_email = 'origin_user_email@email.com'
+        user = baker.make('users.User', email=original_email)
+        user_id = user.id
+        changed_data = {
+            'email': 'changed_user_email@email.com'
+        }
+
+        another_user = baker.make('users.User')
+
+        # When: 다른 유저의 user update api를 호출한다.
+        self.client.force_authenticate(user=another_user)
+        response = self.client.patch(f'/api/users/{user_id}/', data=changed_data)
+
+        # Then: user data 수정을 실패한다.
+        assert_that(response.status_code).is_equal_to(status.HTTP_403_FORBIDDEN)
+
+        user = User.objects.get(id=user_id)
+        assert_that(user.email).is_equal_to(original_email)
+
     def test_should_delete_user(self):
         # Given: user가 주어진다
-        user = baker.make('users.User')
+        user = baker.make('users.User', is_active=True)
         user_id = user.id
 
         # When: 주어진 user로 로그인 한 후, user delete api를 호출한다.
@@ -126,6 +147,21 @@ class UserViewSetTestCase(APITestCase):
 
         # Then: user가 삭제된다.
         assert_that(response.status_code).is_equal_to(status.HTTP_204_NO_CONTENT)
+        assert_that(User.objects.get(id=user_id).is_active).is_false()
+
+    def test_should_fail_delete_user(self):
+        # Given: user가 주어진다
+        user = baker.make('users.User', is_active=True)
+        another_user = baker.make('users.User')
+        user_id = user.id
+
+        # When: 주어진 user로 로그인 한 후, user delete api를 호출한다.
+        self.client.force_authenticate(user=another_user)
+        response = self.client.delete(f'/api/users/{user_id}/')
+
+        # Then: user삭제를 실패한다.
+        assert_that(response.status_code).is_equal_to(status.HTTP_403_FORBIDDEN)
+        assert_that(User.objects.get(id=user_id).is_active).is_true()
 
     @patch.object(Email, 'send_email')
     def test_should_check_university(self, send_email):
@@ -145,3 +181,22 @@ class UserViewSetTestCase(APITestCase):
         assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
         assert_that(user.university_email).is_equal_to(data['university_email'])
         send_email.assert_called_once()
+
+    @patch.object(Email, 'send_email')
+    def test_should_fail_check_university(self, send_email):
+        # Given: user와 등록할 user의 학교 이메일이 주어진다.
+        user = baker.make('users.User')
+        another_user = baker.make('users.User')
+        data = {
+            "university_email": "test@test.com"
+        }
+
+        # When: 주어진 user로 로그인 한 후, 학교 이메일 정보로 check-univ api를 호출한다.
+        self.client.force_authenticate(user=another_user)
+        response = self.client.patch(f'/api/users/{user.id}/check-univ/', data)
+
+        # Then: user의 학교 이메일이 update되고 학교 이메일로 메일이 전송된다.
+        user = User.objects.get(id=user.id)
+        send_email.assert_not_called()
+        assert_that(response.status_code).is_equal_to(status.HTTP_403_FORBIDDEN)
+        assert_that(user.university_email).is_equal_to(user.university_email)

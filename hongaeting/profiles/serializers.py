@@ -10,7 +10,7 @@ class CreateProfileSerializer(serializers.ModelSerializer):
             'user',
             'nickname',
             'gender',
-            'status',
+            'scholarly_status',
             'campus_location',
         )
 
@@ -37,6 +37,28 @@ class ListProfileSerializer(serializers.ModelSerializer):
             'ideal_type',
             'one_sentence',
             'is_viewed',
+        )
+
+
+class RetrieveProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = (
+            'id',
+            'created_at',
+            'updated_at',
+            'nickname',
+            'gender',
+            'age',
+            'height',
+            'body_type',
+            'tag',
+            'image',
+            'appearance',
+            'personality',
+            'hobby',
+            'ideal_type',
+            'one_sentence',
         )
 
 
