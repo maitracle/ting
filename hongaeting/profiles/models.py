@@ -31,11 +31,11 @@ class Profile(BaseModel):
     RELIGION_CHOICES = Choices('NOTHING', 'CHRISTIANITY', 'BUDDHISM', 'CATHOLIC', 'ETC')
     IS_SMOKE_CHOICES = Choices('YES', 'NO', 'SOMETIMES')
     CAMPUS_LOCATION_CHOICES = Choices('SEOUL', 'INTERNATIONAL', 'SINCHON')
-    STATUS_CHOICES = Choices('ATTENDING', 'TAKINGOFF')
+    SCHOLARLY_STATUS_CHOICES = Choices('ATTENDING', 'TAKINGOFF')
 
     user = models.OneToOneField('users.User', on_delete=models.CASCADE)
     nickname = models.CharField(max_length=8, unique=True)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES)
+    scholarly_status = models.CharField(max_length=10, choices=SCHOLARLY_STATUS_CHOICES)
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
     age = models.PositiveSmallIntegerField(validators=[MinValueValidator(19)], null=True)
     height = models.PositiveSmallIntegerField(null=True)

@@ -10,7 +10,7 @@ class CreateProfileSerializer(serializers.ModelSerializer):
             'user',
             'nickname',
             'gender',
-            'status',
+            'scholarly_status',
             'campus_location',
         )
 

@@ -19,7 +19,7 @@ class UserViewSetTestCase(APITestCase):
             "password": "password123",
             "nickname": "test",
             "gender": "MALE",
-            "status": "ATTENDING",
+            "scholarly_status": "ATTENDING",
             "university": "HONGIK",
             "campus_location": "SEOUL",
             "university_email": "testuser@mail.hongik.ac.kr"
@@ -44,7 +44,7 @@ class UserViewSetTestCase(APITestCase):
         profile = Profile.objects.get(user=user.id)
         assert_that(profile.nickname).is_equal_to(user_data['nickname'])
         assert_that(profile.gender).is_equal_to(user_data['gender'])
-        assert_that(profile.status).is_equal_to(user_data['status'])
+        assert_that(profile.scholarly_status).is_equal_to(user_data['scholarly_status'])
         assert_that(profile.campus_location).is_equal_to(user_data['campus_location'])
 
     def test_should_not_create_when_profile_invalid(self):
@@ -54,7 +54,7 @@ class UserViewSetTestCase(APITestCase):
             "password": "password123",
             "nickname": "test",
             "gender": "",
-            "status": "ATTENDING",
+            "scholarly_status": "ATTENDING",
             "university": "HONGIK",
             "campus_location": "SEOUL",
             "university_email": "testuser@mail.hongik.ac.kr"
@@ -78,7 +78,7 @@ class UserViewSetTestCase(APITestCase):
             "password": "",
             "nickname": "test",
             "gender": "MALE",
-            "status": "ATTENDING",
+            "scholarly_status": "ATTENDING",
             "university": "HONGIK",
             "campus_location": "SEOUL",
             "university_email": "testuser@mail.hongik.ac.kr"
@@ -200,4 +200,3 @@ class UserViewSetTestCase(APITestCase):
         send_email.assert_not_called()
         assert_that(response.status_code).is_equal_to(status.HTTP_403_FORBIDDEN)
         assert_that(user.university_email).is_equal_to(user.university_email)
-
