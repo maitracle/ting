@@ -43,6 +43,7 @@ class UserViewSet(
             'user': created_user,
             'nickname': request.data['nickname'],
             'gender': request.data['gender'],
+            'status': request.data['status'],
             'campus_location': request.data['campus_location'],
         }
 
