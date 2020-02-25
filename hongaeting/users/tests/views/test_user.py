@@ -4,6 +4,7 @@ from assertpy import assert_that
 from model_bakery import baker
 from rest_framework import status
 from rest_framework.test import APITestCase
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from common.utils import Email
 from profiles.models import Profile
@@ -200,3 +201,18 @@ class UserViewSetTestCase(APITestCase):
         send_email.assert_not_called()
         assert_that(response.status_code).is_equal_to(status.HTTP_403_FORBIDDEN)
         assert_that(user.university_email).is_equal_to(user.university_email)
+
+    def test_should_refresh_jwt_token(self):
+        # Given: user와 user의 refresh token이 주어진다.
+        user = baker.make('users.User')
+        refresh_token = str(RefreshToken.for_user(user))
+
+        # When: token refresh api를 요청한다.
+        payload = {
+            'refresh': refresh_token,
+        }
+        response = self.client.post('/api/users/tokens/refresh/', data=payload)
+
+        # Then: access token이 반환된다.
+        assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
+        assert_that('access' in response.data).is_true()

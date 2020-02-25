@@ -1,28 +1,50 @@
 from django.db import transaction
-from django_rest_framework_mango.mixins import PermissionMixin
+from django_rest_framework_mango.mixins import PermissionMixin, SerializerMixin
 from rest_framework import viewsets, status
+from rest_framework.decorators import action
 from rest_framework.mixins import UpdateModelMixin, DestroyModelMixin
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework.decorators import action
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSerializer
 
 from profiles.serializers import CreateProfileSerializer
 from users.models import User
 from users.permissions import IsSameUserWithRequestUser
-from users.serializers import CreateUserSerializer
+from users.serializers import UserSerializer, TokenSerializer
 
 
 class UserViewSet(
-    PermissionMixin,
+    PermissionMixin, SerializerMixin,
     UpdateModelMixin, DestroyModelMixin,
     viewsets.GenericViewSet,
 ):
     queryset = User.objects.all()
-    serializer_class = CreateUserSerializer
     permission_classes = (IsSameUserWithRequestUser,)
     permission_by_actions = {
         'create': (AllowAny,),
+        'token': (AllowAny,),
     }
+    serializer_class_by_actions = {
+        'tokens': TokenSerializer,
+        'refresh': TokenRefreshSerializer,
+        'create': UserSerializer,
+        'update': UserSerializer,
+        'partial_update': UserSerializer,
+        'check_email': UserSerializer,
+    }
+
+    @action(detail=False, methods=['post'])
+    def tokens(self, request, *args, **kwargs):
+        token_obtain_pair_serializer = TokenObtainPairSerializer(data=request.data)
+
+        token_obtain_pair_serializer.is_valid(raise_exception=True)
+        token_with_profile = {
+            **token_obtain_pair_serializer.validated_data,
+            'profile': User.objects.get(email=request.data['email']).profile
+        }
+
+        serializer = self.get_serializer(token_with_profile)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
 
     @transaction.atomic
     def create(self, request, *args, **kwargs):
