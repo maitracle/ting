@@ -29,7 +29,7 @@ class ListProfileSerializer(serializers.ModelSerializer):
             'age',
             'height',
             'body_type',
-            'tag',
+            'tags',
             'image',
             'appearance',
             'personality',
@@ -52,7 +52,7 @@ class RetrieveProfileSerializer(serializers.ModelSerializer):
             'age',
             'height',
             'body_type',
-            'tag',
+            'tags',
             'image',
             'appearance',
             'personality',
@@ -66,7 +66,7 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = (
-            'tag',
+            'tags',
             'image',
             'appearance',
             'personality',
@@ -90,7 +90,7 @@ class MyProfileSerializer(serializers.ModelSerializer):
             'age',
             'height',
             'body_type',
-            'tag',
+            'tags',
             'image',
             'appearance',
             'personality',
