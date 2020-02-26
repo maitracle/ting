@@ -97,6 +97,7 @@ class MyProfileSerializer(serializers.ModelSerializer):
             'hobby',
             'ideal_type',
             'one_sentence',
+            'chat_link',
             'university',
         )
 

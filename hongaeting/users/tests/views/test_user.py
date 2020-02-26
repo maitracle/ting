@@ -238,6 +238,7 @@ class UserViewSetTestCase(APITestCase):
         assert_that(response.data['profile']['hobby']).is_equal_to(profile.hobby)
         assert_that(response.data['profile']['ideal_type']).is_equal_to(profile.ideal_type)
         assert_that(response.data['profile']['one_sentence']).is_equal_to(profile.one_sentence)
+        assert_that(response.data['profile']['chat_link']).is_equal_to(profile.chat_link)
 
     def test_should_fail_get_jwt_token(self):
         # Given: user, profile, 올바르지 않은 email, password가 주어진다.
