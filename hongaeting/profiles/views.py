@@ -2,11 +2,14 @@ from django.db.models import Count, Case, When, Value, BooleanField, Subquery, O
 from django_filters.rest_framework import DjangoFilterBackend
 from django_rest_framework_mango.mixins import QuerysetMixin, SerializerMixin
 from rest_framework import viewsets
+from rest_framework.decorators import action
 from rest_framework.mixins import ListModelMixin, UpdateModelMixin, RetrieveModelMixin
+from rest_framework.response import Response
 
 from common.permissions import IsOwnerUserOrReadonly
 from profiles.models import Profile
-from profiles.serializers import ListProfileSerializer, UpdateProfileSerializer, RetrieveProfileSerializer
+from profiles.serializers import ListProfileSerializer, UpdateProfileSerializer, RetrieveProfileSerializer, \
+    MyProfileSerializer
 from self_date.models import CoinHistory
 
 
@@ -22,6 +25,7 @@ class ProfileViewSet(
         'list': ListProfileSerializer,
         'update': UpdateProfileSerializer,
         'retrieve': RetrieveProfileSerializer,
+        'my': MyProfileSerializer,
     }
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('gender', 'user__university',)
@@ -44,3 +48,8 @@ class ProfileViewSet(
                 output_field=BooleanField()
             )
         )
+
+    @action(detail=False, methods=['get'])
+    def my(self, request, *args, **kwargs):
+        serializer = self.get_serializer(request.user.profile)
+        return Response(serializer.data)
