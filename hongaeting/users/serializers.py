@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from profiles.serializers import RetrieveProfileSerializer
+from profiles.serializers import LogInProfileSerializer
 from users.models import User
 
 
@@ -16,13 +16,18 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class TokenSerializer(serializers.Serializer):
-    refresh = serializers.CharField(max_length=500)
-    access = serializers.CharField(max_length=500)
-    profile = RetrieveProfileSerializer()
+    access = serializers.CharField()
+    refresh = serializers.CharField()
+    profile = LogInProfileSerializer()
+    university = serializers.SerializerMethodField()
 
     class Meta:
         fields = (
             'refresh',
             'access',
             'profile',
+            'university',
         )
+
+    def get_university(self, obj):
+        return obj['profile'].user.university

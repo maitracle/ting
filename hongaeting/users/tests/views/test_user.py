@@ -1,12 +1,13 @@
 from unittest.mock import patch
 
 from assertpy import assert_that
+from django.contrib.auth.hashers import make_password
 from model_bakery import baker
 from rest_framework import status
 from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from common.utils import Email
+from common.utils import Email, reformat_datetime
 from profiles.models import Profile
 from users.models import User
 
@@ -202,12 +203,54 @@ class UserViewSetTestCase(APITestCase):
         assert_that(response.status_code).is_equal_to(status.HTTP_403_FORBIDDEN)
         assert_that(user.university_email).is_equal_to(user.university_email)
 
+    def test_should_get_jwt_token_and_profile(self):
+        # Given: user, profile, 올바른 email, password가 주어진다.
+        password_string = 'password'
+        user = baker.make('users.User', password=make_password(password_string), is_active=True)
+        profile = baker.make('profiles.Profile', user=user)
+
+        # When: login api를 호출한다.
+        payload = {
+            'email': user.email,
+            'password': password_string,
+        }
+        response = self.client.post('/api/users/tokens/', data=payload)
+
+        # Then: access token, refresh token, university, profile이 반환된다.
+        assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
+        assert_that('access' in response.data).is_true()
+        assert_that('refresh' in response.data).is_true()
+        assert_that(response.data['university']).is_equal_to(user.university)
+
+        assert_that(response.data['profile']['id']).is_equal_to(profile.id)
+        assert_that(response.data['profile']['created_at']).is_equal_to(reformat_datetime(profile.created_at))
+        assert_that(response.data['profile']['updated_at']).is_equal_to(reformat_datetime(profile.updated_at))
+        assert_that(response.data['profile']['nickname']).is_equal_to(profile.nickname)
+        assert_that(response.data['profile']['gender']).is_equal_to(profile.gender)
+        assert_that(response.data['profile']['image']).is_equal_to(profile.image)
+
+    def test_should_fail_get_jwt_token(self):
+        # Given: user, profile, 올바르지 않은 email, password가 주어진다.
+        baker.make('profiles.Profile')
+
+        invalid_payload = {
+            'email': 'invalid_email@email.com',
+            'password': 'invalid_password',
+        }
+
+        # When: login api를 호출한다.
+        response = self.client.post('/api/users/tokens/', data=invalid_payload)
+
+        # Then: login에 실패하고, 401 status code가 반환된다.
+        assert_that(response.status_code).is_equal_to(status.HTTP_401_UNAUTHORIZED)
+        assert_that(response.data['detail']).is_equal_to('No active account found with the given credentials')
+
     def test_should_refresh_jwt_token(self):
         # Given: user와 user의 refresh token이 주어진다.
-        user = baker.make('users.User')
+        user = baker.make('users.User', is_active=True)
         refresh_token = str(RefreshToken.for_user(user))
 
-        # When: token refresh api를 요청한다.
+        # When: token refresh api를 호출한다.
         payload = {
             'refresh': refresh_token,
         }

@@ -5,7 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.mixins import UpdateModelMixin, DestroyModelMixin
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSerializer
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from profiles.serializers import CreateProfileSerializer
 from users.models import User
@@ -21,12 +21,11 @@ class UserViewSet(
     queryset = User.objects.all()
     permission_classes = (IsSameUserWithRequestUser,)
     permission_by_actions = {
+        'tokens': (AllowAny,),
         'create': (AllowAny,),
-        'token': (AllowAny,),
     }
     serializer_class_by_actions = {
         'tokens': TokenSerializer,
-        'refresh': TokenRefreshSerializer,
         'create': UserSerializer,
         'update': UserSerializer,
         'partial_update': UserSerializer,

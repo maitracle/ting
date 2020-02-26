@@ -74,3 +74,16 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
             'ideal_type',
             'one_sentence',
         )
+
+
+class LogInProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = (
+            'id',
+            'created_at',
+            'updated_at',
+            'nickname',
+            'gender',
+            'image',
+        )
