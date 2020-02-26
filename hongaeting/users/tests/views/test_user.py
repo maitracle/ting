@@ -216,18 +216,28 @@ class UserViewSetTestCase(APITestCase):
         }
         response = self.client.post('/api/users/tokens/', data=payload)
 
-        # Then: access token, refresh token, university, profile이 반환된다.
+        # Then: access token, refresh token, profile이 반환된다.
         assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
         assert_that('access' in response.data).is_true()
         assert_that('refresh' in response.data).is_true()
-        assert_that(response.data['university']).is_equal_to(user.university)
+
+        assert_that(response.data['profile']['university']).is_equal_to(user.university)
 
         assert_that(response.data['profile']['id']).is_equal_to(profile.id)
         assert_that(response.data['profile']['created_at']).is_equal_to(reformat_datetime(profile.created_at))
         assert_that(response.data['profile']['updated_at']).is_equal_to(reformat_datetime(profile.updated_at))
         assert_that(response.data['profile']['nickname']).is_equal_to(profile.nickname)
         assert_that(response.data['profile']['gender']).is_equal_to(profile.gender)
+        assert_that(response.data['profile']['age']).is_equal_to(profile.age)
+        assert_that(response.data['profile']['height']).is_equal_to(profile.height)
+        assert_that(response.data['profile']['body_type']).is_equal_to(profile.body_type)
+        assert_that(response.data['profile']['tag']).is_equal_to(profile.tag)
         assert_that(response.data['profile']['image']).is_equal_to(profile.image)
+        assert_that(response.data['profile']['appearance']).is_equal_to(profile.appearance)
+        assert_that(response.data['profile']['personality']).is_equal_to(profile.personality)
+        assert_that(response.data['profile']['hobby']).is_equal_to(profile.hobby)
+        assert_that(response.data['profile']['ideal_type']).is_equal_to(profile.ideal_type)
+        assert_that(response.data['profile']['one_sentence']).is_equal_to(profile.one_sentence)
 
     def test_should_fail_get_jwt_token(self):
         # Given: user, profile, 올바르지 않은 email, password가 주어진다.

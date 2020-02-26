@@ -160,3 +160,17 @@ class ProfileTestCase(APITestCase):
         error_code = 'permission_denied'
         assert_that(response.data['detail']).is_equal_to(error_message)
         assert_that(response.data['detail'].code).is_equal_to(error_code)
+
+    def test_should_get_my_profile(self):
+        # Given: user와 profile이 주어진다.
+        user = baker.make('users.User')
+        expected_profile = baker.make('profiles.Profile', user=user)
+
+        # When: user가 my profile api를 호출한다.
+        self.client.force_authenticate(user=user)
+        response = self.client.get(f'/api/profiles/my/')
+
+        # Then: 자신의 profile이 반환된다.
+        assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
+        self._check_response_and_expected(response.data, expected_profile)
+        assert_that(response.data['university']).is_equal_to(user.university)

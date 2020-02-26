@@ -76,7 +76,9 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
         )
 
 
-class LogInProfileSerializer(serializers.ModelSerializer):
+class MyProfileSerializer(serializers.ModelSerializer):
+    university = serializers.SerializerMethodField()
+
     class Meta:
         model = Profile
         fields = (
@@ -85,5 +87,18 @@ class LogInProfileSerializer(serializers.ModelSerializer):
             'updated_at',
             'nickname',
             'gender',
+            'age',
+            'height',
+            'body_type',
+            'tag',
             'image',
+            'appearance',
+            'personality',
+            'hobby',
+            'ideal_type',
+            'one_sentence',
+            'university',
         )
+
+    def get_university(self, obj):
+        return obj.user.university
