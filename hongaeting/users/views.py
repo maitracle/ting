@@ -22,6 +22,7 @@ class UserViewSet(
     permission_classes = (IsSameUserWithRequestUser,)
     permission_by_actions = {
         'create': (AllowAny,),
+        'confirm_user': (AllowAny,),
     }
 
     @transaction.atomic
@@ -30,7 +31,6 @@ class UserViewSet(
             'email': request.data['email'],
             'password': request.data['password'],
             'university': request.data['university'],
-            'university_email': request.data['university_email'],
         }
 
         user_serializer = self.get_serializer(data=user_data)
@@ -68,3 +68,13 @@ class UserViewSet(
         user.deactivate()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=False, methods=['post'], url_path='confirm-user')
+    def confirm_user(self, request, *arg, **kwargs):
+        user_code = request.data['user_code']
+
+        user = User.objects.get(user_code=user_code)
+        user.confirm_student()
+        user.save()
+
+        return Response(user_code, status=status.HTTP_200_OK)
