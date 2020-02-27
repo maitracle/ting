@@ -1,9 +1,10 @@
 from rest_framework import serializers
 
+from profiles.serializers import MyProfileSerializer
 from users.models import User
 
 
-class CreateUserSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
@@ -11,4 +12,17 @@ class CreateUserSerializer(serializers.ModelSerializer):
             'password',
             'university',
             'university_email',
+        )
+
+
+class TokenSerializer(serializers.Serializer):
+    access = serializers.CharField()
+    refresh = serializers.CharField()
+    profile = MyProfileSerializer()
+
+    class Meta:
+        fields = (
+            'refresh',
+            'access',
+            'profile',
         )
