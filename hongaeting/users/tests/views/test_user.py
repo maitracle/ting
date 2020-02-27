@@ -236,6 +236,7 @@ class UserViewSetTestCase(APITestCase):
         assert_that(response.data['profile']['appearance']).is_equal_to(profile.appearance)
         assert_that(response.data['profile']['personality']).is_equal_to(profile.personality)
         assert_that(response.data['profile']['hobby']).is_equal_to(profile.hobby)
+        assert_that(response.data['profile']['date_style']).is_equal_to(profile.date_style)
         assert_that(response.data['profile']['ideal_type']).is_equal_to(profile.ideal_type)
         assert_that(response.data['profile']['one_sentence']).is_equal_to(profile.one_sentence)
         assert_that(response.data['profile']['chat_link']).is_equal_to(profile.chat_link)

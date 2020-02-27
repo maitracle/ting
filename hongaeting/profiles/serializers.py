@@ -95,6 +95,7 @@ class MyProfileSerializer(serializers.ModelSerializer):
             'appearance',
             'personality',
             'hobby',
+            'date_style',
             'ideal_type',
             'one_sentence',
             'chat_link',
