@@ -185,6 +185,7 @@ class ProfileTestCase(APITestCase):
         assert_that(response.data['appearance']).is_equal_to(expected_profile.appearance)
         assert_that(response.data['personality']).is_equal_to(expected_profile.personality)
         assert_that(response.data['hobby']).is_equal_to(expected_profile.hobby)
+        assert_that(response.data['date_style']).is_equal_to(expected_profile.date_style)
         assert_that(response.data['ideal_type']).is_equal_to(expected_profile.ideal_type)
         assert_that(response.data['one_sentence']).is_equal_to(expected_profile.one_sentence)
         assert_that(response.data['chat_link']).is_equal_to(expected_profile.chat_link)
