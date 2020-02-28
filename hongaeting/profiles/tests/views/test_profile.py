@@ -111,7 +111,7 @@ class ProfileTestCase(APITestCase):
         assert_that(dictionary['age']).is_equal_to(instance.age)
         assert_that(dictionary['height']).is_equal_to(instance.height)
         assert_that(dictionary['body_type']).is_equal_to(instance.body_type)
-        assert_that(dictionary['tag']).is_equal_to(instance.tag)
+        assert_that(dictionary['tags']).is_equal_to(instance.tags)
         assert_that(dictionary['image']).is_equal_to(instance.image)
         assert_that(dictionary['appearance']).is_equal_to(instance.appearance)
         assert_that(dictionary['personality']).is_equal_to(instance.personality)
@@ -172,5 +172,20 @@ class ProfileTestCase(APITestCase):
 
         # Then: 자신의 profile이 반환된다.
         assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
-        self._check_response_and_expected(response.data, expected_profile)
+
         assert_that(response.data['university']).is_equal_to(user.university)
+
+        assert_that(response.data['nickname']).is_equal_to(expected_profile.nickname)
+        assert_that(response.data['gender']).is_equal_to(expected_profile.gender)
+        assert_that(response.data['age']).is_equal_to(expected_profile.age)
+        assert_that(response.data['height']).is_equal_to(expected_profile.height)
+        assert_that(response.data['body_type']).is_equal_to(expected_profile.body_type)
+        assert_that(response.data['tags']).is_equal_to(expected_profile.tags)
+        assert_that(response.data['image']).is_equal_to(expected_profile.image)
+        assert_that(response.data['appearance']).is_equal_to(expected_profile.appearance)
+        assert_that(response.data['personality']).is_equal_to(expected_profile.personality)
+        assert_that(response.data['hobby']).is_equal_to(expected_profile.hobby)
+        assert_that(response.data['date_style']).is_equal_to(expected_profile.date_style)
+        assert_that(response.data['ideal_type']).is_equal_to(expected_profile.ideal_type)
+        assert_that(response.data['one_sentence']).is_equal_to(expected_profile.one_sentence)
+        assert_that(response.data['chat_link']).is_equal_to(expected_profile.chat_link)

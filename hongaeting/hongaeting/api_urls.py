@@ -13,8 +13,7 @@ router.register('likes', LikeViewSet)
 router.register('profiles', ProfileViewSet)
 
 urlpatterns = [
-    path('tokens/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('tokens/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('users/tokens/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
 
 urlpatterns += router.urls
