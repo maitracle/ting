@@ -83,11 +83,10 @@ class UserViewSet(
     @action(detail=False, methods=['post'], url_path='confirm-user')
     def confirm_user(self, request, *arg, **kwargs):
         user_code = request.data['user_code']
-
-        user = self.get_queryset().get(user_code=user_code)
-        if user:
+        try:
+            user = self.get_queryset().get(user_code=user_code)
             user.confirm_student()
 
             return Response(user_code, status=status.HTTP_200_OK)
-        else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+        except User.DoesNotExist:
+            return Response(user_code, status=status.HTTP_400_BAD_REQUEST)
