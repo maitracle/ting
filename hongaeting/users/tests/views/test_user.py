@@ -201,6 +201,7 @@ class UserViewSetTestCase(APITestCase):
         # Given: user와 user의 user_code가 제공된다.
         user_code = 'abcdefgh'
         user = baker.make('users.user', user_code=user_code)
+        assert_that(user.is_confirmed_student).is_false()
         data = {
             "user_code": user_code,
         }
