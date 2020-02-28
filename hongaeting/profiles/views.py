@@ -20,10 +20,10 @@ class ProfileViewSet(
 ):
     queryset = Profile.objects.all()
     permission_classes = (IsOwnerUserOrReadonly,)
-    serializer_class = UpdateProfileSerializer
     serializer_class_by_actions = {
         'list': ListProfileSerializer,
         'update': UpdateProfileSerializer,
+        'partial_update': UpdateProfileSerializer,
         'retrieve': RetrieveProfileSerializer,
         'my': MyProfileSerializer,
     }
