@@ -14,6 +14,14 @@ class UserSerializer(serializers.ModelSerializer):
         )
 
 
+class UserCheckUnivSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            'university_email',
+        )
+
+
 class TokenSerializer(serializers.Serializer):
     access = serializers.CharField()
     refresh = serializers.CharField()

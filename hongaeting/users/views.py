@@ -10,7 +10,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from profiles.serializers import CreateProfileSerializer
 from users.models import User
 from users.permissions import IsSameUserWithRequestUser
-from users.serializers import UserSerializer, TokenSerializer
+from users.serializers import UserSerializer, TokenSerializer, UserCheckUnivSerializer
 
 
 class UserViewSet(
@@ -30,7 +30,7 @@ class UserViewSet(
         'create': UserSerializer,
         'update': UserSerializer,
         'partial_update': UserSerializer,
-        'check_email': UserSerializer,
+        'check_email': UserCheckUnivSerializer,
     }
 
     @action(detail=False, methods=['post'])
