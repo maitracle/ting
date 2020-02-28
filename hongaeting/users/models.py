@@ -74,6 +74,7 @@ class User(BaseModel, AbstractBaseUser):
 
     def confirm_student(self):
         self.is_confirmed_student = True
+        self.save()
 
     def send_email(self):
         # Todo(10000001a): Email template 다시 작업해야함

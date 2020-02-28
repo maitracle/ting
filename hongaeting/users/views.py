@@ -73,8 +73,10 @@ class UserViewSet(
     def confirm_user(self, request, *arg, **kwargs):
         user_code = request.data['user_code']
 
-        user = User.objects.get(user_code=user_code)
-        user.confirm_student()
-        user.save()
+        user = self.get_queryset().get(user_code=user_code)
+        if user:
+            user.confirm_student()
 
-        return Response(user_code, status=status.HTTP_200_OK)
+            return Response(user_code, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
