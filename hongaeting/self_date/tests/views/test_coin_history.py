@@ -3,6 +3,8 @@ from model_bakery import baker
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from common.utils import reformat_datetime
+
 
 class CoinHistoryTestCase(APITestCase):
     def test_should_get_list(self):
@@ -26,12 +28,6 @@ class CoinHistoryTestCase(APITestCase):
             assert_that(responded_coin_history['profile']).is_equal_to(expected_coin_history.profile)
 
             assert_that(responded_coin_history['created_at'])\
-                .is_equal_to(self._reformat_datetime(expected_coin_history.created_at))
+                .is_equal_to(reformat_datetime(expected_coin_history.created_at))
             assert_that(responded_coin_history['updated_at'])\
-                .is_equal_to(self._reformat_datetime(expected_coin_history.updated_at))
-
-    @staticmethod
-    def _reformat_datetime(datetime):
-        date, time = str(datetime).split(' ')
-
-        return f'{date}T{time.split("+")[0]}Z'
+                .is_equal_to(reformat_datetime(expected_coin_history.updated_at))

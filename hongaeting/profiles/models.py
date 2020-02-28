@@ -25,7 +25,6 @@ class QuestionItem(BaseModel):
 
 
 class Profile(BaseModel):
-    MAX_CHARFIELD_LENGTH = 300
     BODY_TYPE_CHOICES = Choices('SKINNY', 'SLIM', 'NORMAL', 'CHUBBY', 'GLAMOROUS', 'FIT')
     GENDER_CHOICES = Choices('MALE', 'FEMALE')
     RELIGION_CHOICES = Choices('NOTHING', 'CHRISTIANITY', 'BUDDHISM', 'CATHOLIC', 'ETC')
@@ -44,15 +43,15 @@ class Profile(BaseModel):
     is_smoke = models.CharField(max_length=10, choices=IS_SMOKE_CHOICES, blank=True)
     campus_location = models.CharField(max_length=20, choices=CAMPUS_LOCATION_CHOICES, blank=True)
 
-    tag = models.CharField(max_length=100, blank=True)
+    tags = models.CharField(max_length=500, blank=True)
     image = models.CharField(max_length=100, blank=True)
-    one_sentence = models.CharField(max_length=MAX_CHARFIELD_LENGTH, blank=True)
+    one_sentence = models.CharField(max_length=300, blank=True)
 
-    appearance = models.CharField(max_length=MAX_CHARFIELD_LENGTH, validators=[MinLengthValidator(120)], blank=True)
-    personality = models.CharField(max_length=MAX_CHARFIELD_LENGTH, validators=[MinLengthValidator(120)], blank=True)
-    hobby = models.CharField(max_length=MAX_CHARFIELD_LENGTH, validators=[MinLengthValidator(120)], blank=True)
-    date_style = models.CharField(max_length=MAX_CHARFIELD_LENGTH, validators=[MinLengthValidator(120)], blank=True)
-    ideal_type = models.CharField(max_length=MAX_CHARFIELD_LENGTH, validators=[MinLengthValidator(120)], blank=True)
+    appearance = models.CharField(max_length=1000, validators=[MinLengthValidator(120)], blank=True)
+    personality = models.CharField(max_length=1000, validators=[MinLengthValidator(120)], blank=True)
+    hobby = models.CharField(max_length=1000, validators=[MinLengthValidator(120)], blank=True)
+    date_style = models.CharField(max_length=1000, validators=[MinLengthValidator(120)], blank=True)
+    ideal_type = models.CharField(max_length=1000, validators=[MinLengthValidator(120)], blank=True)
     chat_link = models.URLField(blank=True)
 
     is_active = models.BooleanField(default=True)

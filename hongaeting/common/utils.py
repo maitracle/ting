@@ -10,3 +10,9 @@ class Email:
         mail = EmailMessage(title, html_content, to=to_email)
         mail.content_subtype = 'html'
         return mail.send()
+
+
+def reformat_datetime(datetime):
+    date, time = str(datetime).split(' ')
+
+    return f'{date}T{time.split("+")[0]}Z'
