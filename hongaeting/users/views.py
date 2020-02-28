@@ -56,13 +56,12 @@ class UserViewSet(
 
         user_serializer = self.get_serializer(data=user_data)
         user_serializer.is_valid(raise_exception=True)
-        user_instance = user_serializer.save()
-        user_instance.set_user_code()
-        user_instance.save()
+        created_user = user_serializer.save()
+        created_user.set_user_code()
+        created_user.save()
 
-        created_user = User.objects.get(email=user_data['email']).id
         profile_data = {
-            'user': created_user,
+            'user': created_user.id,
             'nickname': request.data['nickname'],
             'gender': request.data['gender'],
             'scholarly_status': request.data['scholarly_status'],
