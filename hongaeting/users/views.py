@@ -47,14 +47,7 @@ class UserViewSet(
 
     @transaction.atomic
     def create(self, request, *args, **kwargs):
-        user_data = {
-            'email': request.data['email'],
-            'password': request.data['password'],
-            'university': request.data['university'],
-            'university_email': request.data['university_email'],
-        }
-
-        user_serializer = self.get_serializer(data=user_data)
+        user_serializer = self.get_serializer(data=request.data)
         user_serializer.is_valid(raise_exception=True)
         created_user = user_serializer.save()
         created_user.set_user_code()
@@ -62,10 +55,7 @@ class UserViewSet(
 
         profile_data = {
             'user': created_user.id,
-            'nickname': request.data['nickname'],
-            'gender': request.data['gender'],
-            'scholarly_status': request.data['scholarly_status'],
-            'campus_location': request.data['campus_location'],
+            **request.data.dict(),
         }
 
         profile_serializer = CreateProfileSerializer(data=profile_data)
