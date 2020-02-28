@@ -41,7 +41,7 @@ class Profile(BaseModel):
     body_type = models.CharField(max_length=10, choices=BODY_TYPE_CHOICES, blank=True)
     religion = models.CharField(max_length=20, choices=RELIGION_CHOICES, blank=True)
     is_smoke = models.CharField(max_length=10, choices=IS_SMOKE_CHOICES, blank=True)
-    campus_location = models.CharField(max_length=20, choices=CAMPUS_LOCATION_CHOICES, blank=True)
+    campus_location = models.CharField(max_length=20, choices=CAMPUS_LOCATION_CHOICES)
 
     tags = models.CharField(max_length=500, blank=True)
     image = models.CharField(max_length=100, blank=True)
