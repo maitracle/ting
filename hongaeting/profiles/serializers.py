@@ -66,11 +66,13 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = (
+            'chat_link',
             'tags',
             'image',
             'appearance',
             'personality',
             'hobby',
+            'date_style',
             'ideal_type',
             'one_sentence',
         )
