@@ -11,7 +11,6 @@ class UserSerializer(serializers.ModelSerializer):
             'email',
             'password',
             'university',
-            'university_email',
         )
 
 
