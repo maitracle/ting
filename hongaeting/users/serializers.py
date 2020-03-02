@@ -11,6 +11,13 @@ class UserSerializer(serializers.ModelSerializer):
             'email',
             'password',
             'university',
+        )
+
+
+class UserCheckUnivSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
             'university_email',
         )
 

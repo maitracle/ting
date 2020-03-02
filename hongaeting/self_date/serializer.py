@@ -7,6 +7,7 @@ class ListCoinHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = CoinHistory
         fields = (
+            'id',
             'user',
             'rest_coin',
             'reason',

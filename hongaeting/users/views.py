@@ -10,7 +10,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from profiles.serializers import CreateProfileSerializer
 from users.models import User
 from users.permissions import IsSameUserWithRequestUser
-from users.serializers import UserSerializer, TokenSerializer
+from users.serializers import UserSerializer, TokenSerializer, UserCheckUnivSerializer
 
 
 class UserViewSet(
@@ -23,13 +23,14 @@ class UserViewSet(
     permission_by_actions = {
         'tokens': (AllowAny,),
         'create': (AllowAny,),
+        'confirm_user': (AllowAny,),
     }
     serializer_class_by_actions = {
         'tokens': TokenSerializer,
         'create': UserSerializer,
         'update': UserSerializer,
         'partial_update': UserSerializer,
-        'check_email': UserSerializer,
+        'check_email': UserCheckUnivSerializer,
     }
 
     @action(detail=False, methods=['post'])
@@ -78,3 +79,14 @@ class UserViewSet(
         user.deactivate()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=False, methods=['post'], url_path='confirm-user')
+    def confirm_user(self, request, *arg, **kwargs):
+        user_code = request.data['user_code']
+        try:
+            user = self.get_queryset().get(user_code=user_code)
+            user.confirm_student()
+
+            return Response(user_code, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response(user_code, status=status.HTTP_400_BAD_REQUEST)

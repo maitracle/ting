@@ -72,6 +72,10 @@ class User(BaseModel, AbstractBaseUser):
         self.is_active = False
         self.save()
 
+    def confirm_student(self):
+        self.is_confirmed_student = True
+        self.save()
+
     def send_email(self):
         # Todo(10000001a): Email template 다시 작업해야함
         html_content = render_to_string('mail_template.html', {'user_code': self.user_code})

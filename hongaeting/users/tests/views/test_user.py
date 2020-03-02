@@ -24,7 +24,6 @@ class UserViewSetTestCase(APITestCase):
             "scholarly_status": "ATTENDING",
             "university": "HONGIK",
             "campus_location": "SEOUL",
-            "university_email": "testuser@mail.hongik.ac.kr"
         }
         user_code_length = 8
 
@@ -39,7 +38,6 @@ class UserViewSetTestCase(APITestCase):
         assert_that(user.email).is_equal_to(user_data['email'])
         assert_that(user.password).is_equal_to(user_data['password'])
         assert_that(user.university).is_equal_to(user_data['university'])
-        assert_that(user.university_email).is_equal_to(user_data['university_email'])
         assert_that(type(user.user_code)).is_equal_to(str)
         assert_that(user.user_code).is_length(user_code_length)
 
@@ -59,7 +57,6 @@ class UserViewSetTestCase(APITestCase):
             "scholarly_status": "ATTENDING",
             "university": "HONGIK",
             "campus_location": "SEOUL",
-            "university_email": "testuser@mail.hongik.ac.kr"
         }
 
         # When: user create api를 호출하여 회원가입을 시도한다.
@@ -83,7 +80,6 @@ class UserViewSetTestCase(APITestCase):
             "scholarly_status": "ATTENDING",
             "university": "HONGIK",
             "campus_location": "SEOUL",
-            "university_email": "testuser@mail.hongik.ac.kr"
         }
 
         # When: user create api를 호출하여 회원가입을 시도한다.
@@ -202,6 +198,39 @@ class UserViewSetTestCase(APITestCase):
         send_email.assert_not_called()
         assert_that(response.status_code).is_equal_to(status.HTTP_403_FORBIDDEN)
         assert_that(user.university_email).is_equal_to(user.university_email)
+
+    def test_confirm_user(self):
+        # Given: user와 user의 user_code가 제공된다.
+        user_code = 'abcdefgh'
+        user = baker.make('users.user', user_code=user_code)
+        assert_that(user.is_confirmed_student).is_false()
+        data = {
+            "user_code": user_code,
+        }
+
+        # When: confirm-user api를 호출한다.
+        response = self.client.post('/api/users/confirm-user/', data=data)
+
+        # Then: user의 is_confirmed field가 True로 바뀐 후 정상적으로 응답이 도달한다.
+        user = User.objects.get(user_code=user_code)
+        assert_that(user.is_confirmed_student).is_true()
+        assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
+
+    def test_should_not_confirm_user(self):
+        # Given: user 1명과 존재하지 않는 user_code가 하나 주어진다.
+        not_exist_user_code = 'abcdefgh'
+        user = baker.make('users.user', user_code='testtest')
+        data = {
+            "user_code": not_exist_user_code,
+        }
+
+        # When: confirm-user api를 호출한다.
+        response = self.client.post('/api/users/confirm-user/', data=data)
+
+        # Then: 찾고자 하는 user가 없다는 오류가 발생하고, 기존 유저는 인증되지 않는다.
+        user = User.objects.get(user_code='testtest')
+        assert_that(response.status_code).is_equal_to(status.HTTP_400_BAD_REQUEST)
+        assert_that(user.is_confirmed_student).is_false()
 
     def test_should_get_jwt_token_and_profile(self):
         # Given: user, profile, 올바른 email, password가 주어진다.
