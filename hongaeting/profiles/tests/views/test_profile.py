@@ -96,6 +96,35 @@ class ProfileTestCase(APITestCase):
         # Given: user 1명과 profile이 주어진다.
         user = baker.make('users.User')
         expected_profile = baker.make('profiles.Profile')
+        coin_history = baker.make(
+            'self_date.CoinHistory',
+            user=user,
+            reason=CoinHistory.CHANGE_REASON.SIGNUP,
+            rest_coin=30
+        )
+
+        # When: user가 retrieve api를 호출한다.
+        self.client.force_authenticate(user=user)
+        response = self.client.get(f'/api/profiles/{expected_profile.id}/')
+
+        # Then: response가 정상적으로 온다.
+        #       coin 개수가 줄어듦
+        assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
+        self._check_response_and_expected(response.data, expected_profile)
+        rest_coin = CoinHistory.objects.filter(user=user).last().rest_coin
+        assert_that(rest_coin).is_equal_to(coin_history.rest_coin - 2)
+
+    def test_should_get_profile_retrieve_which_user_retrieved(self):
+        # Given: user 1명과 임의의 프로필 1개가 생성되고, 프로필을 본 coin_history가 생성된다.
+        user = baker.make('users.User')
+        expected_profile = baker.make('profiles.Profile')
+        view_profile_coin_history = baker.make(
+            'self_date.CoinHistory',
+            user=user,
+            reason=CoinHistory.CHANGE_REASON.VIEW_PROFILE,
+            rest_coin=28,
+            profile=expected_profile,
+        )
 
         # When: user가 retrieve api를 호출한다.
         self.client.force_authenticate(user=user)
@@ -104,6 +133,28 @@ class ProfileTestCase(APITestCase):
         # Then: response가 정상적으로 온다.
         assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
         self._check_response_and_expected(response.data, expected_profile)
+        rest_coin = CoinHistory.objects.filter(user=user).last().rest_coin
+        assert_that(rest_coin).is_equal_to(view_profile_coin_history.rest_coin)
+
+    def test_should_not_get_profile_retrieve_when_user_does_not_have_coin(self):
+        # Given: user 1명과 profile이 주어지고, coin이 남아있지 않은 coin_history가 주어진다.
+        user = baker.make('users.User')
+        expected_profile = baker.make('profiles.Profile')
+        final_coin_history = baker.make(
+            'self_date.CoinHistory',
+            user=user,
+            reason=CoinHistory.CHANGE_REASON.VIEW_PROFILE,
+            rest_coin=0
+        )
+
+        # When: user가 retrieve api를 호출한다.
+        self.client.force_authenticate(user=user)
+        response = self.client.get(f'/api/profiles/{expected_profile.id}/')
+
+        # Then: 코인이 부족하여 403 forbidden 오류가 응답된다.
+        assert_that(response.status_code).is_equal_to(status.HTTP_403_FORBIDDEN)
+        rest_coin = CoinHistory.objects.filter(user=user).last().rest_coin
+        assert_that(rest_coin).is_equal_to(final_coin_history.rest_coin)
 
     def _check_response_and_expected(self, dictionary, instance):
         assert_that(dictionary['nickname']).is_equal_to(instance.nickname)

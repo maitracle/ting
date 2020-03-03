@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from profiles.serializers import CreateProfileSerializer
-from self_date.serializer import CreateSignupCoinHistorySerializer
+from self_date.serializer import CreateCoinHistorySerializer
 from users.models import User
 from users.permissions import IsSameUserWithRequestUser
 from users.serializers import UserSerializer, TokenSerializer, UserCheckUnivSerializer
@@ -72,7 +72,7 @@ class UserViewSet(
             'reason': CoinHistory.CHANGE_REASON.SIGNUP,
         }
 
-        coin_history_serializer = CreateSignupCoinHistorySerializer(data=coin_history_data)
+        coin_history_serializer = CreateCoinHistorySerializer(data=coin_history_data)
         coin_history_serializer.is_valid(raise_exception=True)
         coin_history_serializer.save()
 

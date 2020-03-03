@@ -1,19 +1,11 @@
 from rest_framework import serializers
-
+from profiles.models import Profile
 from self_date.models import CoinHistory, Like
 
 
-class CreateSignupCoinHistorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CoinHistory
-        fields = (
-            'user',
-            'rest_coin',
-            'reason',
-        )
-
-
 class CreateCoinHistorySerializer(serializers.ModelSerializer):
+    profile = serializers.PrimaryKeyRelatedField(queryset=Profile.objects.all(), required=False)
+
     class Meta:
         model = CoinHistory
         fields = (

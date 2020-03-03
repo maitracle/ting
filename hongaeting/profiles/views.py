@@ -1,7 +1,7 @@
 from django.db.models import Count, Case, When, Value, BooleanField, Subquery, OuterRef
 from django_filters.rest_framework import DjangoFilterBackend
 from django_rest_framework_mango.mixins import QuerysetMixin, SerializerMixin
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.mixins import ListModelMixin, UpdateModelMixin, RetrieveModelMixin
 from rest_framework.response import Response
@@ -11,6 +11,7 @@ from profiles.models import Profile
 from profiles.serializers import ListProfileSerializer, UpdateProfileSerializer, RetrieveProfileSerializer, \
     MyProfileSerializer
 from self_date.models import CoinHistory
+from self_date.serializer import CreateCoinHistorySerializer
 
 
 class ProfileViewSet(
@@ -53,3 +54,29 @@ class ProfileViewSet(
     def my(self, request, *args, **kwargs):
         serializer = self.get_serializer(request.user.profile)
         return Response(serializer.data)
+
+    def retrieve(self, request, *args, **kwargs):
+        isRetrieved = CoinHistory.objects.filter(
+            user=request.user,
+            reason=CoinHistory.CHANGE_REASON.VIEW_PROFILE,
+            profile=kwargs['pk']
+        )
+        rest_coin = CoinHistory.objects.filter(user=request.user).last().rest_coin
+        profile_data = self.get_object()
+        profile_serializer = self.get_serializer(profile_data)
+        if isRetrieved:
+            return Response(profile_serializer.data)
+        else:
+            if rest_coin >= 2:
+                coin_history_data = {
+                    "user": request.user.id,
+                    "rest_coin": rest_coin - 2,
+                    "reason": CoinHistory.CHANGE_REASON.VIEW_PROFILE,
+                    "profile": int(kwargs['pk'])
+                }
+                coin_history_instance = CreateCoinHistorySerializer(data=coin_history_data)
+                coin_history_instance.is_valid(raise_exception=True)
+                coin_history_instance.save()
+                return Response(profile_serializer.data)
+            else:
+                return Response(status=status.HTTP_403_FORBIDDEN)
