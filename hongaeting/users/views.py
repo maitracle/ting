@@ -57,7 +57,7 @@ class UserViewSet(
 
         profile_data = {
             'user': created_user.id,
-            **request.data.dict(),
+            **request.data,
         }
 
         profile_serializer = CreateProfileSerializer(data=profile_data)
