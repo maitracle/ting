@@ -39,8 +39,12 @@ class UserViewSetTestCase(APITestCase):
         assert_that(response.status_code).is_equal_to(status.HTTP_201_CREATED)
 
         user = User.objects.get(email=user_data['email'])
+
         assert_that(user.email).is_equal_to(user_data['email'])
-        assert_that(user.password).is_equal_to(user_data['password'])
+
+        hashed_password_prefix = 'pbkdf2_sha256$150000$'
+        assert_that(user.password.startswith(hashed_password_prefix)).is_true()
+
         assert_that(user.university).is_equal_to(user_data['university'])
         assert_that(type(user.user_code)).is_equal_to(str)
         assert_that(user.user_code).is_length(user_code_length)

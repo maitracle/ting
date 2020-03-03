@@ -55,6 +55,7 @@ class UserViewSet(
         user_serializer.is_valid(raise_exception=True)
         created_user = user_serializer.save()
         created_user.set_user_code()
+        created_user.set_password(request.data['password'])
         created_user.save()
 
         profile_data = {
