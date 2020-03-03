@@ -7,6 +7,7 @@ from rest_framework.mixins import ListModelMixin, UpdateModelMixin, RetrieveMode
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 
+from common.constants import VIEW_PROFILE_COST
 from common.permissions import IsOwnerUserOrReadonly
 from profiles.models import Profile
 from profiles.serializers import ListProfileSerializer, UpdateProfileSerializer, RetrieveProfileSerializer, \
@@ -67,7 +68,7 @@ class ProfileViewSet(
             try:
                 coin_history_data = {
                     "user": request.user.id,
-                    "rest_coin": rest_coin - 2,
+                    "rest_coin": rest_coin - VIEW_PROFILE_COST,
                     "reason": CoinHistory.CHANGE_REASON.VIEW_PROFILE,
                     "profile": int(kwargs['pk'])
                 }

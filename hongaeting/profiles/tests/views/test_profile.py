@@ -3,7 +3,7 @@ from model_bakery import baker
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from common.constants import UNIVERSITY_LIST
+from common.constants import UNIVERSITY_LIST, VIEW_PROFILE_COST
 from profiles.models import Profile
 from self_date.models import CoinHistory
 
@@ -112,10 +112,10 @@ class ProfileTestCase(APITestCase):
         assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
         self._check_response_and_expected(response.data, expected_profile)
         rest_coin = CoinHistory.objects.filter(user=user).last().rest_coin
-        assert_that(rest_coin).is_equal_to(coin_history.rest_coin - 2)
+        assert_that(rest_coin).is_equal_to(coin_history.rest_coin - VIEW_PROFILE_COST)
 
     def test_should_get_profile_retrieve_which_user_retrieved(self):
-        # Given: user 1명과 임의의 프로필 1개가 생성되고, 프로필을 본 coin_history가 생성된다.
+        # Given: user 1명과 임의의 프로필 1개가 주어진다. 해당 프로필 조회 coin_history가 주어진다.
         user = baker.make('users.User')
         expected_profile = baker.make('profiles.Profile')
         view_profile_coin_history = baker.make(
@@ -130,7 +130,7 @@ class ProfileTestCase(APITestCase):
         self.client.force_authenticate(user=user)
         response = self.client.get(f'/api/profiles/{expected_profile.id}/')
 
-        # Then: response가 정상적으로 온다.
+        # Then: profile이 반환된다. coin 개수가 감소하지 않는다.
         assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
         self._check_response_and_expected(response.data, expected_profile)
         rest_coin = CoinHistory.objects.filter(user=user).last().rest_coin
