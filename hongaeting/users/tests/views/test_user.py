@@ -171,7 +171,7 @@ class UserViewSetTestCase(APITestCase):
         assert_that(User.objects.get(id=user_id).is_active).is_true()
 
     def test_should_get_my_user_profile_coin_history(self):
-        # Given: user와 profile이 주어진다.
+        # Given: user와 profile, coin_history가 주어진다.
         expected_user = baker.make('users.User')
         expected_profile = baker.make('profiles.Profile', user=expected_user)
         coin_history_quantity = 5
@@ -181,7 +181,7 @@ class UserViewSetTestCase(APITestCase):
         self.client.force_authenticate(user=expected_user)
         response = self.client.get(f'/api/users/my/')
 
-        # Then: 자신의 profile이 반환된다.
+        # Then: 자신의 user, profile, coin_history가 반환된다.
         assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
 
         self._assert_user(response.data['user'], expected_user)
@@ -278,7 +278,7 @@ class UserViewSetTestCase(APITestCase):
         }
         response = self.client.post('/api/users/tokens/', data=payload)
 
-        # Then: access token, refresh token, profile이 반환된다.
+        # Then: access token, refresh token, user, profile, coin_history가 반환된다.
         assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
         assert_that('access' in response.data).is_true()
         assert_that('refresh' in response.data).is_true()
