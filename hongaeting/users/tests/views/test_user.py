@@ -1,3 +1,4 @@
+import json
 from unittest.mock import patch
 
 from assertpy import assert_that
@@ -7,14 +8,16 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from common.constants import SIGNUP_COIN
 from common.utils import Email, reformat_datetime
 from profiles.models import Profile
+from self_date.models import CoinHistory
 from users.models import User
 
 
 class UserViewSetTestCase(APITestCase):
 
-    def test_should_create_profile_when_create_user(self):
+    def test_should_create_profile_and_coin_history_when_create_user(self):
         # Given: 만들어질 user에 관한 데이터가 주어진다.
         user_data = {
             "email": "testuser@test.com",
@@ -23,15 +26,16 @@ class UserViewSetTestCase(APITestCase):
             "gender": "MALE",
             "scholarly_status": "ATTENDING",
             "university": "HONGIK",
-            "campus_location": "SEOUL",
+            "campus_location": "SEOUL"
         }
         user_code_length = 8
 
         # When: user create api를 호출하여 회원가입을 한다.
-        response = self.client.post('/api/users/', data=user_data)
+        response = self.client.post('/api/users/', data=json.dumps(user_data), content_type='application/json')
 
         # Then: user와 profile이 만들어진다.
         #       user의 user_code가 정상적으로 만들어진다.
+        #       user의 coin_history가 정상적으로 만들어진다.
         assert_that(response.status_code).is_equal_to(status.HTTP_201_CREATED)
 
         user = User.objects.get(email=user_data['email'])
@@ -46,6 +50,10 @@ class UserViewSetTestCase(APITestCase):
         assert_that(profile.gender).is_equal_to(user_data['gender'])
         assert_that(profile.scholarly_status).is_equal_to(user_data['scholarly_status'])
         assert_that(profile.campus_location).is_equal_to(user_data['campus_location'])
+
+        coin_history = CoinHistory.objects.get(user=user.id)
+        assert_that(coin_history.rest_coin).is_equal_to(SIGNUP_COIN)
+        assert_that(coin_history.reason).is_equal_to(CoinHistory.CHANGE_REASON.SIGNUP)
 
     def test_should_not_create_when_profile_invalid(self):
         # Given: profile 관련 데이터가 invalid한 user 데이터가 주어진다.
