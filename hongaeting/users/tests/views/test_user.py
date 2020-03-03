@@ -27,6 +27,7 @@ class UserViewSetTestCase(APITestCase):
             "campus_location": "SEOUL",
         }
         user_code_length = 8
+        SIGNUP_COIN = 30
 
         # When: user create api를 호출하여 회원가입을 한다.
         response = self.client.post('/api/users/', data=user_data)
