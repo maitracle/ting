@@ -6,6 +6,7 @@ from rest_framework.mixins import UpdateModelMixin, DestroyModelMixin
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from profiles.serializers import CreateProfileSerializer
 from self_date.serializer import CreateSignupCoinHistorySerializer
@@ -82,7 +83,11 @@ class UserViewSet(
         coin_history_serializer.is_valid(raise_exception=True)
         coin_history_serializer.save()
 
+        refresh = RefreshToken.for_user(created_user)
+
         response_data = {
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
             'user': user_serializer.data,
             'profile': profile_serializer.data,
             'coin_history': [coin_history_serializer.data],

@@ -34,14 +34,19 @@ class UserViewSetTestCase(APITestCase):
         response = self.client.post('/api/users/', data=json.dumps(user_data), content_type='application/json')
 
         # Then: user와 profile이 만들어진다.
-        #       user의 user_code가 정상적으로 만들어진다.
-        #       user의 coin_history가 정상적으로 만들어진다.
+        #       user의 user_code가 만들어진다.
+        #       reason이 sign up coin_history가 만들어진다.
+        #       access token, refresh token이 반환된다.
         assert_that(response.status_code).is_equal_to(status.HTTP_201_CREATED)
+
+        assert_that('access' in response.data).is_true()
+        assert_that('refresh' in response.data).is_true()
 
         assert_that(response.data['user']['email']).is_equal_to(user_data['email'])
         hashed_password_prefix = 'pbkdf2_sha256$150000$'
         assert_that(response.data['user']['password'].startswith(hashed_password_prefix)).is_true()
         assert_that(response.data['user']['university']).is_equal_to(user_data['university'])
+        assert_that(User.objects.get(email=user_data['email']).user_code).is_length(user_code_length)
 
         assert_that(response.data['profile']['nickname']).is_equal_to(user_data['nickname'])
         assert_that(response.data['profile']['gender']).is_equal_to(user_data['gender'])
