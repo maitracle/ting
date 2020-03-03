@@ -8,6 +8,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from common.constants import SIGNUP_COIN
 from common.utils import Email, reformat_datetime
 from profiles.models import Profile
 from self_date.models import CoinHistory
@@ -28,7 +29,6 @@ class UserViewSetTestCase(APITestCase):
             "campus_location": "SEOUL"
         }
         user_code_length = 8
-        SIGNUP_COIN = 30
 
         # When: user create api를 호출하여 회원가입을 한다.
         response = self.client.post('/api/users/', data=json.dumps(user_data), content_type='application/json')
@@ -53,7 +53,7 @@ class UserViewSetTestCase(APITestCase):
 
         coin_history = CoinHistory.objects.get(user=user.id)
         assert_that(coin_history.rest_coin).is_equal_to(SIGNUP_COIN)
-        assert_that(coin_history.reason).is_equal_to('SIGNUP')
+        assert_that(coin_history.reason).is_equal_to(CoinHistory.CHANGE_REASON.SIGNUP)
 
     def test_should_not_create_when_profile_invalid(self):
         # Given: profile 관련 데이터가 invalid한 user 데이터가 주어진다.
