@@ -90,6 +90,12 @@ class UserViewSet(
 
         return Response(response_data, status=status.HTTP_201_CREATED)
 
+    def destroy(self, request, *args, **kwargs):
+        user = self.get_object()
+        user.deactivate()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
     @action(detail=True, methods=['patch'], url_path='check-univ')
     def check_email(self, request, *arg, **kwargs):
         user = self.get_object()
@@ -98,12 +104,6 @@ class UserViewSet(
         user.send_email()
 
         return update_response
-
-    def destroy(self, request, *args, **kwargs):
-        user = self.get_object()
-        user.deactivate()
-
-        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False, methods=['post'], url_path='confirm-user')
     def confirm_user(self, request, *arg, **kwargs):
