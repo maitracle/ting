@@ -15,6 +15,6 @@ class CoinHistory(BaseModel):
     CHANGE_REASON = Choices('SIGNUP', 'VIEW_PROFILE', 'SEND_MESSAGE',)
 
     user = models.ForeignKey('users.User', on_delete=models.CASCADE)
-    rest_coin = models.IntegerField()
+    rest_coin = models.PositiveSmallIntegerField()
     reason = models.CharField(max_length=50, choices=CHANGE_REASON)
     profile = models.OneToOneField('profiles.Profile', on_delete=models.DO_NOTHING, null=True, blank=True)

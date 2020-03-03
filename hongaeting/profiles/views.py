@@ -5,6 +5,7 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.mixins import ListModelMixin, UpdateModelMixin, RetrieveModelMixin
 from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
 
 from common.permissions import IsOwnerUserOrReadonly
 from profiles.models import Profile
@@ -62,21 +63,21 @@ class ProfileViewSet(
             profile=kwargs['pk']
         )
         rest_coin = CoinHistory.objects.filter(user=request.user).last().rest_coin
-        profile_data = self.get_object()
-        profile_serializer = self.get_serializer(profile_data)
-        if isRetrieved:
-            return Response(profile_serializer.data)
-        else:
-            if rest_coin >= 2:
+        if not isRetrieved:
+            try:
                 coin_history_data = {
                     "user": request.user.id,
                     "rest_coin": rest_coin - 2,
                     "reason": CoinHistory.CHANGE_REASON.VIEW_PROFILE,
                     "profile": int(kwargs['pk'])
                 }
+
                 coin_history_instance = CreateCoinHistorySerializer(data=coin_history_data)
                 coin_history_instance.is_valid(raise_exception=True)
                 coin_history_instance.save()
-                return Response(profile_serializer.data)
-            else:
+            except ValidationError:
                 return Response(status=status.HTTP_403_FORBIDDEN)
+        profile_data = self.get_object()
+        profile_serializer = self.get_serializer(profile_data)
+
+        return Response(profile_serializer.data)
