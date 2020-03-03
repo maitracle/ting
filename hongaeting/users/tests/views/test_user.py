@@ -1,3 +1,4 @@
+import json
 from unittest.mock import patch
 
 from assertpy import assert_that
@@ -24,13 +25,13 @@ class UserViewSetTestCase(APITestCase):
             "gender": "MALE",
             "scholarly_status": "ATTENDING",
             "university": "HONGIK",
-            "campus_location": "SEOUL",
+            "campus_location": "SEOUL"
         }
         user_code_length = 8
         SIGNUP_COIN = 30
 
         # When: user create api를 호출하여 회원가입을 한다.
-        response = self.client.post('/api/users/', data=user_data)
+        response = self.client.post('/api/users/', data=json.dumps(user_data), content_type='application/json')
 
         # Then: user와 profile이 만들어진다.
         #       user의 user_code가 정상적으로 만들어진다.
