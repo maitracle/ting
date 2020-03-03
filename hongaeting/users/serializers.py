@@ -6,6 +6,8 @@ from users.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
+    is_confirmed_student = serializers.BooleanField(read_only=True)
+
     class Meta:
         model = User
         fields = (
@@ -13,6 +15,7 @@ class UserSerializer(serializers.ModelSerializer):
             'email',
             'password',
             'university',
+            'is_confirmed_student',
         )
 
 
@@ -24,6 +27,7 @@ class RetrieveUserSerializer(serializers.ModelSerializer):
             'email',
             'university',
             'user_code',
+            'is_confirmed_student',
         )
 
 

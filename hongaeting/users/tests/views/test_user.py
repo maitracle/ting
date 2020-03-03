@@ -46,6 +46,7 @@ class UserViewSetTestCase(APITestCase):
         hashed_password_prefix = 'pbkdf2_sha256$150000$'
         assert_that(response.data['user']['password'].startswith(hashed_password_prefix)).is_true()
         assert_that(response.data['user']['university']).is_equal_to(user_data['university'])
+        assert_that(response.data['user']['is_confirmed_student']).is_false()
         assert_that(User.objects.get(email=user_data['email']).user_code).is_length(user_code_length)
 
         assert_that(response.data['profile']['nickname']).is_equal_to(user_data['nickname'])
@@ -288,8 +289,6 @@ class UserViewSetTestCase(APITestCase):
         assert_that('access' in response.data).is_true()
         assert_that('refresh' in response.data).is_true()
 
-        print(response.data['coin_history'])
-
         self._assert_user(response.data['user'], user)
         self._assert_profile(response.data['profile'], profile)
 
@@ -303,6 +302,7 @@ class UserViewSetTestCase(APITestCase):
         assert_that(responsed_user['email']).is_equal_to(expected_user.email)
         assert_that(responsed_user['university']).is_equal_to(expected_user.university)
         assert_that(responsed_user['user_code']).is_equal_to(expected_user.user_code)
+        assert_that(responsed_user['is_confirmed_student']).is_equal_to(expected_user.is_confirmed_student)
 
     @staticmethod
     def _assert_profile(responsed_profile, expected_profile):
