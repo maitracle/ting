@@ -71,7 +71,11 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = (
-            'chat_link',
+            'age',
+            'height',
+            'body_type',
+            'religion',
+            'is_smoke',
             'tags',
             'image',
             'appearance',
@@ -80,4 +84,5 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
             'date_style',
             'ideal_type',
             'one_sentence',
+            'chat_link',
         )
