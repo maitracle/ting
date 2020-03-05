@@ -2,4 +2,6 @@ from model_utils import Choices
 
 UNIVERSITY_LIST = Choices('HONGIK', 'KYUNGHEE', 'YONSEI', )
 
-SIGNUP_COIN = 30
+SIGNUP_REWARD = 30
+VIEW_PROFILE_COST = 2
+SEND_MESSAGE_COST = 10
