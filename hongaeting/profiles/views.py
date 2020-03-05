@@ -76,15 +76,15 @@ class ProfileViewSet(
 
         return Response(profile_serializer.data)
 
-    @action(detail=False, methods=['post'], url_path='chat-link')
+    @action(detail=True, methods=['get'], url_path='chat-link')
     def get_chat_link(self, request, *arg, **kwargs):
-        profile = Profile.objects.get(id=request.data["id"])
-        if not profile.is_valid_chat_link():
+        profile = self.get_object()
+        if not profile.is_valid_chat_link:
             return Response(status=status.HTTP_404_NOT_FOUND)
         isSent = CoinHistory.objects.filter(
             user=request.user,
             reason=CoinHistory.CHANGE_REASON.SEND_MESSAGE,
-            profile=request.data["id"]
+            profile=profile.id
         )
         if not isSent:
             try:
@@ -93,7 +93,7 @@ class ProfileViewSet(
                     "user": request.user.id,
                     "rest_coin": rest_coin - SEND_MESSAGE_COST,
                     "reason": CoinHistory.CHANGE_REASON.SEND_MESSAGE,
-                    "profile": request.data["id"]
+                    "profile": profile.id
                 }
 
                 coin_history_instance = CreateCoinHistorySerializer(data=coin_history_data)
