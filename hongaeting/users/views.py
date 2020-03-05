@@ -12,7 +12,7 @@ from self_date.serializer import CreateCoinHistorySerializer
 from users.models import User
 from users.permissions import IsSameUserWithRequestUser
 from users.serializers import UserSerializer, TokenSerializer, UserCheckUnivSerializer
-from common.constants import SIGNUP_COIN
+from common.constants import SIGNUP_REWARD
 from self_date.models import CoinHistory
 
 
@@ -68,7 +68,7 @@ class UserViewSet(
 
         coin_history_data = {
             'user': created_user.id,
-            'rest_coin': SIGNUP_COIN,
+            'rest_coin': SIGNUP_REWARD,
             'reason': CoinHistory.CHANGE_REASON.SIGNUP,
         }
 

@@ -8,7 +8,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from common.constants import SIGNUP_COIN
+from common.constants import SIGNUP_REWARD
 from common.utils import Email, reformat_datetime
 from profiles.models import Profile
 from self_date.models import CoinHistory
@@ -52,7 +52,7 @@ class UserViewSetTestCase(APITestCase):
         assert_that(profile.campus_location).is_equal_to(user_data['campus_location'])
 
         coin_history = CoinHistory.objects.get(user=user.id)
-        assert_that(coin_history.rest_coin).is_equal_to(SIGNUP_COIN)
+        assert_that(coin_history.rest_coin).is_equal_to(SIGNUP_REWARD)
         assert_that(coin_history.reason).is_equal_to(CoinHistory.CHANGE_REASON.SIGNUP)
 
     def test_should_not_create_when_profile_invalid(self):
