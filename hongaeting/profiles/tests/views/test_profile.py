@@ -3,7 +3,7 @@ from model_bakery import baker
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from common.constants import UNIVERSITY_LIST, VIEW_PROFILE_COST, SIGNUP_REWARD
+from common.constants import UNIVERSITY_LIST, VIEW_PROFILE_COST, SIGNUP_REWARD, SEND_MESSAGE_COST
 from profiles.models import Profile
 from self_date.models import CoinHistory
 
@@ -213,3 +213,72 @@ class ProfileTestCase(APITestCase):
         error_code = 'permission_denied'
         assert_that(response.data['detail']).is_equal_to(error_message)
         assert_that(response.data['detail'].code).is_equal_to(error_code)
+
+    def test_should_get_chat_link(self):
+        # Given: user 1명과 메시지를 보낼 profile이 1개 주어진다. user의 rest_coin이 충분한 coin_history가 주어진다.
+        user = baker.make('users.User')
+        expected_profile = baker.make('profiles.Profile', chat_link="chatlink@test.com")
+        coin_history = baker.make(
+            'self_date.CoinHistory',
+            user=user,
+            reason=CoinHistory.CHANGE_REASON.SIGNUP,
+            rest_coin=SIGNUP_REWARD
+        )
+
+        # When: user가 send_message api를 호출한다.
+        self.client.force_authenticate(user=user)
+        response = self.client.get(f'/api/profiles/{expected_profile.id}/chat-link/')
+
+        # Then: 정상적으로 chat_link가 반환되고 user의 코인 개수가 비용만큼 줄어든다.
+        assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
+        assert_that(response.data['chat_link']).is_equal_to(expected_profile.chat_link)
+
+        created_coin_history = CoinHistory.objects.filter(user=user).last()
+        assert_that(created_coin_history.rest_coin).is_equal_to(coin_history.rest_coin - SEND_MESSAGE_COST)
+        assert_that(created_coin_history.profile).is_equal_to(expected_profile)
+
+    def test_should_get_chat_link_which_user_sent(self):
+        # Given: user 1명과 메시지를 보낼 profile이 1개 주어진다.
+        # user가 profile에게 메시지를 보냈적이 있음을 알리는 coin_history가 주어진다.
+        user = baker.make('users.User')
+        expected_profile = baker.make('profiles.Profile')
+        coin_history = baker.make(
+            'self_date.CoinHistory',
+            user=user,
+            reason=CoinHistory.CHANGE_REASON.SEND_MESSAGE,
+            rest_coin=SIGNUP_REWARD - SEND_MESSAGE_COST,
+            profile=expected_profile
+        )
+
+        # When: user가 send_message api를 호출한다.
+        self.client.force_authenticate(user=user)
+        response = self.client.get(f'/api/profiles/{expected_profile.id}/chat-link/')
+
+        # Then: 정상적으로 chat_link가 반환되고 user의 코인 개수는 줄어들지 않는다.
+        assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
+        assert_that(response.data['chat_link']).is_equal_to(expected_profile.chat_link)
+
+        created_coin_history = CoinHistory.objects.filter(user=user).last()
+        assert_that(created_coin_history.rest_coin).is_equal_to(coin_history.rest_coin)
+        assert_that(created_coin_history.profile).is_equal_to(expected_profile)
+
+    def test_should_not_get_chat_link_when_user_does_not_have_coin(self):
+        # Given: user 1명과 메시지를 보낼 profile이 1개 주어진다. user의 rest_coin이 0인 coin_history가 주어진다.
+        user = baker.make('users.User')
+        expected_profile = baker.make('profiles.Profile')
+        coin_history = baker.make(
+            'self_date.CoinHistory',
+            user=user,
+            reason=CoinHistory.CHANGE_REASON.SEND_MESSAGE,
+            rest_coin=0,
+        )
+
+        # When: user가 send_message api를 호출한다.
+        self.client.force_authenticate(user=user)
+        response = self.client.get(f'/api/profiles/{expected_profile.id}/chat-link/')
+
+        # Then: 403 에러가 반환되고 user의 코인 개수는 줄어들지 않는다.
+        assert_that(response.status_code).is_equal_to(status.HTTP_403_FORBIDDEN)
+
+        created_coin_history = CoinHistory.objects.filter(user=user).last()
+        assert_that(created_coin_history.rest_coin).is_equal_to(coin_history.rest_coin)

@@ -1,4 +1,5 @@
 from bs4 import BeautifulSoup
+from django.conf import settings
 
 from common.requests import Request
 
@@ -10,6 +11,9 @@ class Kakao:
 
     @classmethod
     def is_valid_kakao_link(cls, kakao_link):
+        if settings.TEST:
+
+            return True
         request = Request.instance()
 
         response = request.get(kakao_link)

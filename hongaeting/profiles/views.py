@@ -7,7 +7,7 @@ from rest_framework.mixins import ListModelMixin, UpdateModelMixin, RetrieveMode
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 
-from common.constants import VIEW_PROFILE_COST
+from common.constants import VIEW_PROFILE_COST, SEND_MESSAGE_COST
 from common.permissions import IsOwnerUserOrReadonly
 from profiles.models import Profile
 from profiles.serializers import ListProfileSerializer, UpdateProfileSerializer, RetrieveProfileSerializer
@@ -75,3 +75,34 @@ class ProfileViewSet(
         profile_serializer = self.get_serializer(profile_data)
 
         return Response(profile_serializer.data)
+
+    @action(detail=True, methods=['get'], url_path='chat-link')
+    def get_chat_link(self, request, *arg, **kwargs):
+        profile = self.get_object()
+        if not profile.is_valid_chat_link:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        isSent = CoinHistory.objects.filter(
+            user=request.user,
+            reason=CoinHistory.CHANGE_REASON.SEND_MESSAGE,
+            profile=profile.id
+        )
+        if not isSent:
+            try:
+                rest_coin = CoinHistory.objects.filter(user=request.user).last().rest_coin
+                coin_history_data = {
+                    "user": request.user.id,
+                    "rest_coin": rest_coin - SEND_MESSAGE_COST,
+                    "reason": CoinHistory.CHANGE_REASON.SEND_MESSAGE,
+                    "profile": profile.id
+                }
+
+                coin_history_instance = CreateCoinHistorySerializer(data=coin_history_data)
+                coin_history_instance.is_valid(raise_exception=True)
+                coin_history_instance.save()
+            except ValidationError:
+                return Response(status=status.HTTP_403_FORBIDDEN)
+
+        chat_link = {
+            "chat_link": profile.chat_link,
+        }
+        return Response(chat_link)

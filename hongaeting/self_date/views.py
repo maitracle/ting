@@ -1,4 +1,4 @@
-from django_rest_framework_mango.mixins import QuerysetMixin, SerializerMixin
+from django_rest_framework_mango.mixins import QuerysetMixin
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.mixins import ListModelMixin, DestroyModelMixin
