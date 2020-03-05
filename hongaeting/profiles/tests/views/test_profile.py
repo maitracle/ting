@@ -3,7 +3,7 @@ from model_bakery import baker
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from common.constants import UNIVERSITY_LIST, VIEW_PROFILE_COST
+from common.constants import UNIVERSITY_LIST, VIEW_PROFILE_COST, SIGNUP_REWARD
 from profiles.models import Profile
 from self_date.models import CoinHistory
 
@@ -100,7 +100,7 @@ class ProfileTestCase(APITestCase):
             'self_date.CoinHistory',
             user=user,
             reason=CoinHistory.CHANGE_REASON.SIGNUP,
-            rest_coin=30
+            rest_coin=SIGNUP_REWARD
         )
 
         # When: user가 retrieve api를 호출한다.
