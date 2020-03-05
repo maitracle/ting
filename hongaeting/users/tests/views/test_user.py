@@ -49,16 +49,13 @@ class UserViewSetTestCase(APITestCase):
         assert_that(response.data['user']['is_confirmed_student']).is_false()
         assert_that(User.objects.get(email=user_data['email']).user_code).is_length(user_code_length)
 
-        coin_history = CoinHistory.objects.get(user=user.id)
-        assert_that(coin_history.rest_coin).is_equal_to(SIGNUP_REWARD)
-        assert_that(coin_history.reason).is_equal_to(CoinHistory.CHANGE_REASON.SIGNUP)
         assert_that(response.data['profile']['nickname']).is_equal_to(user_data['nickname'])
         assert_that(response.data['profile']['gender']).is_equal_to(user_data['gender'])
         assert_that(response.data['profile']['scholarly_status']).is_equal_to(user_data['scholarly_status'])
         assert_that(response.data['profile']['campus_location']).is_equal_to(user_data['campus_location'])
 
         assert_that(response.data['coin_history']).is_length(1)
-        assert_that(response.data['coin_history'][0]['rest_coin']).is_equal_to(SIGNUP_COIN)
+        assert_that(response.data['coin_history'][0]['rest_coin']).is_equal_to(SIGNUP_REWARD)
         assert_that(response.data['coin_history'][0]['reason']).is_equal_to(CoinHistory.CHANGE_REASON.SIGNUP)
 
     def test_should_not_create_when_profile_invalid(self):
