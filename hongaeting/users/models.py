@@ -6,6 +6,7 @@ from django.utils.crypto import get_random_string
 from common.constants import UNIVERSITY_LIST
 from common.models import BaseModel
 from common.utils import Email
+from hongaeting.settings.local import FRONT_END_MAIL_CHECK_PAGE
 
 
 class UserManager(BaseUserManager):
@@ -77,7 +78,7 @@ class User(BaseModel, AbstractBaseUser):
 
     def send_email(self):
         # Todo(10000001a): Email template 다시 작업해야함
-        html_content = render_to_string('mail_template.html', {'user_code': self.user_code})
+        html_content = render_to_string('mail_template.html', {'user_code': self.user_code, 'front_address': FRONT_END_MAIL_CHECK_PAGE})
         Email.send_email(f'{self.profile.nickname}님 학생 인증을 완료해주세요.', html_content, self.university_email)
 
     def set_user_code(self):
