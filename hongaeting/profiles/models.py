@@ -72,4 +72,8 @@ class Profile(BaseModel):
 
     @property
     def is_valid_chat_link(self):
-        return Kakao.is_valid_kakao_link(self.chat_link)
+        try:
+            is_valid = Kakao.is_valid_kakao_link(self.chat_link)
+        except:
+            is_valid = False
+        return is_valid
