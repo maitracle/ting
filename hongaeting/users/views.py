@@ -6,12 +6,13 @@ from rest_framework.mixins import UpdateModelMixin, DestroyModelMixin
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from profiles.serializers import CreateProfileSerializer
 from self_date.serializer import CreateSignupCoinHistorySerializer
 from users.models import User
 from users.permissions import IsSameUserWithRequestUser
-from users.serializers import UserSerializer, TokenSerializer, UserCheckUnivSerializer
+from users.serializers import UserSerializer, TokenSerializer, UserCheckUnivSerializer, MySerializer
 from common.constants import SIGNUP_COIN
 from self_date.models import CoinHistory
 
@@ -34,6 +35,7 @@ class UserViewSet(
         'update': UserSerializer,
         'partial_update': UserSerializer,
         'check_email': UserCheckUnivSerializer,
+        'my': MySerializer,
     }
 
     @action(detail=False, methods=['post'])
@@ -41,12 +43,16 @@ class UserViewSet(
         token_obtain_pair_serializer = TokenObtainPairSerializer(data=request.data)
 
         token_obtain_pair_serializer.is_valid(raise_exception=True)
-        token_with_profile = {
+        user = User.objects.get(email=request.data['email'])
+        coin_history_list = CoinHistory.objects.filter(user=user)
+        response_data = {
             **token_obtain_pair_serializer.validated_data,
-            'profile': User.objects.get(email=request.data['email']).profile
+            'user': user,
+            'profile': user.profile,
+            'coin_history': coin_history_list,
         }
 
-        serializer = self.get_serializer(token_with_profile)
+        serializer = self.get_serializer(response_data)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
 
     @transaction.atomic
@@ -77,7 +83,23 @@ class UserViewSet(
         coin_history_serializer.is_valid(raise_exception=True)
         coin_history_serializer.save()
 
-        return Response(user_serializer.data, status=status.HTTP_201_CREATED)
+        refresh = RefreshToken.for_user(created_user)
+
+        response_data = {
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+            'user': user_serializer.data,
+            'profile': profile_serializer.data,
+            'coin_history': [coin_history_serializer.data],
+        }
+
+        return Response(response_data, status=status.HTTP_201_CREATED)
+
+    def destroy(self, request, *args, **kwargs):
+        user = self.get_object()
+        user.deactivate()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=True, methods=['patch'], url_path='check-univ')
     def check_email(self, request, *arg, **kwargs):
@@ -87,12 +109,6 @@ class UserViewSet(
         user.send_email()
 
         return update_response
-
-    def destroy(self, request, *args, **kwargs):
-        user = self.get_object()
-        user.deactivate()
-
-        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False, methods=['post'], url_path='confirm-user')
     def confirm_user(self, request, *arg, **kwargs):
@@ -104,3 +120,14 @@ class UserViewSet(
             return Response(user_code, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response(user_code, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['get'])
+    def my(self, request, *args, **kwargs):
+        data = {
+            'user': request.user,
+            'profile': request.user.profile,
+            'coin_history': CoinHistory.objects.filter(user=request.user),
+
+        }
+        serializer = self.get_serializer(data)
+        return Response(serializer.data)
