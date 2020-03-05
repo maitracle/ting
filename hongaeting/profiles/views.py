@@ -10,8 +10,7 @@ from rest_framework.exceptions import ValidationError
 from common.constants import VIEW_PROFILE_COST
 from common.permissions import IsOwnerUserOrReadonly
 from profiles.models import Profile
-from profiles.serializers import ListProfileSerializer, UpdateProfileSerializer, RetrieveProfileSerializer, \
-    MyProfileSerializer
+from profiles.serializers import ListProfileSerializer, UpdateProfileSerializer, RetrieveProfileSerializer
 from self_date.models import CoinHistory
 from self_date.serializer import CreateCoinHistorySerializer
 
@@ -28,7 +27,6 @@ class ProfileViewSet(
         'update': UpdateProfileSerializer,
         'partial_update': UpdateProfileSerializer,
         'retrieve': RetrieveProfileSerializer,
-        'my': MyProfileSerializer,
     }
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('gender', 'user__university',)
@@ -51,11 +49,6 @@ class ProfileViewSet(
                 output_field=BooleanField()
             )
         )
-
-    @action(detail=False, methods=['get'])
-    def my(self, request, *args, **kwargs):
-        serializer = self.get_serializer(request.user.profile)
-        return Response(serializer.data)
 
     def retrieve(self, request, *args, **kwargs):
         isRetrieved = CoinHistory.objects.filter(

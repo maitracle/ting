@@ -63,6 +63,7 @@ class RetrieveProfileSerializer(serializers.ModelSerializer):
             'date_style',
             'ideal_type',
             'one_sentence',
+            'chat_link',
         )
 
 
@@ -80,33 +81,3 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
             'ideal_type',
             'one_sentence',
         )
-
-
-class MyProfileSerializer(serializers.ModelSerializer):
-    university = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Profile
-        fields = (
-            'id',
-            'created_at',
-            'updated_at',
-            'nickname',
-            'gender',
-            'age',
-            'height',
-            'body_type',
-            'tags',
-            'image',
-            'appearance',
-            'personality',
-            'hobby',
-            'date_style',
-            'ideal_type',
-            'one_sentence',
-            'chat_link',
-            'university',
-        )
-
-    def get_university(self, obj):
-        return obj.user.university

@@ -34,7 +34,6 @@ class UserManager(BaseUserManager):
 
 
 class User(BaseModel, AbstractBaseUser):
-
     email = models.EmailField(max_length=100, unique=True)
 
     is_staff = models.BooleanField(default=False)
@@ -79,7 +78,7 @@ class User(BaseModel, AbstractBaseUser):
     def send_email(self):
         # Todo(10000001a): Email template 다시 작업해야함
         html_content = render_to_string('mail_template.html', {'user_code': self.user_code})
-        Email.send_email('title', html_content, [self.university_email])
+        Email.send_email('title', html_content, self.university_email)
 
     def set_user_code(self):
         user_code = get_random_string(length=8)

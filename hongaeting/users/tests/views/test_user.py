@@ -34,26 +34,32 @@ class UserViewSetTestCase(APITestCase):
         response = self.client.post('/api/users/', data=json.dumps(user_data), content_type='application/json')
 
         # Then: user와 profile이 만들어진다.
-        #       user의 user_code가 정상적으로 만들어진다.
-        #       user의 coin_history가 정상적으로 만들어진다.
+        #       user의 user_code가 만들어진다.
+        #       reason이 sign up coin_history가 만들어진다.
+        #       access token, refresh token이 반환된다.
         assert_that(response.status_code).is_equal_to(status.HTTP_201_CREATED)
 
-        user = User.objects.get(email=user_data['email'])
-        assert_that(user.email).is_equal_to(user_data['email'])
-        assert_that(user.password).is_equal_to(user_data['password'])
-        assert_that(user.university).is_equal_to(user_data['university'])
-        assert_that(type(user.user_code)).is_equal_to(str)
-        assert_that(user.user_code).is_length(user_code_length)
+        assert_that('access' in response.data).is_true()
+        assert_that('refresh' in response.data).is_true()
 
-        profile = Profile.objects.get(user=user.id)
-        assert_that(profile.nickname).is_equal_to(user_data['nickname'])
-        assert_that(profile.gender).is_equal_to(user_data['gender'])
-        assert_that(profile.scholarly_status).is_equal_to(user_data['scholarly_status'])
-        assert_that(profile.campus_location).is_equal_to(user_data['campus_location'])
+        assert_that(response.data['user']['email']).is_equal_to(user_data['email'])
+        hashed_password_prefix = 'pbkdf2_sha256$150000$'
+        assert_that(response.data['user']['password'].startswith(hashed_password_prefix)).is_true()
+        assert_that(response.data['user']['university']).is_equal_to(user_data['university'])
+        assert_that(response.data['user']['is_confirmed_student']).is_false()
+        assert_that(User.objects.get(email=user_data['email']).user_code).is_length(user_code_length)
 
         coin_history = CoinHistory.objects.get(user=user.id)
         assert_that(coin_history.rest_coin).is_equal_to(SIGNUP_REWARD)
         assert_that(coin_history.reason).is_equal_to(CoinHistory.CHANGE_REASON.SIGNUP)
+        assert_that(response.data['profile']['nickname']).is_equal_to(user_data['nickname'])
+        assert_that(response.data['profile']['gender']).is_equal_to(user_data['gender'])
+        assert_that(response.data['profile']['scholarly_status']).is_equal_to(user_data['scholarly_status'])
+        assert_that(response.data['profile']['campus_location']).is_equal_to(user_data['campus_location'])
+
+        assert_that(response.data['coin_history']).is_length(1)
+        assert_that(response.data['coin_history'][0]['rest_coin']).is_equal_to(SIGNUP_COIN)
+        assert_that(response.data['coin_history'][0]['reason']).is_equal_to(CoinHistory.CHANGE_REASON.SIGNUP)
 
     def test_should_not_create_when_profile_invalid(self):
         # Given: profile 관련 데이터가 invalid한 user 데이터가 주어진다.
@@ -77,6 +83,8 @@ class UserViewSetTestCase(APITestCase):
         assert_that(user).is_empty()
         profile = Profile.objects.filter(nickname=user_data['nickname'])
         assert_that(profile).is_empty()
+        coin_history = CoinHistory.objects.filter(user__email=user_data['email'])
+        assert_that(coin_history).is_empty()
 
     def test_should_not_create_when_user_invalid(self):
         # Given: user 관련 데이터가 invalid한 user 데이터가 주어진다.
@@ -100,6 +108,8 @@ class UserViewSetTestCase(APITestCase):
         assert_that(user).is_empty()
         profile = Profile.objects.filter(nickname=user_data['nickname'])
         assert_that(profile).is_empty()
+        coin_history = CoinHistory.objects.filter(user__email=user_data['email'])
+        assert_that(coin_history).is_empty()
 
     def test_should_update_user(self):
         # Given: user와 바꿀 user data가 주어진다
@@ -168,6 +178,27 @@ class UserViewSetTestCase(APITestCase):
         # Then: user삭제를 실패한다.
         assert_that(response.status_code).is_equal_to(status.HTTP_403_FORBIDDEN)
         assert_that(User.objects.get(id=user_id).is_active).is_true()
+
+    def test_should_get_my_user_profile_coin_history(self):
+        # Given: user와 profile, coin_history가 주어진다.
+        expected_user = baker.make('users.User')
+        expected_profile = baker.make('profiles.Profile', user=expected_user)
+        coin_history_quantity = 5
+        expected_coin_history_list = baker.make('self_date.CoinHistory', user=expected_user, _quantity=coin_history_quantity)
+
+        # When: user가 my profile api를 호출한다.
+        self.client.force_authenticate(user=expected_user)
+        response = self.client.get(f'/api/users/my/')
+
+        # Then: 자신의 user, profile, coin_history가 반환된다.
+        assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
+
+        self._assert_user(response.data['user'], expected_user)
+        self._assert_profile(response.data['profile'], expected_profile)
+
+        assert_that(response.data['coin_history']).is_length(coin_history_quantity)
+        for response_coin_history, expected_coin_history in zip(response.data['coin_history'], expected_coin_history_list):
+            self._assert_coin_history(response_coin_history, expected_coin_history)
 
     @patch.object(Email, 'send_email')
     def test_should_check_university(self, send_email):
@@ -240,11 +271,14 @@ class UserViewSetTestCase(APITestCase):
         assert_that(response.status_code).is_equal_to(status.HTTP_400_BAD_REQUEST)
         assert_that(user.is_confirmed_student).is_false()
 
-    def test_should_get_jwt_token_and_profile(self):
-        # Given: user, profile, 올바른 email, password가 주어진다.
+    def test_should_get_jwt_token_user_profile_and_coin_history(self):
+        # Given: user, profile, coin_history, 올바른 email, password가 주어진다.
         password_string = 'password'
         user = baker.make('users.User', password=make_password(password_string), is_active=True)
         profile = baker.make('profiles.Profile', user=user)
+
+        coin_history_quantity = 5
+        coin_history_list = baker.make('self_date.CoinHistory', user=user, _quantity=coin_history_quantity)
 
         # When: login api를 호출한다.
         payload = {
@@ -253,30 +287,55 @@ class UserViewSetTestCase(APITestCase):
         }
         response = self.client.post('/api/users/tokens/', data=payload)
 
-        # Then: access token, refresh token, profile이 반환된다.
+        # Then: access token, refresh token, user, profile, coin_history가 반환된다.
         assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
         assert_that('access' in response.data).is_true()
         assert_that('refresh' in response.data).is_true()
 
-        assert_that(response.data['profile']['university']).is_equal_to(user.university)
+        self._assert_user(response.data['user'], user)
+        self._assert_profile(response.data['profile'], profile)
 
-        assert_that(response.data['profile']['id']).is_equal_to(profile.id)
-        assert_that(response.data['profile']['created_at']).is_equal_to(reformat_datetime(profile.created_at))
-        assert_that(response.data['profile']['updated_at']).is_equal_to(reformat_datetime(profile.updated_at))
-        assert_that(response.data['profile']['nickname']).is_equal_to(profile.nickname)
-        assert_that(response.data['profile']['gender']).is_equal_to(profile.gender)
-        assert_that(response.data['profile']['age']).is_equal_to(profile.age)
-        assert_that(response.data['profile']['height']).is_equal_to(profile.height)
-        assert_that(response.data['profile']['body_type']).is_equal_to(profile.body_type)
-        assert_that(response.data['profile']['tags']).is_equal_to(profile.tags)
-        assert_that(response.data['profile']['image']).is_equal_to(profile.image)
-        assert_that(response.data['profile']['appearance']).is_equal_to(profile.appearance)
-        assert_that(response.data['profile']['personality']).is_equal_to(profile.personality)
-        assert_that(response.data['profile']['hobby']).is_equal_to(profile.hobby)
-        assert_that(response.data['profile']['date_style']).is_equal_to(profile.date_style)
-        assert_that(response.data['profile']['ideal_type']).is_equal_to(profile.ideal_type)
-        assert_that(response.data['profile']['one_sentence']).is_equal_to(profile.one_sentence)
-        assert_that(response.data['profile']['chat_link']).is_equal_to(profile.chat_link)
+        assert_that(response.data['coin_history']).is_length(coin_history_quantity)
+        for response_coin_history, expected_coin_history in zip(response.data['coin_history'], coin_history_list):
+            self._assert_coin_history(response_coin_history, expected_coin_history)
+
+    @staticmethod
+    def _assert_user(responsed_user, expected_user):
+        assert_that(responsed_user['id']).is_equal_to(expected_user.id)
+        assert_that(responsed_user['email']).is_equal_to(expected_user.email)
+        assert_that(responsed_user['university']).is_equal_to(expected_user.university)
+        assert_that(responsed_user['user_code']).is_equal_to(expected_user.user_code)
+        assert_that(responsed_user['is_confirmed_student']).is_equal_to(expected_user.is_confirmed_student)
+
+    @staticmethod
+    def _assert_profile(responsed_profile, expected_profile):
+        assert_that(responsed_profile['id']).is_equal_to(expected_profile.id)
+        assert_that(responsed_profile['created_at']).is_equal_to(reformat_datetime(expected_profile.created_at))
+        assert_that(responsed_profile['updated_at']).is_equal_to(reformat_datetime(expected_profile.updated_at))
+        assert_that(responsed_profile['nickname']).is_equal_to(expected_profile.nickname)
+        assert_that(responsed_profile['gender']).is_equal_to(expected_profile.gender)
+        assert_that(responsed_profile['age']).is_equal_to(expected_profile.age)
+        assert_that(responsed_profile['height']).is_equal_to(expected_profile.height)
+        assert_that(responsed_profile['body_type']).is_equal_to(expected_profile.body_type)
+        assert_that(responsed_profile['tags']).is_equal_to(expected_profile.tags)
+        assert_that(responsed_profile['image']).is_equal_to(expected_profile.image)
+        assert_that(responsed_profile['appearance']).is_equal_to(expected_profile.appearance)
+        assert_that(responsed_profile['personality']).is_equal_to(expected_profile.personality)
+        assert_that(responsed_profile['hobby']).is_equal_to(expected_profile.hobby)
+        assert_that(responsed_profile['date_style']).is_equal_to(expected_profile.date_style)
+        assert_that(responsed_profile['ideal_type']).is_equal_to(expected_profile.ideal_type)
+        assert_that(responsed_profile['one_sentence']).is_equal_to(expected_profile.one_sentence)
+        assert_that(responsed_profile['chat_link']).is_equal_to(expected_profile.chat_link)
+
+    @staticmethod
+    def _assert_coin_history(response_coin_history, expected_coin_history):
+        assert_that(response_coin_history['id']).is_equal_to(expected_coin_history.id)
+        assert_that(response_coin_history['user']).is_equal_to(expected_coin_history.user.id)
+        assert_that(response_coin_history['rest_coin']).is_equal_to(expected_coin_history.rest_coin)
+        assert_that(response_coin_history['reason']).is_equal_to(expected_coin_history.reason)
+        assert_that(response_coin_history['profile']).is_equal_to(expected_coin_history.profile)
+        assert_that(response_coin_history['created_at']).is_equal_to(reformat_datetime(expected_coin_history.created_at))
+        assert_that(response_coin_history['updated_at']).is_equal_to(reformat_datetime(expected_coin_history.updated_at))
 
     def test_should_fail_get_jwt_token(self):
         # Given: user, profile, 올바르지 않은 email, password가 주어진다.
