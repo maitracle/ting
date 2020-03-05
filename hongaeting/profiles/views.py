@@ -51,14 +51,14 @@ class ProfileViewSet(
         )
 
     def retrieve(self, request, *args, **kwargs):
-        isRetrieved = CoinHistory.objects.filter(
+        isViewed = CoinHistory.objects.filter(
             user=request.user,
             reason=CoinHistory.CHANGE_REASON.VIEW_PROFILE,
             profile=kwargs['pk']
-        )
-        rest_coin = CoinHistory.objects.filter(user=request.user).last().rest_coin
-        if not isRetrieved:
+        ).exists()
+        if not isViewed:
             try:
+                rest_coin = CoinHistory.objects.filter(user=request.user).last().rest_coin
                 coin_history_data = {
                     "user": request.user.id,
                     "rest_coin": rest_coin - VIEW_PROFILE_COST,
