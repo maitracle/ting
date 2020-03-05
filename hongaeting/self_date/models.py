@@ -17,4 +17,4 @@ class CoinHistory(BaseModel):
     user = models.ForeignKey('users.User', on_delete=models.CASCADE)
     rest_coin = models.PositiveSmallIntegerField()
     reason = models.CharField(max_length=50, choices=CHANGE_REASON)
-    profile = models.OneToOneField('profiles.Profile', on_delete=models.DO_NOTHING, null=True, blank=True)
+    profile = models.ForeignKey('profiles.Profile', on_delete=models.DO_NOTHING, null=True, blank=True)

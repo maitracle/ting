@@ -56,6 +56,7 @@ class ProfileViewSet(
             reason=CoinHistory.CHANGE_REASON.VIEW_PROFILE,
             profile=kwargs['pk']
         ).exists()
+
         if not isViewed:
             try:
                 rest_coin = CoinHistory.objects.filter(user=request.user).last().rest_coin
@@ -69,10 +70,12 @@ class ProfileViewSet(
                 coin_history_instance = CreateCoinHistorySerializer(data=coin_history_data)
                 coin_history_instance.is_valid(raise_exception=True)
                 coin_history_instance.save()
+
             except ValidationError:
                 return Response(status=status.HTTP_403_FORBIDDEN)
-        profile_data = self.get_object()
-        profile_serializer = self.get_serializer(profile_data)
+
+        profile = self.get_object()
+        profile_serializer = self.get_serializer(profile)
 
         return Response(profile_serializer.data)
 

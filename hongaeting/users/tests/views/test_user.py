@@ -201,6 +201,7 @@ class UserViewSetTestCase(APITestCase):
     def test_should_check_university(self, send_email):
         # Given: user와 등록할 user의 학교 이메일이 주어진다.
         user = baker.make('users.User')
+        baker.make('profiles.Profile', user=user)
         user_id = user.id
         data = {
             "university_email": "test@test.com"
