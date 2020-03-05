@@ -1,13 +1,16 @@
-from django_rest_framework_mango.mixins import QuerysetMixin, SerializerMixin
+from django_rest_framework_mango.mixins import QuerysetMixin
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 from rest_framework.mixins import ListModelMixin, DestroyModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from common.constants import SEND_MESSAGE_COST
 from common.permissions import IsOwnerUserOrReadonly
 from self_date.models import CoinHistory, Like
-from self_date.serializer import ListCoinHistorySerializer, LikeSerializer
+from self_date.serializer import ListCoinHistorySerializer, LikeSerializer, CreateCoinHistorySerializer
+from profiles.models import Kakao, Profile
 
 
 class CoinHistoryViewSet(
@@ -24,6 +27,37 @@ class CoinHistoryViewSet(
 
     def list_queryset(self, queryset):
         return self.filtered_queryset_by_user(queryset)
+
+    @action(detail=True, methods=['post'], url_path='send-message')
+    def send_message(self, request, *arg, **kwargs):
+        profile = Profile.objects.get(id=int(kwargs['pk']))
+        if not Kakao.is_valid_kakao_link(profile.chat_link):
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        else:
+            isSent = CoinHistory.objects.filter(
+                user=request.user,
+                reason=CoinHistory.CHANGE_REASON.SEND_MESSAGE,
+                profile=kwargs['pk']
+            )
+            rest_coin = CoinHistory.objects.filter(user=request.user).last().rest_coin
+            if not isSent:
+                try:
+                    coin_history_data = {
+                        "user": request.user.id,
+                        "rest_coin": rest_coin - SEND_MESSAGE_COST,
+                        "reason": CoinHistory.CHANGE_REASON.SEND_MESSAGE,
+                        "profile": int(kwargs['pk'])
+                    }
+
+                    coin_history_instance = CreateCoinHistorySerializer(data=coin_history_data)
+                    coin_history_instance.is_valid(raise_exception=True)
+                    coin_history_instance.save()
+                except ValidationError:
+                    return Response(status=status.HTTP_403_FORBIDDEN)
+            chat_link = {
+                "chat_link": profile.chat_link,
+            }
+            return Response(chat_link)
 
 
 class LikeViewSet(
