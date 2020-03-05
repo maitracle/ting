@@ -92,7 +92,7 @@ class ProfileTestCase(APITestCase):
         for response_profile, expected_is_viewed in zip(response.data, expected_is_viewed_list):
             assert_that(response_profile['is_viewed']).is_equal_to(expected_is_viewed)
 
-    def test_should_get_profile(self):
+    def test_should_get_profile_retrieve(self):
         # Given: user 1명과 profile이 주어진다.
         user = baker.make('users.User')
         expected_profile = baker.make('profiles.Profile')
