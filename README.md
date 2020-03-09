@@ -37,6 +37,10 @@ hongaeting_test=# ALTER ROLE postgres CREATEDB;
 # db client 관련 문제
 # https://stackoverflow.com/questions/44084846/cannot-connect-to-the-docker-daemon-on-macos
 env LDFLAGS="-I/usr/local/opt/openssl/include -L/usr/local/opt/openssl/lib" pip install psycopg2==2.8.4
+
+# ubuntu에서는
+#sudo apt-get install python-psycopg2
+sudo apt install libpq-dev python3-dev # 이게 되는듯?!
 ```
 
 #### pyenv 설치 (with pyenv-installer)
@@ -60,9 +64,9 @@ eval "$(pyenv virtualenv-init -)"
 
 #### 가상환경 설정
 ```
-$ pyenv install 3.7.4
+$ pyenv install 3.7.6
 
-$ pyenv virtualenv 3.7.4 {project-name}-env
+$ pyenv virtualenv 3.7.6 {project-name}-env
 
 $ mkdir {project-name}
 
