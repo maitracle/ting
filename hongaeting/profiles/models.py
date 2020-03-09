@@ -25,10 +25,10 @@ class QuestionItem(BaseModel):
 
 
 class Profile(BaseModel):
-    BODY_TYPE_CHOICES = Choices('SKINNY', 'SLIM', 'NORMAL', 'CHUBBY', 'GLAMOROUS', 'FIT')
+    BODY_TYPE_CHOICES = Choices('SKINNY', 'SLIM', 'SLIMFIT', 'NORMAL', 'FIT', 'CHUBBY')
     GENDER_CHOICES = Choices('MALE', 'FEMALE')
     RELIGION_CHOICES = Choices('NOTHING', 'CHRISTIANITY', 'BUDDHISM', 'CATHOLIC', 'ETC')
-    IS_SMOKE_CHOICES = Choices('YES', 'NO', 'SOMETIMES')
+    IS_SMOKE_CHOICES = Choices('YES', 'NO')
     CAMPUS_LOCATION_CHOICES = Choices('SEOUL', 'INTERNATIONAL', 'SINCHON')
     SCHOLARLY_STATUS_CHOICES = Choices('ATTENDING', 'TAKINGOFF')
 
@@ -45,7 +45,7 @@ class Profile(BaseModel):
 
     tags = models.CharField(max_length=500, blank=True)
     image = models.CharField(max_length=100, blank=True)
-    one_sentence = models.CharField(max_length=300, blank=True)
+    one_sentence = models.CharField(max_length=35, blank=True)
 
     appearance = models.CharField(max_length=1000, validators=[MinLengthValidator(120)], blank=True)
     personality = models.CharField(max_length=1000, validators=[MinLengthValidator(120)], blank=True)
