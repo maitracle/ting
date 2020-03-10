@@ -5,7 +5,7 @@ PROFILE = 'Production'
 
 DEBUG = False
 
-ALLOWED_HOSTS = ['ec2-46-51-226-242.ap-northeast-1.compute.amazonaws.com:8080']
+ALLOWED_HOSTS = ['*']
 
 
 # Build paths
