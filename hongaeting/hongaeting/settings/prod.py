@@ -7,6 +7,9 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
+# CORS
+CORS_ORIGIN_ALLOW_ALL = True
+
 
 # Build paths
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
