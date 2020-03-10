@@ -5,7 +5,7 @@ PROFILE = 'Production'
 
 DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = '*'
 
 
 # Build paths
