@@ -4,24 +4,7 @@ from django.db import models
 from model_utils import Choices
 
 from common.Kakao import Kakao
-from common.constants import UNIVERSITY_LIST
 from common.models import BaseModel
-
-
-class QuestionList(BaseModel):
-    name = models.CharField(max_length=30)
-    university = models.CharField(max_length=30, choices=UNIVERSITY_LIST)
-    season = models.IntegerField()
-    version = models.IntegerField()
-
-    def __str__(self):
-        return self.name
-
-
-class QuestionItem(BaseModel):
-    name = models.CharField(max_length=100)
-    question_list = models.ForeignKey('profiles.QuestionList', on_delete=models.CASCADE)
-    question_number = models.PositiveSmallIntegerField()
 
 
 class Profile(BaseModel):
