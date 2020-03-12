@@ -182,3 +182,25 @@ STATIC_URL = '/static/'
 
 # user model setting
 AUTH_USER_MODEL = 'users.User'
+
+
+# media files
+DEFAULT_FILE_STORAGE = 'common.custom_storages.MediaStorage'
+
+# MediaStorage
+AWS_ACCESS_KEY_ID = os.environ['S3_ACCESS_KEY_ID']
+AWS_SECRET_ACCESS_KEY = os.environ['S3_SECRET_ACCESS_KEY']
+
+# s3 profile bucket
+AWS_STORAGE_BUCKET_NAME = os.environ['AWS_STORAGE_BUCKET_NAME']
+AWS_S3_REGION_NAME = 'ap-northeast-1'
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com'
+AWS_DEFAULT_ACL = 'public-read'
+
+MEDIA_ROOT = 'base/media'
+MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{MEDIA_ROOT}/"
+
+AWS_IS_GZIPPED = True
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}

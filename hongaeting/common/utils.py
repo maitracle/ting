@@ -1,6 +1,3 @@
-import os
-from datetime import datetime
-
 from django.conf import settings
 from django.core.mail import EmailMessage
 
@@ -23,12 +20,3 @@ def reformat_datetime(datetime_data):
     date, time = str(datetime_data).split(' ')
 
     return f'{date}T{time.split("+")[0]}Z'
-
-
-def set_filename_format(now, instance, original_filename):
-    return f"{instance.user.id}-{str(now.date())}-{now.microsecond}{os.path.splitext(original_filename)[1]}"
-
-
-def user_directory_path(instance, original_filename):
-    path = f"profiles/{instance.user.get_full_name()}/{set_filename_format(datetime.now(), instance, original_filename)}"
-    return path
