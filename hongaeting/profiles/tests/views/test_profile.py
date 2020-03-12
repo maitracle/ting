@@ -157,6 +157,7 @@ class ProfileTestCase(APITestCase):
         assert_that(rest_coin).is_equal_to(final_coin_history.rest_coin)
 
     def _check_response_and_expected(self, dictionary, instance):
+        assert_that(dictionary['image']).is_equal_to(instance.image)
         assert_that(dictionary['nickname']).is_equal_to(instance.nickname)
         assert_that(dictionary['gender']).is_equal_to(instance.gender)
         assert_that(dictionary['age']).is_equal_to(instance.age)
