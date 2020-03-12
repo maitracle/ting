@@ -16,12 +16,14 @@ class CreateProfileSerializer(serializers.ModelSerializer):
 
 
 class ListProfileSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField(use_url=True)
     is_viewed = serializers.BooleanField()
 
     class Meta:
         model = Profile
         fields = (
             'id',
+            'image',
             'created_at',
             'updated_at',
             'nickname',
@@ -43,10 +45,13 @@ class ListProfileSerializer(serializers.ModelSerializer):
 
 
 class RetrieveProfileSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField(use_url=True)
+
     class Meta:
         model = Profile
         fields = (
             'id',
+            'image',
             'created_at',
             'updated_at',
             'nickname',
@@ -68,9 +73,12 @@ class RetrieveProfileSerializer(serializers.ModelSerializer):
 
 
 class UpdateProfileSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField(use_url=True)
+
     class Meta:
         model = Profile
         fields = (
+            'image',
             'age',
             'height',
             'body_type',

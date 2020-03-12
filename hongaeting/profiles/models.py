@@ -28,7 +28,6 @@ class Profile(BaseModel):
     campus_location = models.CharField(max_length=20, choices=CAMPUS_LOCATION_CHOICES)
 
     tags = models.CharField(max_length=500, blank=True)
-    # image = models.CharField(max_length=100, blank=True)
     image = models.ImageField(upload_to=user_directory_path, blank=True, null=True, max_length=1000)
     one_sentence = models.CharField(max_length=35, blank=True)
 
