@@ -27,4 +27,7 @@ STATICFILES_DIRS = [
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
+
+# media files
+DEFAULT_FILE_STORAGE = 'common.custom_storages.MediaStorage'
 MEDIA_ROOT = 'production/media'

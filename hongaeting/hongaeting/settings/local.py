@@ -25,3 +25,6 @@ EMAIL_USE_TLS = os.environ['EMAIL_USE_TLS']
 
 # front-end mail check page
 FRONT_END_MAIL_CHECK_PAGE = 'http://localhost:3000/user-confirm/'
+
+# media files
+DEFAULT_FILE_STORAGE = 'common.custom_storages.MediaStorage'
