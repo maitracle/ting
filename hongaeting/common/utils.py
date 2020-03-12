@@ -20,7 +20,7 @@ class Email:
 
 
 def reformat_datetime(datetime_data):
-    date, time = str(datetime_data.split(' '))
+    date, time = str(datetime_data).split(' ')
 
     return f'{date}T{time.split("+")[0]}Z'
 
