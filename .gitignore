@@ -11,5 +11,4 @@ venv
 # pycharm setting
 .idea
 
-.static_root
 hongaeting/hongaeting/static
