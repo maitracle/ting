@@ -181,3 +181,11 @@ STATIC_URL = '/static/'
 
 # user model setting
 AUTH_USER_MODEL = 'users.User'
+
+
+# front app url
+FRONT_END_URL = ''
+
+
+# front-end mail check page
+FRONT_END_MAIL_CHECK_PAGE = 'user/email-confirm/'
