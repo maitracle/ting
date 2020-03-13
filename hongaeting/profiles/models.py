@@ -50,7 +50,7 @@ class Profile(BaseModel):
     appearance = models.CharField(max_length=1000, validators=[MinLengthValidator(120)], blank=True)
     personality = models.CharField(max_length=1000, validators=[MinLengthValidator(120)], blank=True)
     hobby = models.CharField(max_length=1000, validators=[MinLengthValidator(120)], blank=True)
-    date_style = models.CharField(max_length=1000, validators=[MinLengthValidator(120)], blank=True)
+    date_style = models.CharField(max_length=1000, validators=[MinLengthValidator(60)], blank=True)
     ideal_type = models.CharField(max_length=1000, validators=[MinLengthValidator(120)], blank=True)
     chat_link = models.URLField(blank=True)
 
