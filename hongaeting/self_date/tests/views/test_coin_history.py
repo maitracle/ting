@@ -21,7 +21,7 @@ class CoinHistoryTestCase(APITestCase):
         assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
         assert_that(response.data).is_length(coin_history_quantity)
 
-        for responded_coin_history, expected_coin_history in zip(response.data, expected_coin_histories):
+        for responded_coin_history, expected_coin_history in zip(response.data, reversed(expected_coin_histories)):
             assert_that(responded_coin_history['user']).is_equal_to(user.id)
             assert_that(responded_coin_history['rest_coin']).is_equal_to(expected_coin_history.rest_coin)
             assert_that(responded_coin_history['reason']).is_equal_to(expected_coin_history.reason)

@@ -44,7 +44,7 @@ class UserViewSet(
 
         token_obtain_pair_serializer.is_valid(raise_exception=True)
         user = User.objects.get(email=request.data['email'])
-        coin_history_list = CoinHistory.objects.filter(user=user)
+        coin_history_list = CoinHistory.objects.filter(user=user).order_by('-id')
         response_data = {
             **token_obtain_pair_serializer.validated_data,
             'user': user,
@@ -126,7 +126,7 @@ class UserViewSet(
         data = {
             'user': request.user,
             'profile': request.user.profile,
-            'coin_history': CoinHistory.objects.filter(user=request.user),
+            'coin_history': CoinHistory.objects.filter(user=request.user).order_by('-id'),
 
         }
         serializer = self.get_serializer(data)
