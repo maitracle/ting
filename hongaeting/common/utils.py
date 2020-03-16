@@ -16,7 +16,7 @@ class Email:
         return mail.send()
 
 
-def reformat_datetime(datetime):
-    date, time = str(datetime).split(' ')
+def reformat_datetime(datetime_data):
+    date, time = str(datetime_data).split(' ')
 
     return f'{date}T{time.split("+")[0]}Z'
