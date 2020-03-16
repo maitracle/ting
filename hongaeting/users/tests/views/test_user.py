@@ -181,7 +181,8 @@ class UserViewSetTestCase(APITestCase):
         expected_user = baker.make('users.User')
         expected_profile = baker.make('profiles.Profile', user=expected_user)
         coin_history_quantity = 5
-        expected_coin_history_list = baker.make('self_date.CoinHistory', user=expected_user, _quantity=coin_history_quantity)
+        expected_coin_history_list = baker.make('self_date.CoinHistory', user=expected_user,
+                                                _quantity=coin_history_quantity)
 
         # When: user가 my profile api를 호출한다.
         self.client.force_authenticate(user=expected_user)
@@ -194,7 +195,8 @@ class UserViewSetTestCase(APITestCase):
         self._assert_profile(response.data['profile'], expected_profile)
 
         assert_that(response.data['coin_history']).is_length(coin_history_quantity)
-        for response_coin_history, expected_coin_history in zip(response.data['coin_history'], expected_coin_history_list):
+        for response_coin_history, expected_coin_history in \
+                zip(response.data['coin_history'], reversed(expected_coin_history_list)):
             self._assert_coin_history(response_coin_history, expected_coin_history)
 
     @patch.object(Email, 'send_email')
@@ -294,7 +296,8 @@ class UserViewSetTestCase(APITestCase):
         self._assert_profile(response.data['profile'], profile)
 
         assert_that(response.data['coin_history']).is_length(coin_history_quantity)
-        for response_coin_history, expected_coin_history in zip(response.data['coin_history'], coin_history_list):
+        for response_coin_history, expected_coin_history in \
+                zip(response.data['coin_history'], reversed(coin_history_list)):
             self._assert_coin_history(response_coin_history, expected_coin_history)
 
     @staticmethod
@@ -332,8 +335,10 @@ class UserViewSetTestCase(APITestCase):
         assert_that(response_coin_history['rest_coin']).is_equal_to(expected_coin_history.rest_coin)
         assert_that(response_coin_history['reason']).is_equal_to(expected_coin_history.reason)
         assert_that(response_coin_history['profile']).is_equal_to(expected_coin_history.profile)
-        assert_that(response_coin_history['created_at']).is_equal_to(reformat_datetime(expected_coin_history.created_at))
-        assert_that(response_coin_history['updated_at']).is_equal_to(reformat_datetime(expected_coin_history.updated_at))
+        assert_that(response_coin_history['created_at']).is_equal_to(
+            reformat_datetime(expected_coin_history.created_at))
+        assert_that(response_coin_history['updated_at']).is_equal_to(
+            reformat_datetime(expected_coin_history.updated_at))
 
     def test_should_fail_get_jwt_token(self):
         # Given: user, profile, 올바르지 않은 email, password가 주어진다.
