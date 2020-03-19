@@ -202,3 +202,11 @@ AWS_IS_GZIPPED = True
 AWS_S3_OBJECT_PARAMETERS = {
     'CacheControl': 'max-age=86400',
 }
+
+
+# front app url
+FRONT_END_URL = ''
+
+
+# front-end mail check page
+FRONT_END_MAIL_CHECK_PAGE = 'user/email-confirm/'
