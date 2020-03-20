@@ -9,6 +9,18 @@ from common.models import BaseModel
 from common.utils import Email
 
 
+class NullableEmailField(models.EmailField):
+    description = "EmailField that stores NULL but returns ''"
+
+    def to_python(self, value):
+        if isinstance(value, models.EmailField):
+            return value
+        return value or ''
+
+    def get_prep_value(self, value):
+        return value or None
+
+
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None):
         if not email:
@@ -42,7 +54,8 @@ class User(BaseModel, AbstractBaseUser):
     is_active = models.BooleanField(default=True)
 
     university = models.CharField(max_length=10, blank=True, null=True, choices=UNIVERSITY_LIST)
-    university_email = models.EmailField(max_length=100, blank=True, help_text='학교 인증을 위한 메일')
+    university_email = NullableEmailField(max_length=100, null=True, blank=True, unique=True,
+                                          help_text='학교 인증을 위한 메일')
     is_confirmed_student = models.BooleanField(default=False, help_text='학교 인증을 받았는지 여부')
 
     user_code = models.CharField(max_length=10, blank=True)
