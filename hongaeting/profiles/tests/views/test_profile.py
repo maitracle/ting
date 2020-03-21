@@ -1,4 +1,3 @@
-import shutil
 import tempfile
 
 from PIL import Image
@@ -9,21 +8,9 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from common.constants import UNIVERSITY_LIST, VIEW_PROFILE_COST, SIGNUP_REWARD, SEND_MESSAGE_COST
+from common.decorator import delete_media_root
 from profiles.models import Profile
 from self_date.models import CoinHistory
-
-
-def delete_media_root(func):
-    # 테스트 도중 생성된 MEDIA root directory를 삭제하는 decorator
-    def wrapper(*args, **kwargs):
-        try:
-            result = func(*args, **kwargs)
-        finally:
-            media_root = settings.MEDIA_ROOT.split('/')[0]
-            shutil.rmtree(media_root)
-        return result
-
-    return wrapper
 
 
 class ProfileTestCase(APITestCase):
@@ -212,7 +199,7 @@ class ProfileTestCase(APITestCase):
 
     @delete_media_root
     def test_should_update_image_at_profile(self):
-        # Given: user 1명과 그의 profile, 수정할 데이터가 주어진다.
+        # Given: user 1명과 그의 profile, 수정할 image file이 주어진다.
         user = baker.make('users.User')
         profile = baker.make('profiles.Profile', user=user, is_active=True)
 
@@ -227,7 +214,7 @@ class ProfileTestCase(APITestCase):
         self.client.force_authenticate(user=user)
         response = self.client.patch(f'/api/profiles/{profile.id}/', data=update_data)
 
-        # Then: response가 정상적으로 오고, 수정할 데이터가 정상적으로 수정된다.
+        # Then: profile의 image field가 반환된다.
         assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
 
         email_name, email_domain = user.email.split('@')
