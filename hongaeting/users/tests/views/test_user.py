@@ -1,7 +1,10 @@
 import json
+import tempfile
 from unittest.mock import patch
 
+from PIL import Image
 from assertpy import assert_that
+from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from model_bakery import baker
 from rest_framework import status
@@ -9,6 +12,7 @@ from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from common.constants import SIGNUP_REWARD
+from common.decorator import delete_media_root
 from common.utils import Email, reformat_datetime
 from profiles.models import Profile
 from self_date.models import CoinHistory
@@ -127,6 +131,32 @@ class UserViewSetTestCase(APITestCase):
 
         user = User.objects.get(id=user_id)
         assert_that(user.email).is_equal_to(changed_data['email'])
+
+    @delete_media_root
+    def test_should_update_student_id_card_image_field(self):
+        # Given: user와 수정할 image file이 주어진다.
+        user = baker.make('users.User',
+                          email='origin_user_email@email.com')
+        user_id = user.id
+
+        tmp_file = tempfile.NamedTemporaryFile(suffix='.jpg')
+        image = Image.new('RGB', (100, 100))
+        image.save(tmp_file.name)
+        update_data = {
+            'student_id_card_image': tmp_file
+        }
+
+        # When: user update api를 호출한다.
+        self.client.force_authenticate(user=user)
+        response = self.client.patch(f'/api/users/{user_id}/', data=update_data)
+
+        # Then: user의 student_id_card_image가 반환된다.
+        assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
+
+        email_name, email_domain = user.email.split('@')
+        expected_image_url = f'https://{settings.AWS_S3_CUSTOM_DOMAIN}/' \
+                             f'{settings.MEDIA_ROOT}/id_cards/{email_name}%40{email_domain}/image.jpg'
+        assert_that(response.data['student_id_card_image']).is_equal_to(expected_image_url)
 
     def test_should_fail_update_user(self):
         # Given: user 2개와 바꿀 user data가 주어진다

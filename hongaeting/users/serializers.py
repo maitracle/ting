@@ -6,6 +6,7 @@ from users.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
+    student_id_card_image = serializers.ImageField(use_url=True, required=False)
     is_confirmed_student = serializers.BooleanField(read_only=True)
 
     class Meta:
@@ -15,6 +16,7 @@ class UserSerializer(serializers.ModelSerializer):
             'email',
             'password',
             'university',
+            'student_id_card_image',
             'is_confirmed_student',
         )
 
