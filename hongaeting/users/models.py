@@ -1,3 +1,5 @@
+import os
+
 from django.conf import settings
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.db import models
@@ -7,6 +9,11 @@ from django.utils.crypto import get_random_string
 from common.constants import UNIVERSITY_LIST
 from common.models import BaseModel
 from common.utils import Email
+
+
+def student_id_card_image_path(instance, original_filename):
+    path = f"id_cards/{instance.get_full_name()}/image{os.path.splitext(original_filename)[1]}"
+    return path
 
 
 class NullableEmailField(models.EmailField):
@@ -56,6 +63,8 @@ class User(BaseModel, AbstractBaseUser):
     university = models.CharField(max_length=10, blank=True, null=True, choices=UNIVERSITY_LIST)
     university_email = NullableEmailField(max_length=100, null=True, blank=True, unique=True,
                                           help_text='학교 인증을 위한 메일')
+    student_id_card_image = models.ImageField(upload_to=student_id_card_image_path, blank=True, null=True,
+                                              max_length=1000)
     is_confirmed_student = models.BooleanField(default=False, help_text='학교 인증을 받았는지 여부')
 
     user_code = models.CharField(max_length=10, blank=True)
