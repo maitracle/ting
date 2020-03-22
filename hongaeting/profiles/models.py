@@ -44,7 +44,8 @@ class Profile(BaseModel):
     ideal_type = models.CharField(max_length=1000, validators=[MinLengthValidator(120)], blank=True)
     chat_link = models.URLField(blank=True)
 
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False)
+    is_completed = models.BooleanField(default=False)
 
     def clean(self):
         # Todo(10000001a): user를 create 할 때 atomic하게 profile도 만들어지는 상황에서 clean이 실행되지 않는 문제를 해결해야 한다.

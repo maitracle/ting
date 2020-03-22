@@ -32,7 +32,8 @@ class ProfileTestCase(APITestCase):
         # Given: user 1명과 profile이 주어진다.
         user = baker.make('users.User')
         profile_quantity = 10
-        expected_profile_list = baker.make('profiles.Profile', _quantity=profile_quantity)
+        expected_profile_list = baker.make('profiles.Profile', _quantity=profile_quantity,
+                                           is_active=True, is_completed=True)
 
         # When: user가 list api를 호출한다.
         self.client.force_authenticate(user=user)
@@ -57,17 +58,18 @@ class ProfileTestCase(APITestCase):
         }
 
         expected_profile = baker.make('profiles.Profile', gender=expected_profile_data['gender'],
-                                      user__university=expected_profile_data['university'])
+                                      user__university=expected_profile_data['university'],
+                                      is_active=True, is_completed=True)
         baker.make('profiles.Profile', gender=Profile.GENDER_CHOICES.FEMALE,
-                   user__university=UNIVERSITY_LIST.HONGIK)
+                   user__university=UNIVERSITY_LIST.HONGIK, is_active=True, is_completed=True)
         baker.make('profiles.Profile', gender=Profile.GENDER_CHOICES.MALE,
-                   user__university=UNIVERSITY_LIST.KYUNGHEE)
+                   user__university=UNIVERSITY_LIST.KYUNGHEE, is_active=True, is_completed=True)
         baker.make('profiles.Profile', gender=Profile.GENDER_CHOICES.FEMALE,
-                   user__university=UNIVERSITY_LIST.KYUNGHEE)
+                   user__university=UNIVERSITY_LIST.KYUNGHEE, is_active=True, is_completed=True)
         baker.make('profiles.Profile', gender=Profile.GENDER_CHOICES.MALE,
-                   user__university=UNIVERSITY_LIST.YONSEI)
+                   user__university=UNIVERSITY_LIST.YONSEI, is_active=True, is_completed=True)
         baker.make('profiles.Profile', gender=Profile.GENDER_CHOICES.FEMALE,
-                   user__university=UNIVERSITY_LIST.YONSEI)
+                   user__university=UNIVERSITY_LIST.YONSEI, is_active=True, is_completed=True)
 
         # When: user가 필터링 된 list api를 호출한다.
         self.client.force_authenticate(user=user)

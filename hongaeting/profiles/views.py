@@ -37,7 +37,7 @@ class ProfileViewSet(
             .filter(profile_id=OuterRef('id'))
 
         return queryset.filter(
-            is_active=True
+            is_active=True, is_completed=True,
         ).annotate(
             view_count=Count(Subquery(coin_history_queryset.values('id')))
         ).annotate(

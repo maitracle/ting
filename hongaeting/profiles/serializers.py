@@ -93,4 +93,6 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
             'ideal_type',
             'one_sentence',
             'chat_link',
+            'is_active',
+            'is_completed',
         )
