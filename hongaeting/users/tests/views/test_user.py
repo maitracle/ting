@@ -143,8 +143,9 @@ class UserViewSetTestCase(APITestCase):
         try:
             image = Image.new('RGB', (100, 100))
             image.save('tmp_image.jpg')
+            tmp_file = open('tmp_image.jpg', 'rb')
             update_data = {
-                'student_id_card_image': open('tmp_image.jpg', 'rb')
+                'student_id_card_image': tmp_file
             }
 
             # When: user update api를 호출한다.
@@ -161,6 +162,7 @@ class UserViewSetTestCase(APITestCase):
 
         finally:
             # 임시로 만든 이미지 파일을 삭제한다.
+            tmp_file.close()
             if os.path.exists("tmp_image.jpg"):
                 os.remove("tmp_image.jpg")
 
