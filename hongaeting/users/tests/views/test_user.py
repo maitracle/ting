@@ -1,4 +1,5 @@
 import json
+import os
 import tempfile
 from unittest.mock import patch
 
@@ -139,24 +140,29 @@ class UserViewSetTestCase(APITestCase):
                           email='origin_user_email@email.com')
         user_id = user.id
 
-        tmp_file = tempfile.NamedTemporaryFile(suffix='.jpg')
-        image = Image.new('RGB', (100, 100))
-        image.save(tmp_file.name)
-        update_data = {
-            'student_id_card_image': tmp_file
-        }
+        try:
+            image = Image.new('RGB', (100, 100))
+            image.save('tmp_image.jpg')
+            update_data = {
+                'student_id_card_image': open('tmp_image.jpg', 'rb')
+            }
 
-        # When: user update api를 호출한다.
-        self.client.force_authenticate(user=user)
-        response = self.client.patch(f'/api/users/{user_id}/', data=update_data)
+            # When: user update api를 호출한다.
+            self.client.force_authenticate(user=user)
+            response = self.client.patch(f'/api/users/{user_id}/', data=update_data)
 
-        # Then: user의 student_id_card_image가 반환된다.
-        assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
+            # Then: user의 student_id_card_image가 반환된다.
+            assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
 
-        email_name, email_domain = user.email.split('@')
-        expected_image_url = f'https://{settings.AWS_S3_CUSTOM_DOMAIN}/' \
-                             f'{settings.MEDIA_ROOT}/id_cards/{email_name}%40{email_domain}/image.jpg'
-        assert_that(response.data['student_id_card_image']).is_equal_to(expected_image_url)
+            email_name, email_domain = user.email.split('@')
+            expected_image_url = f'https://{settings.AWS_S3_CUSTOM_DOMAIN}/' \
+                                 f'{settings.MEDIA_ROOT}/id_cards/{email_name}%40{email_domain}/image.jpg'
+            assert_that(response.data['student_id_card_image']).is_equal_to(expected_image_url)
+
+        finally:
+            # 임시로 만든 이미지 파일을 삭제한다.
+            if os.path.exists("tmp_image.jpg"):
+                os.remove("tmp_image.jpg")
 
     def test_should_fail_update_user(self):
         # Given: user 2개와 바꿀 user data가 주어진다

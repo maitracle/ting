@@ -1,4 +1,4 @@
-import tempfile
+import os
 
 from PIL import Image
 from assertpy import assert_that
@@ -203,24 +203,29 @@ class ProfileTestCase(APITestCase):
         user = baker.make('users.User')
         profile = baker.make('profiles.Profile', user=user, is_active=True)
 
-        tmp_file = tempfile.NamedTemporaryFile(suffix='.jpg')
-        image = Image.new('RGB', (100, 100))
-        image.save(tmp_file.name)
-        update_data = {
-            'image': tmp_file
-        }
+        try:
+            image = Image.new('RGB', (100, 100))
+            image.save('tmp_image.jpg')
+            update_data = {
+                'image': open('tmp_image.jpg', 'rb')
+            }
 
-        # When: user가 update api를 호출한다.
-        self.client.force_authenticate(user=user)
-        response = self.client.patch(f'/api/profiles/{profile.id}/', data=update_data)
+            # When: user가 update api를 호출한다.
+            self.client.force_authenticate(user=user)
+            response = self.client.patch(f'/api/profiles/{profile.id}/', data=update_data)
 
-        # Then: profile의 image field가 반환된다.
-        assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
+            # Then: profile의 image field가 반환된다.
+            assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
 
-        email_name, email_domain = user.email.split('@')
-        expected_image_url = f'https://{settings.AWS_S3_CUSTOM_DOMAIN}/' \
-                             f'{settings.MEDIA_ROOT}/profiles/{email_name}%40{email_domain}/image.jpg'
-        assert_that(response.data['image']).is_equal_to(expected_image_url)
+            email_name, email_domain = user.email.split('@')
+            expected_image_url = f'https://{settings.AWS_S3_CUSTOM_DOMAIN}/' \
+                                 f'{settings.MEDIA_ROOT}/profiles/{email_name}%40{email_domain}/image.jpg'
+            assert_that(response.data['image']).is_equal_to(expected_image_url)
+
+        finally:
+            # 임시로 만든 이미지 파일을 삭제한다.
+            if os.path.exists("tmp_image.jpg"):
+                os.remove("tmp_image.jpg")
 
     def test_should_fail_update_profile(self):
         # Given: user 1명과 다른 user의 profile, 수정할 데이터가 주어진다.
