@@ -1,8 +1,11 @@
+import datetime
 import os
+from unittest import mock
 
 from PIL import Image
 from assertpy import assert_that
 from django.conf import settings
+from django.utils.timezone import now
 from model_bakery import baker
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -320,3 +323,36 @@ class ProfileTestCase(APITestCase):
 
         created_coin_history = CoinHistory.objects.filter(user=user).last()
         assert_that(created_coin_history.rest_coin).is_equal_to(coin_history.rest_coin)
+
+    def test_should_get_new_profile_list(self):
+        # Given: user 1명과 profile 3개가 주어진다.
+        user = baker.make('users.User')
+        profile_quantity = 3
+        baker.make('profiles.Profile', _quantity=profile_quantity)
+
+        # When: user가 list_profile api를 호출한다.
+        self.client.force_authenticate(user=user)
+        response = self.client.get('/api/profiles/')
+
+        # Then: response의 is_new_profile 필드가 True이다.
+        assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
+        assert_that(response.data).is_length(profile_quantity)
+        for i in range(profile_quantity):
+            assert_that(response.data[i]['is_new_profile']).is_true()
+
+    @mock.patch('django.utils.timezone.now', lambda: now() - datetime.timedelta(days=1))
+    def test_should_get_not_new_profile_list(self):
+        # Given: user 1명과 하루 전에 생성된 profile 3개가 주어진다.
+        user = baker.make('users.User')
+        profile_quantity = 3
+        baker.make('profiles.Profile', _quantity=profile_quantity)
+
+        # When: user가 list_profile api를 호출한다.
+        self.client.force_authenticate(user=user)
+        response = self.client.get('/api/profiles/')
+
+        # Then: response의 is_new_profile 필드가 False이다.
+        assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
+        assert_that(response.data).is_length(profile_quantity)
+        for i in range(profile_quantity):
+            assert_that(response.data[i]['is_new_profile']).is_false()

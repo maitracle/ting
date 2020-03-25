@@ -18,6 +18,7 @@ class CreateProfileSerializer(serializers.ModelSerializer):
 class ListProfileSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(use_url=True)
     is_viewed = serializers.BooleanField()
+    is_new_profile = serializers.BooleanField()
 
     class Meta:
         model = Profile
@@ -41,6 +42,7 @@ class ListProfileSerializer(serializers.ModelSerializer):
             'ideal_type',
             'one_sentence',
             'is_viewed',
+            'is_new_profile',
         )
 
 

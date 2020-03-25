@@ -1,4 +1,7 @@
+from datetime import datetime, timedelta
+
 from django.db.models import Count, Case, When, Value, BooleanField, Subquery, OuterRef
+from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 from django_rest_framework_mango.mixins import QuerysetMixin, SerializerMixin
 from rest_framework import viewsets, status
@@ -43,6 +46,14 @@ class ProfileViewSet(
         ).annotate(
             is_viewed=Case(
                 When(view_count__gt=0,
+                     then=Value(True)
+                     ),
+                default=Value(False),
+                output_field=BooleanField()
+            )
+        ).annotate(
+            is_new_profile=Case(
+                When(created_at__gt=timezone.make_aware(datetime.now()) - timedelta(days=1),
                      then=Value(True)
                      ),
                 default=Value(False),
