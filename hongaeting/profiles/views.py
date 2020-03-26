@@ -9,18 +9,18 @@ from rest_framework.exceptions import ValidationError
 
 from common.constants import VIEW_PROFILE_COST, SEND_MESSAGE_COST
 from common.permissions import IsOwnerUserOrReadonly
-from profiles.models import Profile
+from profiles.models import SelfDateProfile
 from profiles.serializers import ListProfileSerializer, UpdateProfileSerializer, RetrieveProfileSerializer
 from self_date.models import CoinHistory
 from self_date.serializer import CreateCoinHistorySerializer
 
 
-class ProfileViewSet(
+class SelfDateProfileViewSet(
     QuerysetMixin, SerializerMixin,
     UpdateModelMixin, ListModelMixin, RetrieveModelMixin,
     viewsets.GenericViewSet,
 ):
-    queryset = Profile.objects.all()
+    queryset = SelfDateProfile.objects.all()
     permission_classes = (IsOwnerUserOrReadonly,)
     serializer_class_by_actions = {
         'list': ListProfileSerializer,

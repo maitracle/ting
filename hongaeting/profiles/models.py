@@ -14,7 +14,7 @@ def profile_image_path(instance, original_filename):
     return path
 
 
-class Profile(BaseModel):
+class SelfDateProfile(BaseModel):
     BODY_TYPE_CHOICES = Choices('SKINNY', 'SLIM', 'SLIM_TONED', 'NORMAL', 'BUFF', 'CHUBBY')
     RELIGION_CHOICES = Choices('NOTHING', 'CHRISTIANITY', 'BUDDHISM', 'CATHOLIC', 'ETC')
     IS_SMOKE_CHOICES = Choices('YES', 'NO')

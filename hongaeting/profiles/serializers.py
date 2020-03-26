@@ -1,11 +1,11 @@
 from rest_framework import serializers
 
-from profiles.models import Profile
+from profiles.models import SelfDateProfile
 
 
 class CreateProfileSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Profile
+        model = SelfDateProfile
         fields = (
             'user',
             'nickname',
@@ -20,7 +20,7 @@ class ListProfileSerializer(serializers.ModelSerializer):
     is_viewed = serializers.BooleanField()
 
     class Meta:
-        model = Profile
+        model = SelfDateProfile
         fields = (
             'id',
             'image',
@@ -48,7 +48,7 @@ class RetrieveProfileSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(use_url=True)
 
     class Meta:
-        model = Profile
+        model = SelfDateProfile
         fields = (
             'id',
             'image',
@@ -76,7 +76,7 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(use_url=True)
 
     class Meta:
-        model = Profile
+        model = SelfDateProfile
         fields = (
             'image',
             'age',

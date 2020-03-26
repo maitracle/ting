@@ -9,7 +9,7 @@ from rest_framework.test import APITestCase
 
 from common.constants import UNIVERSITY_LIST, VIEW_PROFILE_COST, SIGNUP_REWARD, SEND_MESSAGE_COST
 from common.decorator import delete_media_root
-from profiles.models import Profile
+from profiles.models import SelfDateProfile
 from self_date.models import CoinHistory
 
 

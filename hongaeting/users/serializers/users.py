@@ -3,6 +3,7 @@ from rest_framework import serializers
 from profiles.serializers import RetrieveProfileSerializer
 from self_date.serializer import ListCoinHistorySerializer
 from users.models import User
+from users.serializers.profiles import ProfileSerializer
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -45,7 +46,7 @@ class TokenSerializer(serializers.Serializer):
     access = serializers.CharField()
     refresh = serializers.CharField()
     user = RetrieveUserSerializer()
-    profile = RetrieveProfileSerializer()
+    profile = ProfileSerializer()
     coin_history = ListCoinHistorySerializer(many=True)
 
     class Meta:
@@ -60,7 +61,7 @@ class TokenSerializer(serializers.Serializer):
 
 class MySerializer(serializers.Serializer):
     user = RetrieveUserSerializer()
-    profile = RetrieveProfileSerializer()
+    profile = ProfileSerializer()
     coin_history = ListCoinHistorySerializer(many=True)
 
     class Meta:

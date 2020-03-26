@@ -15,7 +15,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from common.constants import SIGNUP_REWARD
 from common.decorator import delete_media_root
 from common.utils import Email, reformat_datetime
-from profiles.models import Profile
+from profiles.models import SelfDateProfile
 from self_date.models import CoinHistory
 from users.models import User
 

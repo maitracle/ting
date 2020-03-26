@@ -13,7 +13,8 @@ from self_date.serializer import CreateCoinHistorySerializer
 from users.models import User
 from users.permissions import IsSameUserWithRequestUser
 from common.constants import SIGNUP_REWARD
-from users.serializers import UserSerializer, TokenSerializer, UserCheckUnivSerializer, MySerializer
+from users.serializers.profiles import ProfileSerializer
+from users.serializers.users import UserSerializer, TokenSerializer, UserCheckUnivSerializer, MySerializer
 from self_date.models import CoinHistory
 
 
@@ -69,7 +70,7 @@ class UserViewSet(
             **request.data,
         }
 
-        profile_serializer = CreateProfileSerializer(data=profile_data)
+        profile_serializer = ProfileSerializer(data=profile_data)
         profile_serializer.is_valid(raise_exception=True)
         profile_serializer.save()
 
