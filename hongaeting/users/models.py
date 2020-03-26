@@ -1,3 +1,4 @@
+import datetime
 import os
 
 from django.conf import settings
@@ -5,6 +6,7 @@ from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.db import models
 from django.template.loader import render_to_string
 from django.utils.crypto import get_random_string
+from model_utils import Choices
 
 from common.constants import UNIVERSITY_LIST
 from common.models import BaseModel
@@ -113,3 +115,21 @@ class User(BaseModel, AbstractBaseUser):
             self.user_code = user_code
         else:
             self.set_user_code()
+
+
+class Profile(BaseModel):
+    GENDER_CHOICES = Choices('MALE', 'FEMALE')
+    SCHOLARLY_STATUS_CHOICES = Choices('ATTENDING', 'TAKING_OFF')
+    CAMPUS_LOCATION_CHOICES = Choices('SEOUL', 'INTERNATIONAL', 'SINCHON')
+
+    user = models.OneToOneField('users.User', on_delete=models.CASCADE)
+
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
+    birthday = models.DateField()
+
+    scholarly_status = models.CharField(max_length=10, choices=SCHOLARLY_STATUS_CHOICES)
+    campus_location = models.CharField(max_length=20, choices=CAMPUS_LOCATION_CHOICES)
+
+    @property
+    def age(self):
+        return datetime.datetime.now().year - self.birthday.year

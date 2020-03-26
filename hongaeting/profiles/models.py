@@ -15,23 +15,16 @@ def profile_image_path(instance, original_filename):
 
 
 class Profile(BaseModel):
-    BODY_TYPE_CHOICES = Choices('SKINNY', 'SLIM', 'SLIMFIT', 'NORMAL', 'FIT', 'CHUBBY')
-    GENDER_CHOICES = Choices('MALE', 'FEMALE')
+    BODY_TYPE_CHOICES = Choices('SKINNY', 'SLIM', 'SLIM_TONED', 'NORMAL', 'BUFF', 'CHUBBY')
     RELIGION_CHOICES = Choices('NOTHING', 'CHRISTIANITY', 'BUDDHISM', 'CATHOLIC', 'ETC')
     IS_SMOKE_CHOICES = Choices('YES', 'NO')
-    CAMPUS_LOCATION_CHOICES = Choices('SEOUL', 'INTERNATIONAL', 'SINCHON')
-    SCHOLARLY_STATUS_CHOICES = Choices('ATTENDING', 'TAKINGOFF')
 
     user = models.OneToOneField('users.User', on_delete=models.CASCADE)
     nickname = models.CharField(max_length=8, unique=True)
-    scholarly_status = models.CharField(max_length=10, choices=SCHOLARLY_STATUS_CHOICES)
-    gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
-    age = models.PositiveSmallIntegerField(validators=[MinValueValidator(19)], null=True)
     height = models.PositiveSmallIntegerField(null=True)
     body_type = models.CharField(max_length=10, choices=BODY_TYPE_CHOICES, blank=True)
     religion = models.CharField(max_length=20, choices=RELIGION_CHOICES, blank=True)
     is_smoke = models.CharField(max_length=10, choices=IS_SMOKE_CHOICES, blank=True)
-    campus_location = models.CharField(max_length=20, choices=CAMPUS_LOCATION_CHOICES)
 
     tags = models.CharField(max_length=500, blank=True)
     image = models.ImageField(upload_to=profile_image_path, blank=True, null=True, max_length=1000)
