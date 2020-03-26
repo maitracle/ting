@@ -1,10 +1,11 @@
 import json
 import os
-import tempfile
+from datetime import datetime
 from unittest.mock import patch
 
 from PIL import Image
 from assertpy import assert_that
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from model_bakery import baker
@@ -12,26 +13,27 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from common.constants import SIGNUP_REWARD
+from common.constants import SIGNUP_REWARD, UNIVERSITY_CHOICES
 from common.decorator import delete_media_root
 from common.utils import Email, reformat_datetime
-from profiles.models import SelfDateProfile
 from self_date.models import CoinHistory
-from users.models import User
+from users.models import User, Profile
 
 
 class UserViewSetTestCase(APITestCase):
 
     def test_should_create_profile_and_coin_history_when_create_user(self):
         # Given: 만들어질 user에 관한 데이터가 주어진다.
+        birthday = (datetime.today() - relativedelta(years=20)).strftime('%Y-%m-%d')
         user_data = {
-            "email": "testuser@test.com",
-            "password": "password123",
-            "nickname": "test",
-            "gender": "MALE",
-            "scholarly_status": "ATTENDING",
-            "university": "HONGIK",
-            "campus_location": "SEOUL"
+            'email': 'testuser@test.com',
+            'password': 'password123',
+            'university': UNIVERSITY_CHOICES.HONGIK,
+
+            'gender': 'MALE',
+            'birthday': birthday,
+            'scholarly_status': 'ATTENDING',
+            'campus_location': 'SEOUL',
         }
         user_code_length = 8
 
@@ -47,17 +49,24 @@ class UserViewSetTestCase(APITestCase):
         assert_that('access' in response.data).is_true()
         assert_that('refresh' in response.data).is_true()
 
+        user = User.objects.get(email=user_data['email'])
+
+        assert_that(response.data['user']['id']).is_equal_to(user.id)
         assert_that(response.data['user']['email']).is_equal_to(user_data['email'])
         hashed_password_prefix = 'pbkdf2_sha256$150000$'
         assert_that(response.data['user']['password'].startswith(hashed_password_prefix)).is_true()
         assert_that(response.data['user']['university']).is_equal_to(user_data['university'])
         assert_that(response.data['user']['is_confirmed_student']).is_false()
-        assert_that(User.objects.get(email=user_data['email']).user_code).is_length(user_code_length)
+        assert_that(user.user_code).is_length(user_code_length)
 
-        assert_that(response.data['profile']['nickname']).is_equal_to(user_data['nickname'])
+        assert_that(response.data['profile']['id']).is_equal_to(user.profile.id)
+        assert_that(response.data['profile']['user']).is_equal_to(user.id)
         assert_that(response.data['profile']['gender']).is_equal_to(user_data['gender'])
+        assert_that(response.data['profile']['birthday']).is_equal_to(user_data['birthday'])
         assert_that(response.data['profile']['scholarly_status']).is_equal_to(user_data['scholarly_status'])
         assert_that(response.data['profile']['campus_location']).is_equal_to(user_data['campus_location'])
+        assert_that(response.data['profile']['created_at']).is_equal_to(reformat_datetime(user.profile.created_at))
+        assert_that(response.data['profile']['updated_at']).is_equal_to(reformat_datetime(user.profile.updated_at))
 
         assert_that(response.data['coin_history']).is_length(1)
         assert_that(response.data['coin_history'][0]['rest_coin']).is_equal_to(SIGNUP_REWARD)
@@ -65,14 +74,16 @@ class UserViewSetTestCase(APITestCase):
 
     def test_should_not_create_when_profile_invalid(self):
         # Given: profile 관련 데이터가 invalid한 user 데이터가 주어진다.
+        birthday = (datetime.today() - relativedelta(years=20)).strftime('%Y-%m-%d')
         user_data = {
-            "email": "testuser@test.com",
-            "password": "password123",
-            "nickname": "test",
-            "gender": "",
-            "scholarly_status": "ATTENDING",
-            "university": "HONGIK",
-            "campus_location": "SEOUL",
+            'email': 'testuser@test.com',
+            'password': 'password123',
+            'university': UNIVERSITY_CHOICES.HONGIK,
+
+            'gender': '',
+            'birthday': birthday,
+            'scholarly_status': 'ATTENDING',
+            'campus_location': 'SEOUL',
         }
 
         # When: user create api를 호출하여 회원가입을 시도한다.
@@ -83,21 +94,23 @@ class UserViewSetTestCase(APITestCase):
 
         user = User.objects.filter(email=user_data['email'])
         assert_that(user).is_empty()
-        profile = Profile.objects.filter(nickname=user_data['nickname'])
+        profile = Profile.objects.filter(user__email=user_data['email'])
         assert_that(profile).is_empty()
         coin_history = CoinHistory.objects.filter(user__email=user_data['email'])
         assert_that(coin_history).is_empty()
 
     def test_should_not_create_when_user_invalid(self):
         # Given: user 관련 데이터가 invalid한 user 데이터가 주어진다.
+        birthday = (datetime.today() - relativedelta(years=20)).strftime('%Y-%m-%d')
         user_data = {
-            "email": "testuser@test.com",
-            "password": "",
-            "nickname": "test",
-            "gender": "MALE",
-            "scholarly_status": "ATTENDING",
-            "university": "HONGIK",
-            "campus_location": "SEOUL",
+            'email': 'testuser@test.com',
+            'password': '',
+            'university': UNIVERSITY_CHOICES.HONGIK,
+
+            'gender': 'MALE',
+            'birthday': birthday,
+            'scholarly_status': 'ATTENDING',
+            'campus_location': 'SEOUL',
         }
 
         # When: user create api를 호출하여 회원가입을 시도한다.
@@ -108,7 +121,7 @@ class UserViewSetTestCase(APITestCase):
 
         user = User.objects.filter(email=user_data['email'])
         assert_that(user).is_empty()
-        profile = Profile.objects.filter(nickname=user_data['nickname'])
+        profile = Profile.objects.filter(user__email=user_data['email'])
         assert_that(profile).is_empty()
         coin_history = CoinHistory.objects.filter(user__email=user_data['email'])
         assert_that(coin_history).is_empty()
@@ -163,10 +176,10 @@ class UserViewSetTestCase(APITestCase):
         finally:
             # 임시로 만든 이미지 파일을 삭제한다.
             tmp_file.close()
-            if os.path.exists("tmp_image.jpg"):
-                os.remove("tmp_image.jpg")
+            if os.path.exists('tmp_image.jpg'):
+                os.remove('tmp_image.jpg')
 
-    def test_should_fail_update_user(self):
+    def test_should_fail_update_user_for_another_user(self):
         # Given: user 2개와 바꿀 user data가 주어진다
         original_email = 'origin_user_email@email.com'
         user = baker.make('users.User', email=original_email)
@@ -217,7 +230,7 @@ class UserViewSetTestCase(APITestCase):
     def test_should_get_my_user_profile_coin_history(self):
         # Given: user와 profile, coin_history가 주어진다.
         expected_user = baker.make('users.User')
-        expected_profile = baker.make('profiles.Profile', user=expected_user)
+        expected_profile = baker.make('users.Profile', user=expected_user)
         coin_history_quantity = 5
         expected_coin_history_list = baker.make('self_date.CoinHistory', user=expected_user,
                                                 _quantity=coin_history_quantity)
@@ -241,10 +254,10 @@ class UserViewSetTestCase(APITestCase):
     def test_should_check_university(self, send_email):
         # Given: user와 등록할 user의 학교 이메일이 주어진다.
         user = baker.make('users.User')
-        baker.make('profiles.Profile', user=user)
+        baker.make('users.Profile', user=user)
         user_id = user.id
         data = {
-            "university_email": "test@test.com"
+            'university_email': 'test@test.com'
         }
 
         # When: 주어진 user로 로그인 한 후, 학교 이메일 정보로 check-univ api를 호출한다.
@@ -263,7 +276,7 @@ class UserViewSetTestCase(APITestCase):
         user = baker.make('users.User')
         another_user = baker.make('users.User')
         data = {
-            "university_email": "test@test.com"
+            'university_email': 'test@test.com'
         }
 
         # When: 주어진 user로 로그인 한 후, 학교 이메일 정보로 check-univ api를 호출한다.
@@ -282,7 +295,7 @@ class UserViewSetTestCase(APITestCase):
         user = baker.make('users.user', user_code=user_code)
         assert_that(user.is_confirmed_student).is_false()
         data = {
-            "user_code": user_code,
+            'user_code': user_code,
         }
 
         # When: confirm-user api를 호출한다.
@@ -298,7 +311,7 @@ class UserViewSetTestCase(APITestCase):
         not_exist_user_code = 'abcdefgh'
         user = baker.make('users.user', user_code='testtest')
         data = {
-            "user_code": not_exist_user_code,
+            'user_code': not_exist_user_code,
         }
 
         # When: confirm-user api를 호출한다.
@@ -313,7 +326,7 @@ class UserViewSetTestCase(APITestCase):
         # Given: user, profile, coin_history, 올바른 email, password가 주어진다.
         password_string = 'password'
         user = baker.make('users.User', password=make_password(password_string), is_active=True)
-        profile = baker.make('profiles.Profile', user=user)
+        profile = baker.make('users.Profile', user=user)
 
         coin_history_quantity = 5
         coin_history_list = baker.make('self_date.CoinHistory', user=user, _quantity=coin_history_quantity)
@@ -349,22 +362,13 @@ class UserViewSetTestCase(APITestCase):
     @staticmethod
     def _assert_profile(responsed_profile, expected_profile):
         assert_that(responsed_profile['id']).is_equal_to(expected_profile.id)
+        assert_that(responsed_profile['user']).is_equal_to(expected_profile.user.id)
+        assert_that(responsed_profile['gender']).is_equal_to(expected_profile.gender)
+        assert_that(responsed_profile['birthday']).is_equal_to(expected_profile.birthday.strftime('%Y-%m-%d'))
+        assert_that(responsed_profile['scholarly_status']).is_equal_to(expected_profile.scholarly_status)
+        assert_that(responsed_profile['campus_location']).is_equal_to(expected_profile.campus_location)
         assert_that(responsed_profile['created_at']).is_equal_to(reformat_datetime(expected_profile.created_at))
         assert_that(responsed_profile['updated_at']).is_equal_to(reformat_datetime(expected_profile.updated_at))
-        assert_that(responsed_profile['nickname']).is_equal_to(expected_profile.nickname)
-        assert_that(responsed_profile['gender']).is_equal_to(expected_profile.gender)
-        assert_that(responsed_profile['age']).is_equal_to(expected_profile.age)
-        assert_that(responsed_profile['height']).is_equal_to(expected_profile.height)
-        assert_that(responsed_profile['body_type']).is_equal_to(expected_profile.body_type)
-        assert_that(responsed_profile['tags']).is_equal_to(expected_profile.tags)
-        assert_that(responsed_profile['image']).is_equal_to(expected_profile.image)
-        assert_that(responsed_profile['appearance']).is_equal_to(expected_profile.appearance)
-        assert_that(responsed_profile['personality']).is_equal_to(expected_profile.personality)
-        assert_that(responsed_profile['hobby']).is_equal_to(expected_profile.hobby)
-        assert_that(responsed_profile['date_style']).is_equal_to(expected_profile.date_style)
-        assert_that(responsed_profile['ideal_type']).is_equal_to(expected_profile.ideal_type)
-        assert_that(responsed_profile['one_sentence']).is_equal_to(expected_profile.one_sentence)
-        assert_that(responsed_profile['chat_link']).is_equal_to(expected_profile.chat_link)
 
     @staticmethod
     def _assert_coin_history(response_coin_history, expected_coin_history):
@@ -380,7 +384,7 @@ class UserViewSetTestCase(APITestCase):
 
     def test_should_fail_get_jwt_token(self):
         # Given: user, profile, 올바르지 않은 email, password가 주어진다.
-        baker.make('profiles.Profile')
+        baker.make('users.Profile')
 
         invalid_payload = {
             'email': 'invalid_email@email.com',

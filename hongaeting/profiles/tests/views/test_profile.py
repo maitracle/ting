@@ -7,7 +7,7 @@ from model_bakery import baker
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from common.constants import UNIVERSITY_LIST, VIEW_PROFILE_COST, SIGNUP_REWARD, SEND_MESSAGE_COST
+from common.constants import UNIVERSITY_CHOICES, VIEW_PROFILE_COST, SIGNUP_REWARD, SEND_MESSAGE_COST
 from common.decorator import delete_media_root
 from profiles.models import SelfDateProfile
 from self_date.models import CoinHistory
@@ -46,15 +46,15 @@ class ProfileTestCase(APITestCase):
         expected_profile = baker.make('profiles.Profile', gender=expected_profile_data['gender'],
                                       user__university=expected_profile_data['university'])
         baker.make('profiles.Profile', gender=Profile.GENDER_CHOICES.FEMALE,
-                   user__university=UNIVERSITY_LIST.HONGIK)
+                   user__university=UNIVERSITY_CHOICES.HONGIK)
         baker.make('profiles.Profile', gender=Profile.GENDER_CHOICES.MALE,
-                   user__university=UNIVERSITY_LIST.KYUNGHEE)
+                   user__university=UNIVERSITY_CHOICES.KYUNGHEE)
         baker.make('profiles.Profile', gender=Profile.GENDER_CHOICES.FEMALE,
-                   user__university=UNIVERSITY_LIST.KYUNGHEE)
+                   user__university=UNIVERSITY_CHOICES.KYUNGHEE)
         baker.make('profiles.Profile', gender=Profile.GENDER_CHOICES.MALE,
-                   user__university=UNIVERSITY_LIST.YONSEI)
+                   user__university=UNIVERSITY_CHOICES.YONSEI)
         baker.make('profiles.Profile', gender=Profile.GENDER_CHOICES.FEMALE,
-                   user__university=UNIVERSITY_LIST.YONSEI)
+                   user__university=UNIVERSITY_CHOICES.YONSEI)
 
         # When: user가 필터링 된 list api를 호출한다.
         self.client.force_authenticate(user=user)

@@ -1,6 +1,6 @@
 from model_utils import Choices
 
-UNIVERSITY_LIST = Choices('HONGIK', 'KYUNGHEE', 'YONSEI', )
+UNIVERSITY_CHOICES = Choices('HONGIK', 'KYUNGHEE', 'YONSEI', )
 
 SIGNUP_REWARD = 30
 VIEW_PROFILE_COST = 2

@@ -8,7 +8,7 @@ from django.template.loader import render_to_string
 from django.utils.crypto import get_random_string
 from model_utils import Choices
 
-from common.constants import UNIVERSITY_LIST
+from common.constants import UNIVERSITY_CHOICES
 from common.models import BaseModel
 from common.utils import Email
 
@@ -62,7 +62,7 @@ class User(BaseModel, AbstractBaseUser):
     is_superuser = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
 
-    university = models.CharField(max_length=10, blank=True, null=True, choices=UNIVERSITY_LIST)
+    university = models.CharField(max_length=10, blank=True, null=True, choices=UNIVERSITY_CHOICES)
     university_email = NullableEmailField(max_length=100, null=True, blank=True, unique=True,
                                           help_text='학교 인증을 위한 메일')
     student_id_card_image = models.ImageField(upload_to=student_id_card_image_path, blank=True, null=True,
@@ -106,7 +106,7 @@ class User(BaseModel, AbstractBaseUser):
                                         {'user_code': self.user_code,
                                          'front_address':
                                              f'{settings.FRONT_END_URL}{settings.FRONT_END_MAIL_CHECK_PAGE}'})
-        Email.send_email(f'{self.profile.nickname}님 학생 인증을 완료해주세요.', html_content, self.university_email)
+        Email.send_email(f'{self.university_email}님 학생 인증을 완료해주세요.', html_content, self.university_email)
 
     def set_user_code(self):
         user_code = get_random_string(length=8)
