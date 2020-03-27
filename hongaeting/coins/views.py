@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django_rest_framework_mango.mixins import QuerysetMixin
 from rest_framework import viewsets, filters
 from rest_framework.mixins import ListModelMixin

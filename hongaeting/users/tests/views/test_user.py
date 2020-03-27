@@ -13,10 +13,10 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from coins.models import CoinHistory
 from common.constants import SIGNUP_REWARD, UNIVERSITY_CHOICES
 from common.decorator import delete_media_root
 from common.utils import Email, reformat_datetime
-from coins.models import CoinHistory
 from users.models import User, Profile
 
 
@@ -28,7 +28,6 @@ class UserViewSetTestCase(APITestCase):
         user_data = {
             'email': 'testuser@test.com',
             'password': 'password123',
-
 
             'gender': 'MALE',
             'birthday': birthday,

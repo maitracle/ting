@@ -8,13 +8,13 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from coins.models import CoinHistory
 from coins.serializers import CreateCoinHistorySerializer
+from common.constants import SIGNUP_REWARD
 from users.models import User
 from users.permissions import IsSameUserWithRequestUser
-from common.constants import SIGNUP_REWARD
 from users.serializers.profiles import ProfileSerializer
 from users.serializers.users import UserSerializer, TokenSerializer, UserCheckUnivSerializer, MySerializer
-from coins.models import CoinHistory
 
 
 class UserViewSet(

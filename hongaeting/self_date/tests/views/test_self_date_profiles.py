@@ -8,10 +8,10 @@ from model_bakery import baker
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from coins.models import CoinHistory
 from common.constants import UNIVERSITY_CHOICES, VIEW_PROFILE_COST, SIGNUP_REWARD, SEND_MESSAGE_COST
 from common.decorator import delete_media_root
 from common.utils import reformat_datetime
-from coins.models import CoinHistory
 from users.models import Profile
 
 
@@ -40,8 +40,8 @@ class ProfileTestCase(APITestCase):
         user = baker.make('users.User')
 
         expected_profile_data = {
-            "gender": "MALE",
-            "university": "HONGIK"
+            'gender': 'MALE',
+            'university': 'HONGIK'
         }
 
         expected_profile = baker.make('self_date.SelfDateProfile', profile__gender=expected_profile_data['gender'],
@@ -73,7 +73,7 @@ class ProfileTestCase(APITestCase):
             self._check_response_and_expected(response, expected_profile)
             assert_that(response['is_viewed']).is_equal_to(expected_is_viewed_value)
 
-    @skip("coin history가 만들어질 때까지 테스트를 건너뛴다.")
+    @skip('coin history가 만들어질 때까지 테스트를 건너뛴다.')
     def test_is_viewed_in_list(self):
         # Given: user 하나와 여러 조합의 coin_history가 주어진다.
         user = baker.make('users.User')
@@ -196,10 +196,10 @@ class ProfileTestCase(APITestCase):
         user = baker.make('users.User')
         profile = baker.make('self_date.SelfDateProfile', profile__user=user, is_active=True)
         update_data = {
-            'appearance': """가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가
+            'appearance': '''가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가
             나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타
             파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자
-            차카타파하"""
+            차카타파하'''
         }
 
         # When: user가 update api를 호출한다.
@@ -239,18 +239,18 @@ class ProfileTestCase(APITestCase):
         finally:
             # 임시로 만든 이미지 파일을 삭제한다.
             tmp_file.close()
-            if os.path.exists("tmp_image.jpg"):
-                os.remove("tmp_image.jpg")
+            if os.path.exists('tmp_image.jpg'):
+                os.remove('tmp_image.jpg')
 
     def test_should_fail_update_profile(self):
         # Given: user 1명과 다른 user의 profile, 수정할 데이터가 주어진다.
         user = baker.make('users.User')
         profile = baker.make('self_date.SelfDateProfile', is_active=True)
         update_data = {
-            "appearance": """가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가
+            'appearance': '''가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가
                     나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타
                     파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자
-                    차카타파하"""
+                    차카타파하'''
         }
 
         # When: user가 update api를 호출한다.
@@ -268,7 +268,7 @@ class ProfileTestCase(APITestCase):
     def test_should_get_chat_link(self):
         # Given: user 1명과 메시지를 보낼 profile이 1개 주어진다. user의 rest_coin이 충분한 coin_history가 주어진다.
         user = baker.make('users.User')
-        expected_profile = baker.make('self_date.SelfDateProfile', chat_link="chatlink@test.com")
+        expected_profile = baker.make('self_date.SelfDateProfile', chat_link='chatlink@test.com')
         coin_history = baker.make(
             'coins.CoinHistory',
             user=user,

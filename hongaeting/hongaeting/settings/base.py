@@ -107,11 +107,11 @@ def get_redis_location(name):
 
 # Cache
 CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": get_redis_location('DEFAULT'),  # 1번 DB
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': get_redis_location('DEFAULT'),  # 1번 DB
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
         }
     }
 }
@@ -196,7 +196,7 @@ AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazo
 AWS_DEFAULT_ACL = 'public-read'
 
 MEDIA_ROOT = 'base/media'
-MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{MEDIA_ROOT}/"
+MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{MEDIA_ROOT}/'
 
 AWS_IS_GZIPPED = True
 AWS_S3_OBJECT_PARAMETERS = {

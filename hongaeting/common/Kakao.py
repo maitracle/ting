@@ -12,7 +12,6 @@ class Kakao:
     @classmethod
     def is_valid_kakao_link(cls, kakao_link):
         if settings.TEST:
-
             return True
         request = Request.instance()
 

@@ -13,7 +13,7 @@ from users.models import User
 
 
 def image_path(instance, original_filename):
-    path = f"profiles/{instance.profile.user.get_full_name()}/image{os.path.splitext(original_filename)[1]}"
+    path = f'profiles/{instance.profile.user.get_full_name()}/image{os.path.splitext(original_filename)[1]}'
     return path
 
 

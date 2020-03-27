@@ -27,7 +27,7 @@ class CoinHistoryTestCase(APITestCase):
             assert_that(responded_coin_history['reason']).is_equal_to(expected_coin_history.reason)
             assert_that(responded_coin_history['profile']).is_equal_to(expected_coin_history.profile)
 
-            assert_that(responded_coin_history['created_at'])\
+            assert_that(responded_coin_history['created_at']) \
                 .is_equal_to(reformat_datetime(expected_coin_history.created_at))
-            assert_that(responded_coin_history['updated_at'])\
+            assert_that(responded_coin_history['updated_at']) \
                 .is_equal_to(reformat_datetime(expected_coin_history.updated_at))

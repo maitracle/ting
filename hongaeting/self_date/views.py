@@ -13,9 +13,9 @@ from coins.serializers import CreateCoinHistorySerializer
 from common.constants import VIEW_PROFILE_COST, SEND_MESSAGE_COST
 from common.permissions import IsOwnerProfileOrReadonly
 from common.permissions import IsOwnerUserOrReadonly
+from self_date.serializers import LikeSerializer
 from self_date.serializers import ListSelfDateProfileSerializer, UpdateSelfDateProfileSerializer, \
     RetrieveSelfDateProfileSerializer
-from self_date.serializers import LikeSerializer
 from .models import SelfDateProfile, Like
 
 
@@ -65,10 +65,10 @@ class SelfDateProfileViewSet(
             try:
                 rest_coin = CoinHistory.objects.filter(user=request.user).last().rest_coin
                 coin_history_data = {
-                    "user": request.user.id,
-                    "rest_coin": rest_coin - VIEW_PROFILE_COST,
-                    "reason": CoinHistory.CHANGE_REASON.VIEW_PROFILE,
-                    "profile": int(kwargs['pk'])
+                    'user': request.user.id,
+                    'rest_coin': rest_coin - VIEW_PROFILE_COST,
+                    'reason': CoinHistory.CHANGE_REASON.VIEW_PROFILE,
+                    'profile': int(kwargs['pk'])
                 }
 
                 coin_history_instance = CreateCoinHistorySerializer(data=coin_history_data)
@@ -97,10 +97,10 @@ class SelfDateProfileViewSet(
             try:
                 rest_coin = CoinHistory.objects.filter(user=request.user).last().rest_coin
                 coin_history_data = {
-                    "user": request.user.id,
-                    "rest_coin": rest_coin - SEND_MESSAGE_COST,
-                    "reason": CoinHistory.CHANGE_REASON.SEND_MESSAGE,
-                    "profile": profile.id
+                    'user': request.user.id,
+                    'rest_coin': rest_coin - SEND_MESSAGE_COST,
+                    'reason': CoinHistory.CHANGE_REASON.SEND_MESSAGE,
+                    'profile': profile.id
                 }
 
                 coin_history_instance = CreateCoinHistorySerializer(data=coin_history_data)
@@ -110,7 +110,7 @@ class SelfDateProfileViewSet(
                 return Response(status=status.HTTP_403_FORBIDDEN)
 
         chat_link = {
-            "chat_link": profile.chat_link,
+            'chat_link': profile.chat_link,
         }
         return Response(chat_link)
 

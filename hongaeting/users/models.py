@@ -14,7 +14,7 @@ from common.utils import Email
 
 
 def student_id_card_image_path(instance, original_filename):
-    path = f"id_cards/{instance.get_full_name()}/image{os.path.splitext(original_filename)[1]}"
+    path = f'id_cards/{instance.get_full_name()}/image{os.path.splitext(original_filename)[1]}'
     return path
 
 
