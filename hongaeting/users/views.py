@@ -8,7 +8,6 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from profiles.serializers import CreateProfileSerializer
 from self_date.serializer import CreateCoinHistorySerializer
 from users.models import User
 from users.permissions import IsSameUserWithRequestUser

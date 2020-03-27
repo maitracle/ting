@@ -1,6 +1,5 @@
 from rest_framework import serializers
 
-from profiles.serializers import RetrieveProfileSerializer
 from self_date.serializer import ListCoinHistorySerializer
 from users.models import User
 from users.serializers.profiles import ProfileSerializer

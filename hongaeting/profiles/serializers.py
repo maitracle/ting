@@ -4,7 +4,7 @@ from profiles.models import SelfDateProfile
 from users.serializers.profiles import ProfileSerializer
 
 
-class CreateProfileSerializer(serializers.ModelSerializer):
+class CreateSelfDateProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = SelfDateProfile
         fields = (
@@ -16,7 +16,7 @@ class CreateProfileSerializer(serializers.ModelSerializer):
         )
 
 
-class ListProfileSerializer(serializers.ModelSerializer):
+class ListSelfDateProfileSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(use_url=True)
     profile = ProfileSerializer()
     is_viewed = serializers.BooleanField()
@@ -46,7 +46,7 @@ class ListProfileSerializer(serializers.ModelSerializer):
         )
 
 
-class RetrieveProfileSerializer(serializers.ModelSerializer):
+class RetrieveSelfDateProfileSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(use_url=True)
     profile = ProfileSerializer()
 
@@ -75,7 +75,7 @@ class RetrieveProfileSerializer(serializers.ModelSerializer):
         )
 
 
-class UpdateProfileSerializer(serializers.ModelSerializer):
+class UpdateSelfDateProfileSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(use_url=True)
 
     class Meta:

@@ -10,7 +10,8 @@ from rest_framework.exceptions import ValidationError
 from common.constants import VIEW_PROFILE_COST, SEND_MESSAGE_COST
 from common.permissions import IsOwnerProfileOrReadonly
 from profiles.models import SelfDateProfile
-from profiles.serializers import ListProfileSerializer, UpdateProfileSerializer, RetrieveProfileSerializer
+from profiles.serializers import ListSelfDateProfileSerializer, UpdateSelfDateProfileSerializer, \
+    RetrieveSelfDateProfileSerializer
 from self_date.models import CoinHistory
 from self_date.serializer import CreateCoinHistorySerializer
 
@@ -23,10 +24,10 @@ class SelfDateProfileViewSet(
     queryset = SelfDateProfile.objects.all()
     permission_classes = (IsOwnerProfileOrReadonly,)
     serializer_class_by_actions = {
-        'list': ListProfileSerializer,
-        'update': UpdateProfileSerializer,
-        'partial_update': UpdateProfileSerializer,
-        'retrieve': RetrieveProfileSerializer,
+        'list': ListSelfDateProfileSerializer,
+        'update': UpdateSelfDateProfileSerializer,
+        'partial_update': UpdateSelfDateProfileSerializer,
+        'retrieve': RetrieveSelfDateProfileSerializer,
     }
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('profile__gender', 'profile__university',)
