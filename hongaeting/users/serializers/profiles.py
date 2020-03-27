@@ -11,8 +11,9 @@ class ProfileSerializer(serializers.ModelSerializer):
             'user',
             'gender',
             'birthday',
-            'scholarly_status',
+            'university',
             'campus_location',
+            'scholarly_status',
             'created_at',
             'updated_at',
         )

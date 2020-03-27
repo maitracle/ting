@@ -28,12 +28,13 @@ class UserViewSetTestCase(APITestCase):
         user_data = {
             'email': 'testuser@test.com',
             'password': 'password123',
-            'university': UNIVERSITY_CHOICES.HONGIK,
+
 
             'gender': 'MALE',
             'birthday': birthday,
-            'scholarly_status': 'ATTENDING',
+            'university': UNIVERSITY_CHOICES.HONGIK,
             'campus_location': 'SEOUL',
+            'scholarly_status': 'ATTENDING',
         }
         user_code_length = 8
 
@@ -55,7 +56,6 @@ class UserViewSetTestCase(APITestCase):
         assert_that(response.data['user']['email']).is_equal_to(user_data['email'])
         hashed_password_prefix = 'pbkdf2_sha256$150000$'
         assert_that(response.data['user']['password'].startswith(hashed_password_prefix)).is_true()
-        assert_that(response.data['user']['university']).is_equal_to(user_data['university'])
         assert_that(response.data['user']['is_confirmed_student']).is_false()
         assert_that(user.user_code).is_length(user_code_length)
 
@@ -63,8 +63,9 @@ class UserViewSetTestCase(APITestCase):
         assert_that(response.data['profile']['user']).is_equal_to(user.id)
         assert_that(response.data['profile']['gender']).is_equal_to(user_data['gender'])
         assert_that(response.data['profile']['birthday']).is_equal_to(user_data['birthday'])
-        assert_that(response.data['profile']['scholarly_status']).is_equal_to(user_data['scholarly_status'])
+        assert_that(response.data['profile']['university']).is_equal_to(user_data['university'])
         assert_that(response.data['profile']['campus_location']).is_equal_to(user_data['campus_location'])
+        assert_that(response.data['profile']['scholarly_status']).is_equal_to(user_data['scholarly_status'])
         assert_that(response.data['profile']['created_at']).is_equal_to(reformat_datetime(user.profile.created_at))
         assert_that(response.data['profile']['updated_at']).is_equal_to(reformat_datetime(user.profile.updated_at))
 
@@ -355,7 +356,7 @@ class UserViewSetTestCase(APITestCase):
     def _assert_user(responsed_user, expected_user):
         assert_that(responsed_user['id']).is_equal_to(expected_user.id)
         assert_that(responsed_user['email']).is_equal_to(expected_user.email)
-        assert_that(responsed_user['university']).is_equal_to(expected_user.university)
+
         assert_that(responsed_user['user_code']).is_equal_to(expected_user.user_code)
         assert_that(responsed_user['is_confirmed_student']).is_equal_to(expected_user.is_confirmed_student)
 
@@ -365,8 +366,9 @@ class UserViewSetTestCase(APITestCase):
         assert_that(responsed_profile['user']).is_equal_to(expected_profile.user.id)
         assert_that(responsed_profile['gender']).is_equal_to(expected_profile.gender)
         assert_that(responsed_profile['birthday']).is_equal_to(expected_profile.birthday.strftime('%Y-%m-%d'))
-        assert_that(responsed_profile['scholarly_status']).is_equal_to(expected_profile.scholarly_status)
+        assert_that(responsed_profile['university']).is_equal_to(expected_profile.university)
         assert_that(responsed_profile['campus_location']).is_equal_to(expected_profile.campus_location)
+        assert_that(responsed_profile['scholarly_status']).is_equal_to(expected_profile.scholarly_status)
         assert_that(responsed_profile['created_at']).is_equal_to(reformat_datetime(expected_profile.created_at))
         assert_that(responsed_profile['updated_at']).is_equal_to(reformat_datetime(expected_profile.updated_at))
 

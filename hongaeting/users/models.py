@@ -62,7 +62,6 @@ class User(BaseModel, AbstractBaseUser):
     is_superuser = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
 
-    university = models.CharField(max_length=10, blank=True, null=True, choices=UNIVERSITY_CHOICES)
     university_email = NullableEmailField(max_length=100, null=True, blank=True, unique=True,
                                           help_text='학교 인증을 위한 메일')
     student_id_card_image = models.ImageField(upload_to=student_id_card_image_path, blank=True, null=True,
@@ -127,8 +126,9 @@ class Profile(BaseModel):
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
     birthday = models.DateField()
 
-    scholarly_status = models.CharField(max_length=10, choices=SCHOLARLY_STATUS_CHOICES)
+    university = models.CharField(max_length=10, blank=True, null=True, choices=UNIVERSITY_CHOICES)
     campus_location = models.CharField(max_length=20, choices=CAMPUS_LOCATION_CHOICES)
+    scholarly_status = models.CharField(max_length=10, choices=SCHOLARLY_STATUS_CHOICES)
 
     @property
     def age(self):

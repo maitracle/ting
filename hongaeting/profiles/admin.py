@@ -6,4 +6,4 @@ from profiles.models import SelfDateProfile
 
 @register(SelfDateProfile)
 class SelfDateProfileAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user',)
+    list_display = ('id', 'profile',)

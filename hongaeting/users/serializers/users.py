@@ -16,7 +16,6 @@ class UserSerializer(serializers.ModelSerializer):
             'id',
             'email',
             'password',
-            'university',
             'student_id_card_image',
             'is_confirmed_student',
         )
@@ -28,7 +27,6 @@ class RetrieveUserSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'email',
-            'university',
             'user_code',
             'is_confirmed_student',
         )

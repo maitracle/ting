@@ -10,7 +10,7 @@ router = SimpleRouter()
 router.register('users', UserViewSet)
 router.register('coin-histories', CoinHistoryViewSet)
 router.register('likes', LikeViewSet)
-router.register('self-dates', SelfDateProfileViewSet)
+router.register('self-date-profiles', SelfDateProfileViewSet)
 
 urlpatterns = [
     path('users/tokens/refresh/', TokenRefreshView.as_view(), name='token_refresh'),

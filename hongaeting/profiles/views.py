@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 
 from common.constants import VIEW_PROFILE_COST, SEND_MESSAGE_COST
-from common.permissions import IsOwnerUserOrReadonly
+from common.permissions import IsOwnerProfileOrReadonly
 from profiles.models import SelfDateProfile
 from profiles.serializers import ListProfileSerializer, UpdateProfileSerializer, RetrieveProfileSerializer
 from self_date.models import CoinHistory
@@ -21,7 +21,7 @@ class SelfDateProfileViewSet(
     viewsets.GenericViewSet,
 ):
     queryset = SelfDateProfile.objects.all()
-    permission_classes = (IsOwnerUserOrReadonly,)
+    permission_classes = (IsOwnerProfileOrReadonly,)
     serializer_class_by_actions = {
         'list': ListProfileSerializer,
         'update': UpdateProfileSerializer,
@@ -29,7 +29,7 @@ class SelfDateProfileViewSet(
         'retrieve': RetrieveProfileSerializer,
     }
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('gender', 'user__university',)
+    filterset_fields = ('profile__gender', 'profile__university',)
 
     def list_queryset(self, queryset):
         coin_history_queryset = CoinHistory.objects.filter(user=self.request.user).filter(
