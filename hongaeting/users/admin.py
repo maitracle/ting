@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.admin import register
 
-from users.models import User
+from users.models import User, Profile
 
 
 @register(User)
@@ -18,3 +18,8 @@ class UserAdmin(admin.ModelAdmin):
         self.message_user(request, f'{updated_count}명의 user를 confirm상태로 변경')
 
     confirm_user.short_description = '여러명의 user를 한번에 confirm'
+
+
+@register(Profile)
+class ProfileAdmin(admin.ModelAdmin):
+    pass
