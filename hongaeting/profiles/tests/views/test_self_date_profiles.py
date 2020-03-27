@@ -11,7 +11,7 @@ from rest_framework.test import APITestCase
 from common.constants import UNIVERSITY_CHOICES, VIEW_PROFILE_COST, SIGNUP_REWARD, SEND_MESSAGE_COST
 from common.decorator import delete_media_root
 from common.utils import reformat_datetime
-from self_date.models import CoinHistory
+from coins.models import CoinHistory
 from users.models import Profile
 
 
@@ -81,13 +81,13 @@ class ProfileTestCase(APITestCase):
         profile_quantity = 5
         profile_list = baker.make('profiles.SelfDateProfile', _quantity=profile_quantity)
 
-        baker.make('self_date.CoinHistory', user=user, reason=CoinHistory.CHANGE_REASON.VIEW_PROFILE,
+        baker.make('coins.CoinHistory', user=user, reason=CoinHistory.CHANGE_REASON.VIEW_PROFILE,
                    profile=profile_list[1])
-        baker.make('self_date.CoinHistory', user=user, reason=CoinHistory.CHANGE_REASON.SEND_MESSAGE,
+        baker.make('coins.CoinHistory', user=user, reason=CoinHistory.CHANGE_REASON.SEND_MESSAGE,
                    profile=profile_list[2])
-        baker.make('self_date.CoinHistory', reason=CoinHistory.CHANGE_REASON.VIEW_PROFILE,
+        baker.make('coins.CoinHistory', reason=CoinHistory.CHANGE_REASON.VIEW_PROFILE,
                    profile=profile_list[3])
-        baker.make('self_date.CoinHistory', user=user, reason=CoinHistory.CHANGE_REASON.VIEW_PROFILE,
+        baker.make('coins.CoinHistory', user=user, reason=CoinHistory.CHANGE_REASON.VIEW_PROFILE,
                    profile=profile_list[4])
 
         expected_is_viewed_list = [False, True, False, False, True]
@@ -105,7 +105,7 @@ class ProfileTestCase(APITestCase):
         user = baker.make('users.User')
         expected_profile = baker.make('profiles.SelfDateProfile')
         coin_history = baker.make(
-            'self_date.CoinHistory',
+            'coins.CoinHistory',
             user=user,
             reason=CoinHistory.CHANGE_REASON.SIGNUP,
             rest_coin=SIGNUP_REWARD
@@ -127,7 +127,7 @@ class ProfileTestCase(APITestCase):
         user = baker.make('users.User')
         expected_profile = baker.make('profiles.SelfDateProfile')
         view_profile_coin_history = baker.make(
-            'self_date.CoinHistory',
+            'coins.CoinHistory',
             user=user,
             reason=CoinHistory.CHANGE_REASON.VIEW_PROFILE,
             rest_coin=28,
@@ -149,7 +149,7 @@ class ProfileTestCase(APITestCase):
         user = baker.make('users.User')
         expected_profile = baker.make('profiles.SelfDateProfile')
         final_coin_history = baker.make(
-            'self_date.CoinHistory',
+            'coins.CoinHistory',
             user=user,
             reason=CoinHistory.CHANGE_REASON.VIEW_PROFILE,
             rest_coin=0
@@ -270,7 +270,7 @@ class ProfileTestCase(APITestCase):
         user = baker.make('users.User')
         expected_profile = baker.make('profiles.SelfDateProfile', chat_link="chatlink@test.com")
         coin_history = baker.make(
-            'self_date.CoinHistory',
+            'coins.CoinHistory',
             user=user,
             reason=CoinHistory.CHANGE_REASON.SIGNUP,
             rest_coin=SIGNUP_REWARD
@@ -294,7 +294,7 @@ class ProfileTestCase(APITestCase):
         user = baker.make('users.User')
         expected_profile = baker.make('profiles.SelfDateProfile')
         coin_history = baker.make(
-            'self_date.CoinHistory',
+            'coins.CoinHistory',
             user=user,
             reason=CoinHistory.CHANGE_REASON.SEND_MESSAGE,
             rest_coin=SIGNUP_REWARD - SEND_MESSAGE_COST,
@@ -318,7 +318,7 @@ class ProfileTestCase(APITestCase):
         user = baker.make('users.User')
         expected_profile = baker.make('profiles.SelfDateProfile')
         coin_history = baker.make(
-            'self_date.CoinHistory',
+            'coins.CoinHistory',
             user=user,
             reason=CoinHistory.CHANGE_REASON.SEND_MESSAGE,
             rest_coin=0,

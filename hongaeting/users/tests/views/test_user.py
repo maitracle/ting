@@ -16,7 +16,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from common.constants import SIGNUP_REWARD, UNIVERSITY_CHOICES
 from common.decorator import delete_media_root
 from common.utils import Email, reformat_datetime
-from self_date.models import CoinHistory
+from coins.models import CoinHistory
 from users.models import User, Profile
 
 
@@ -233,7 +233,7 @@ class UserViewSetTestCase(APITestCase):
         expected_user = baker.make('users.User')
         expected_profile = baker.make('users.Profile', user=expected_user)
         coin_history_quantity = 5
-        expected_coin_history_list = baker.make('self_date.CoinHistory', user=expected_user,
+        expected_coin_history_list = baker.make('coins.CoinHistory', user=expected_user,
                                                 _quantity=coin_history_quantity)
 
         # When: user가 my profile api를 호출한다.
@@ -330,7 +330,7 @@ class UserViewSetTestCase(APITestCase):
         profile = baker.make('users.Profile', user=user)
 
         coin_history_quantity = 5
-        coin_history_list = baker.make('self_date.CoinHistory', user=user, _quantity=coin_history_quantity)
+        coin_history_list = baker.make('coins.CoinHistory', user=user, _quantity=coin_history_quantity)
 
         # When: login api를 호출한다.
         payload = {

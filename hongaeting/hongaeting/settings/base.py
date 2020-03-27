@@ -44,6 +44,7 @@ PROJECT_APPS = [
     'users',
     'self_date',
     'profiles',
+    'coins',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + \

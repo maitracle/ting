@@ -10,17 +10,20 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
+        ('profiles', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Like',
+            name='CoinHistory',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
-                ('liked_user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='liked_user', to=settings.AUTH_USER_MODEL)),
+                ('rest_coin', models.PositiveSmallIntegerField()),
+                ('reason', models.CharField(choices=[('SIGNUP', 'SIGNUP'), ('VIEW_PROFILE', 'VIEW_PROFILE'), ('SEND_MESSAGE', 'SEND_MESSAGE')], max_length=50)),
+                ('profile', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='profiles.SelfDateProfile')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
             options={

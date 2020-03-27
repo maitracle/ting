@@ -3,7 +3,8 @@ from rest_framework.routers import SimpleRouter
 from rest_framework_simplejwt.views import TokenRefreshView
 
 from profiles.views import SelfDateProfileViewSet
-from self_date.views import CoinHistoryViewSet, LikeViewSet
+from coins.views import CoinHistoryViewSet
+from self_date.views import LikeViewSet
 from users.views import UserViewSet
 
 router = SimpleRouter()

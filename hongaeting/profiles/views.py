@@ -12,8 +12,8 @@ from common.permissions import IsOwnerProfileOrReadonly
 from profiles.models import SelfDateProfile
 from profiles.serializers import ListSelfDateProfileSerializer, UpdateSelfDateProfileSerializer, \
     RetrieveSelfDateProfileSerializer
-from self_date.models import CoinHistory
-from self_date.serializer import CreateCoinHistorySerializer
+from coins.models import CoinHistory
+from coins.serializers import CreateCoinHistorySerializer
 
 
 class SelfDateProfileViewSet(
