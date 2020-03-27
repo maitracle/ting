@@ -43,7 +43,6 @@ PACKAGE_APPS = [
 PROJECT_APPS = [
     'users',
     'self_date',
-    'profiles',
     'coins',
 ]
 

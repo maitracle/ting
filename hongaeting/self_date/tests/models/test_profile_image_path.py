@@ -2,13 +2,13 @@ from assertpy import assert_that
 from django.test import TestCase
 from model_bakery import baker
 
-from profiles.models import image_path
+from self_date.models import image_path
 
 
 class SelfDateProfileImagePathTestCase(TestCase):
     def test_image_path(self):
         # Given: profile 하나가 주어진다.
-        self_date_profile = baker.make('profiles.SelfDateProfile')
+        self_date_profile = baker.make('self_date.SelfDateProfile')
         file_name = 'image_name.png'
 
         # When: image_path method를 호출한다.

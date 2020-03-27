@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from coins.models import CoinHistory
-from profiles.models import SelfDateProfile
+from self_date.models import SelfDateProfile
 
 
 class CreateCoinHistorySerializer(serializers.ModelSerializer):

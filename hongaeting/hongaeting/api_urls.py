@@ -2,9 +2,8 @@ from django.urls import path
 from rest_framework.routers import SimpleRouter
 from rest_framework_simplejwt.views import TokenRefreshView
 
-from profiles.views import SelfDateProfileViewSet
 from coins.views import CoinHistoryViewSet
-from self_date.views import LikeViewSet
+from self_date.views import LikeViewSet, SelfDateProfileViewSet
 from users.views import UserViewSet
 
 router = SimpleRouter()

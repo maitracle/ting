@@ -20,7 +20,7 @@ class ProfileTestCase(APITestCase):
         # Given: user 1명과 profile이 주어진다.
         user = baker.make('users.User')
         profile_quantity = 10
-        expected_profile_list = baker.make('profiles.SelfDateProfile', _quantity=profile_quantity)
+        expected_profile_list = baker.make('self_date.SelfDateProfile', _quantity=profile_quantity)
 
         # When: user가 list api를 호출한다.
         self.client.force_authenticate(user=user)
@@ -44,17 +44,17 @@ class ProfileTestCase(APITestCase):
             "university": "HONGIK"
         }
 
-        expected_profile = baker.make('profiles.SelfDateProfile', profile__gender=expected_profile_data['gender'],
+        expected_profile = baker.make('self_date.SelfDateProfile', profile__gender=expected_profile_data['gender'],
                                       profile__university=expected_profile_data['university'])
-        baker.make('profiles.SelfDateProfile', profile__gender=Profile.GENDER_CHOICES.FEMALE,
+        baker.make('self_date.SelfDateProfile', profile__gender=Profile.GENDER_CHOICES.FEMALE,
                    profile__university=UNIVERSITY_CHOICES.HONGIK)
-        baker.make('profiles.SelfDateProfile', profile__gender=Profile.GENDER_CHOICES.MALE,
+        baker.make('self_date.SelfDateProfile', profile__gender=Profile.GENDER_CHOICES.MALE,
                    profile__university=UNIVERSITY_CHOICES.KYUNGHEE)
-        baker.make('profiles.SelfDateProfile', profile__gender=Profile.GENDER_CHOICES.FEMALE,
+        baker.make('self_date.SelfDateProfile', profile__gender=Profile.GENDER_CHOICES.FEMALE,
                    profile__university=UNIVERSITY_CHOICES.KYUNGHEE)
-        baker.make('profiles.SelfDateProfile', profile__gender=Profile.GENDER_CHOICES.MALE,
+        baker.make('self_date.SelfDateProfile', profile__gender=Profile.GENDER_CHOICES.MALE,
                    profile__university=UNIVERSITY_CHOICES.YONSEI)
-        baker.make('profiles.SelfDateProfile', profile__gender=Profile.GENDER_CHOICES.FEMALE,
+        baker.make('self_date.SelfDateProfile', profile__gender=Profile.GENDER_CHOICES.FEMALE,
                    profile__university=UNIVERSITY_CHOICES.YONSEI)
 
         # When: user가 필터링 된 list api를 호출한다.
@@ -79,7 +79,7 @@ class ProfileTestCase(APITestCase):
         user = baker.make('users.User')
 
         profile_quantity = 5
-        profile_list = baker.make('profiles.SelfDateProfile', _quantity=profile_quantity)
+        profile_list = baker.make('self_date.SelfDateProfile', _quantity=profile_quantity)
 
         baker.make('coins.CoinHistory', user=user, reason=CoinHistory.CHANGE_REASON.VIEW_PROFILE,
                    profile=profile_list[1])
@@ -103,7 +103,7 @@ class ProfileTestCase(APITestCase):
     def test_should_get_retrieved_profile(self):
         # Given: user 1명과 profile이 주어진다.
         user = baker.make('users.User')
-        expected_profile = baker.make('profiles.SelfDateProfile')
+        expected_profile = baker.make('self_date.SelfDateProfile')
         coin_history = baker.make(
             'coins.CoinHistory',
             user=user,
@@ -125,7 +125,7 @@ class ProfileTestCase(APITestCase):
     def test_should_get_retrieved_profile_which_user_viewed(self):
         # Given: user 1명과 임의의 프로필 1개가 주어진다. 해당 프로필 조회 coin_history가 주어진다.
         user = baker.make('users.User')
-        expected_profile = baker.make('profiles.SelfDateProfile')
+        expected_profile = baker.make('self_date.SelfDateProfile')
         view_profile_coin_history = baker.make(
             'coins.CoinHistory',
             user=user,
@@ -147,7 +147,7 @@ class ProfileTestCase(APITestCase):
     def test_should_not_get_retrieved_profile_when_user_does_not_have_coin(self):
         # Given: user 1명과 profile이 주어지고, coin이 남아있지 않은 coin_history가 주어진다.
         user = baker.make('users.User')
-        expected_profile = baker.make('profiles.SelfDateProfile')
+        expected_profile = baker.make('self_date.SelfDateProfile')
         final_coin_history = baker.make(
             'coins.CoinHistory',
             user=user,
@@ -194,7 +194,7 @@ class ProfileTestCase(APITestCase):
     def test_should_update_profile(self):
         # Given: user 1명과 그의 profile, 수정할 데이터가 주어진다.
         user = baker.make('users.User')
-        profile = baker.make('profiles.SelfDateProfile', profile__user=user, is_active=True)
+        profile = baker.make('self_date.SelfDateProfile', profile__user=user, is_active=True)
         update_data = {
             'appearance': """가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가
             나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타
@@ -214,7 +214,7 @@ class ProfileTestCase(APITestCase):
     def test_should_update_image_at_profile(self):
         # Given: user 1명과 그의 profile, 수정할 image file이 주어진다.
         user = baker.make('users.User')
-        profile = baker.make('profiles.SelfDateProfile', profile__user=user, is_active=True)
+        profile = baker.make('self_date.SelfDateProfile', profile__user=user, is_active=True)
 
         try:
             image = Image.new('RGB', (100, 100))
@@ -245,7 +245,7 @@ class ProfileTestCase(APITestCase):
     def test_should_fail_update_profile(self):
         # Given: user 1명과 다른 user의 profile, 수정할 데이터가 주어진다.
         user = baker.make('users.User')
-        profile = baker.make('profiles.SelfDateProfile', is_active=True)
+        profile = baker.make('self_date.SelfDateProfile', is_active=True)
         update_data = {
             "appearance": """가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가
                     나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타
@@ -268,7 +268,7 @@ class ProfileTestCase(APITestCase):
     def test_should_get_chat_link(self):
         # Given: user 1명과 메시지를 보낼 profile이 1개 주어진다. user의 rest_coin이 충분한 coin_history가 주어진다.
         user = baker.make('users.User')
-        expected_profile = baker.make('profiles.SelfDateProfile', chat_link="chatlink@test.com")
+        expected_profile = baker.make('self_date.SelfDateProfile', chat_link="chatlink@test.com")
         coin_history = baker.make(
             'coins.CoinHistory',
             user=user,
@@ -292,7 +292,7 @@ class ProfileTestCase(APITestCase):
         # Given: user 1명과 메시지를 보낼 profile이 1개 주어진다.
         # user가 profile에게 메시지를 보냈적이 있음을 알리는 coin_history가 주어진다.
         user = baker.make('users.User')
-        expected_profile = baker.make('profiles.SelfDateProfile')
+        expected_profile = baker.make('self_date.SelfDateProfile')
         coin_history = baker.make(
             'coins.CoinHistory',
             user=user,
@@ -316,7 +316,7 @@ class ProfileTestCase(APITestCase):
     def test_should_not_get_chat_link_when_user_does_not_have_coin(self):
         # Given: user 1명과 메시지를 보낼 profile이 1개 주어진다. user의 rest_coin이 0인 coin_history가 주어진다.
         user = baker.make('users.User')
-        expected_profile = baker.make('profiles.SelfDateProfile')
+        expected_profile = baker.make('self_date.SelfDateProfile')
         coin_history = baker.make(
             'coins.CoinHistory',
             user=user,
