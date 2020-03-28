@@ -11,7 +11,7 @@ class CoinHistoryTestCase(APITestCase):
         # Given: user 1명이 생성되고 그 유저의 coin-history가 생성된다.
         user = baker.make('users.User')
         coin_history_quantity = 3
-        expected_coin_histories = baker.make('self_date.CoinHistory', user=user, _quantity=coin_history_quantity)
+        expected_coin_histories = baker.make('coins.CoinHistory', user=user, _quantity=coin_history_quantity)
 
         # When: user가 coin_history_list api 호출
         self.client.force_authenticate(user=user)
@@ -27,7 +27,7 @@ class CoinHistoryTestCase(APITestCase):
             assert_that(responded_coin_history['reason']).is_equal_to(expected_coin_history.reason)
             assert_that(responded_coin_history['profile']).is_equal_to(expected_coin_history.profile)
 
-            assert_that(responded_coin_history['created_at'])\
+            assert_that(responded_coin_history['created_at']) \
                 .is_equal_to(reformat_datetime(expected_coin_history.created_at))
-            assert_that(responded_coin_history['updated_at'])\
+            assert_that(responded_coin_history['updated_at']) \
                 .is_equal_to(reformat_datetime(expected_coin_history.updated_at))

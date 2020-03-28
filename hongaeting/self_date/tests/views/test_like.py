@@ -53,7 +53,7 @@ class LikeTestCase(APITestCase):
         user = baker.make('users.User')
         liked_user = baker.make('users.User')
         like_data = {
-            "liked_user": liked_user.id,
+            'liked_user': liked_user.id,
         }
 
         # When: user가 like_create api를 호출한다.
@@ -62,8 +62,8 @@ class LikeTestCase(APITestCase):
 
         # Then: like 모델이 정상적으로 생성된다.
         assert_that(response.status_code).is_equal_to(status.HTTP_201_CREATED)
-        assert_that(response.data["user"]).is_equal_to(user.id)
-        assert_that(response.data["liked_user"]).is_equal_to(liked_user.id)
+        assert_that(response.data['user']).is_equal_to(user.id)
+        assert_that(response.data['liked_user']).is_equal_to(liked_user.id)
 
     def test_should_destroy(self):
         # Given: user와 like가 하나 주어진다.

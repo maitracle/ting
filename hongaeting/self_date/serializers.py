@@ -1,11 +1,13 @@
 from rest_framework import serializers
 
-from profiles.models import Profile
+from self_date.models import Like
+from users.serializers.profiles import ProfileSerializer
+from .models import SelfDateProfile
 
 
-class CreateProfileSerializer(serializers.ModelSerializer):
+class CreateSelfDateProfileSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Profile
+        model = SelfDateProfile
         fields = (
             'user',
             'nickname',
@@ -15,23 +17,21 @@ class CreateProfileSerializer(serializers.ModelSerializer):
         )
 
 
-class ListProfileSerializer(serializers.ModelSerializer):
+class ListSelfDateProfileSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(use_url=True)
+    profile = ProfileSerializer()
     is_viewed = serializers.BooleanField()
 
     class Meta:
-        model = Profile
+        model = SelfDateProfile
         fields = (
             'id',
             'image',
-            'created_at',
-            'updated_at',
             'nickname',
-            'gender',
-            'age',
             'height',
             'body_type',
             'religion',
+            'is_smoke',
             'tags',
             'image',
             'appearance',
@@ -41,45 +41,22 @@ class ListProfileSerializer(serializers.ModelSerializer):
             'ideal_type',
             'one_sentence',
             'is_viewed',
+            'profile',
+            'created_at',
+            'updated_at',
         )
 
 
-class RetrieveProfileSerializer(serializers.ModelSerializer):
+class RetrieveSelfDateProfileSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(use_url=True)
+    profile = ProfileSerializer()
 
     class Meta:
-        model = Profile
+        model = SelfDateProfile
         fields = (
             'id',
             'image',
-            'created_at',
-            'updated_at',
             'nickname',
-            'gender',
-            'age',
-            'height',
-            'body_type',
-            'religion',
-            'tags',
-            'image',
-            'appearance',
-            'personality',
-            'hobby',
-            'date_style',
-            'ideal_type',
-            'one_sentence',
-            'chat_link',
-        )
-
-
-class UpdateProfileSerializer(serializers.ModelSerializer):
-    image = serializers.ImageField(use_url=True)
-
-    class Meta:
-        model = Profile
-        fields = (
-            'image',
-            'age',
             'height',
             'body_type',
             'religion',
@@ -93,4 +70,44 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
             'ideal_type',
             'one_sentence',
             'chat_link',
+            'profile',
+            'created_at',
+            'updated_at',
+        )
+
+
+class UpdateSelfDateProfileSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField(use_url=True)
+
+    class Meta:
+        model = SelfDateProfile
+        fields = (
+            'image',
+            'height',
+            'body_type',
+            'religion',
+            'is_smoke',
+            'tags',
+            'image',
+            'appearance',
+            'personality',
+            'hobby',
+            'date_style',
+            'ideal_type',
+            'one_sentence',
+            'chat_link',
+            'profile',
+            'created_at',
+            'updated_at',
+        )
+
+
+class LikeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Like
+        fields = (
+            'user',
+            'liked_user',
+            'created_at',
+            'updated_at',
         )

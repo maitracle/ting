@@ -11,7 +11,7 @@ class StudentIdCardImagePath(TestCase):
         user = baker.make('users.User')
         file_name = 'image_name.png'
 
-        # When: profile_image_path method를 호출한다.
+        # When: image_path method를 호출한다.
         path = student_id_card_image_path(user, file_name)
 
         # Then: image가 저장될 경로가 반환된다.

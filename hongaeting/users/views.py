@@ -8,13 +8,13 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from profiles.serializers import CreateProfileSerializer
-from self_date.serializer import CreateCoinHistorySerializer
+from coins.models import CoinHistory
+from coins.serializers import CreateCoinHistorySerializer
+from common.constants import SIGNUP_REWARD
 from users.models import User
 from users.permissions import IsSameUserWithRequestUser
-from common.constants import SIGNUP_REWARD
-from users.serializers import UserSerializer, TokenSerializer, UserCheckUnivSerializer, MySerializer
-from self_date.models import CoinHistory
+from users.serializers.profiles import ProfileSerializer
+from users.serializers.users import UserSerializer, TokenSerializer, UserCheckUnivSerializer, MySerializer
 
 
 class UserViewSet(
@@ -69,7 +69,7 @@ class UserViewSet(
             **request.data,
         }
 
-        profile_serializer = CreateProfileSerializer(data=profile_data)
+        profile_serializer = ProfileSerializer(data=profile_data)
         profile_serializer.is_valid(raise_exception=True)
         profile_serializer.save()
 
