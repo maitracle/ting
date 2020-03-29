@@ -126,6 +126,33 @@ class UserViewSetTestCase(APITestCase):
         coin_history = CoinHistory.objects.filter(user__email=user_data['email'])
         assert_that(coin_history).is_empty()
 
+    def test_should_not_create_profile_when_campus_location_is_invalid(self):
+        # Given: 대학과 캠퍼스가 일치하지 않는 user에 관한 데이터가 주어진다.
+        birthday = (datetime.today() - relativedelta(years=20)).strftime('%Y-%m-%d')
+        user_data = {
+            'email': 'testuser@test.com',
+            'password': 'password123',
+
+            'gender': 'MALE',
+            'birthday': birthday,
+            'university': UNIVERSITY_CHOICES.HONGIK,
+            'campus_location': 'INTERNATIONAL',
+            'scholarly_status': 'ATTENDING',
+        }
+
+        # When: user create api를 호출하여 회원가입을 한다.
+        response = self.client.post('/api/users/', data=json.dumps(user_data), content_type='application/json')
+
+        # Then: user, profile, coin_history가 생성되지 않는다.
+        assert_that(response.status_code).is_equal_to(status.HTTP_400_BAD_REQUEST)
+
+        user = User.objects.filter(email=user_data['email'])
+        assert_that(user).is_empty()
+        profile = Profile.objects.filter(user__email=user_data['email'])
+        assert_that(profile).is_empty()
+        coin_history = CoinHistory.objects.filter(user__email=user_data['email'])
+        assert_that(coin_history).is_empty()
+
     def test_should_update_user(self):
         # Given: user와 바꿀 user data가 주어진다
         user = baker.make('users.User',
@@ -413,30 +440,3 @@ class UserViewSetTestCase(APITestCase):
         # Then: access token이 반환된다.
         assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
         assert_that('access' in response.data).is_true()
-
-    def test_should_not_create_profile_when_campus_location_is_invalid(self):
-        # Given: 대학과 캠퍼스가 일치하지 않는 user에 관한 데이터가 주어진다.
-        birthday = (datetime.today() - relativedelta(years=20)).strftime('%Y-%m-%d')
-        user_data = {
-            'email': 'testuser@test.com',
-            'password': 'password123',
-
-            'gender': 'MALE',
-            'birthday': birthday,
-            'university': UNIVERSITY_CHOICES.HONGIK,
-            'campus_location': 'INTERNATIONAL',
-            'scholarly_status': 'ATTENDING',
-        }
-
-        # When: user create api를 호출하여 회원가입을 한다.
-        response = self.client.post('/api/users/', data=json.dumps(user_data), content_type='application/json')
-
-        # Then: user, profile, coin_history가 생성되지 않는다.
-        assert_that(response.status_code).is_equal_to(status.HTTP_400_BAD_REQUEST)
-
-        user = User.objects.filter(email=user_data['email'])
-        assert_that(user).is_empty()
-        profile = Profile.objects.filter(user__email=user_data['email'])
-        assert_that(profile).is_empty()
-        coin_history = CoinHistory.objects.filter(user__email=user_data['email'])
-        assert_that(coin_history).is_empty()
