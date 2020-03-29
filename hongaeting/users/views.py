@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from django.core.exceptions import ValidationError
 from coins.models import CoinHistory
 from coins.serializers import CreateCoinHistorySerializer
 from common.constants import SIGNUP_REWARD
@@ -55,45 +56,49 @@ class UserViewSet(
         serializer = self.get_serializer(response_data)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
 
-    @transaction.atomic
     def create(self, request, *args, **kwargs):
-        user_serializer = self.get_serializer(data=request.data)
-        user_serializer.is_valid(raise_exception=True)
-        created_user = user_serializer.save()
-        created_user.set_user_code()
-        created_user.set_password(request.data['password'])
-        created_user.save()
+        try:
+            with transaction.atomic():
+                user_serializer = self.get_serializer(data=request.data)
+                user_serializer.is_valid(raise_exception=True)
+                created_user = user_serializer.save()
+                created_user.set_user_code()
+                created_user.set_password(request.data['password'])
+                created_user.save()
 
-        profile_data = {
-            'user': created_user.id,
-            **request.data,
-        }
+                profile_data = {
+                    'user': created_user.id,
+                    **request.data,
+                }
 
-        profile_serializer = ProfileSerializer(data=profile_data)
-        profile_serializer.is_valid(raise_exception=True)
-        profile_serializer.save()
+                profile_serializer = ProfileSerializer(data=profile_data)
+                profile_serializer.is_valid(raise_exception=True)
+                created_profile = profile_serializer.save()
+                created_profile.clean()
 
-        coin_history_data = {
-            'user': created_user.id,
-            'rest_coin': SIGNUP_REWARD,
-            'reason': CoinHistory.CHANGE_REASON.SIGNUP,
-        }
+                coin_history_data = {
+                    'user': created_user.id,
+                    'rest_coin': SIGNUP_REWARD,
+                    'reason': CoinHistory.CHANGE_REASON.SIGNUP,
+                }
 
-        coin_history_serializer = CreateCoinHistorySerializer(data=coin_history_data)
-        coin_history_serializer.is_valid(raise_exception=True)
-        coin_history_serializer.save()
+                coin_history_serializer = CreateCoinHistorySerializer(data=coin_history_data)
+                coin_history_serializer.is_valid(raise_exception=True)
+                coin_history_serializer.save()
 
-        refresh = RefreshToken.for_user(created_user)
+                refresh = RefreshToken.for_user(created_user)
 
-        response_data = {
-            'refresh': str(refresh),
-            'access': str(refresh.access_token),
-            'user': user_serializer.data,
-            'profile': profile_serializer.data,
-            'coin_history': [coin_history_serializer.data],
-        }
+                response_data = {
+                    'refresh': str(refresh),
+                    'access': str(refresh.access_token),
+                    'user': user_serializer.data,
+                    'profile': profile_serializer.data,
+                    'coin_history': [coin_history_serializer.data],
+                }
 
-        return Response(response_data, status=status.HTTP_201_CREATED)
+                return Response(response_data, status=status.HTTP_201_CREATED)
+        except ValidationError as err:
+            return Response(err, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, *args, **kwargs):
         user = self.get_object()

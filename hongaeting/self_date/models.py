@@ -1,6 +1,5 @@
 import os
 
-from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
 from django.db import models
 from model_utils import Choices
@@ -42,20 +41,6 @@ class SelfDateProfile(BaseModel):
     chat_link = models.URLField(blank=True)
 
     is_active = models.BooleanField(default=True)
-
-    def clean(self):
-        # Todo(10000001a): user를 create 할 때 atomic하게 profile도 만들어지는 상황에서 clean이 실행되지 않는 문제를 해결해야 한다.
-        # if self.user.university == 'HONGIK':
-        #     if not self.campus_location == 'SEOUL':
-        #         raise ValidationError('Not Valid Campus')
-        # elif self.user.university == 'KYUNGHEE':
-        #     if not (self.campus_location == 'SEOUL' or self.campus_location == 'INTERNATIONAL'):
-        #         raise ValidationError('Not Valid Campus')
-        # elif self.user.university == 'YONSEI':
-        #     if not (self.campus_location == 'SINCHON' or self.campus_location == 'INTERNATIONAL'):
-        #         raise ValidationError('Not Valid Campus')
-        if 'kakao' not in self.chat_link:
-            raise ValidationError('Not Valid chat link')
 
     @property
     def is_valid_chat_link(self):

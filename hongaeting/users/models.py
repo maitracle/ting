@@ -3,12 +3,13 @@ import os
 
 from django.conf import settings
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.template.loader import render_to_string
 from django.utils.crypto import get_random_string
 from model_utils import Choices
 
-from common.constants import UNIVERSITY_CHOICES
+from common.constants import UNIVERSITY_CHOICES, MAP_UNIVERSITY_WITH_CAMPUS
 from common.models import BaseModel
 from common.utils import Email
 
@@ -133,3 +134,7 @@ class Profile(BaseModel):
     @property
     def age(self):
         return datetime.datetime.now().year - self.birthday.year
+
+    def clean(self):
+        if not self.campus_location in MAP_UNIVERSITY_WITH_CAMPUS[self.university]:
+            raise ValidationError('Not Valid Campus')
