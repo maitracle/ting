@@ -55,33 +55,14 @@ class UserViewSet(
         serializer = self.get_serializer(response_data)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
 
-    @transaction.atomic
     def create(self, request, *args, **kwargs):
         user_serializer = self.get_serializer(data=request.data)
         user_serializer.is_valid(raise_exception=True)
         created_user = user_serializer.save()
+
         created_user.set_user_code()
         created_user.set_password(request.data['password'])
         created_user.save()
-
-        profile_data = {
-            'user': created_user.id,
-            **request.data,
-        }
-
-        profile_serializer = ProfileSerializer(data=profile_data)
-        profile_serializer.is_valid(raise_exception=True)
-        profile_serializer.save()
-
-        coin_history_data = {
-            'user': created_user.id,
-            'rest_coin': SIGNUP_REWARD,
-            'reason': CoinHistory.CHANGE_REASON.SIGNUP,
-        }
-
-        coin_history_serializer = CreateCoinHistorySerializer(data=coin_history_data)
-        coin_history_serializer.is_valid(raise_exception=True)
-        coin_history_serializer.save()
 
         refresh = RefreshToken.for_user(created_user)
 
@@ -89,8 +70,6 @@ class UserViewSet(
             'refresh': str(refresh),
             'access': str(refresh.access_token),
             'user': user_serializer.data,
-            'profile': profile_serializer.data,
-            'coin_history': [coin_history_serializer.data],
         }
 
         return Response(response_data, status=status.HTTP_201_CREATED)
