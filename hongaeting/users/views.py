@@ -1,17 +1,15 @@
-from django.db import transaction
 from django_rest_framework_mango.mixins import PermissionMixin, SerializerMixin
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
-from rest_framework.mixins import UpdateModelMixin, DestroyModelMixin
+from rest_framework.mixins import UpdateModelMixin, DestroyModelMixin, CreateModelMixin
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from coins.models import CoinHistory
-from coins.serializers import CreateCoinHistorySerializer
-from common.constants import SIGNUP_REWARD
-from users.models import User
+from common.permissions import IsOwnerUserOrReadonly
+from users.models import User, Profile
 from users.permissions import IsSameUserWithRequestUser
 from users.serializers.profiles import ProfileSerializer
 from users.serializers.users import UserSerializer, TokenSerializer, UserCheckUnivSerializer, MySerializer
@@ -48,7 +46,7 @@ class UserViewSet(
         response_data = {
             **token_obtain_pair_serializer.validated_data,
             'user': user,
-            'profile': user.profile,
+            'profile': getattr(user, 'profile', None),
             'coin_history': coin_history_list,
         }
 
@@ -104,9 +102,18 @@ class UserViewSet(
     def my(self, request, *args, **kwargs):
         data = {
             'user': request.user,
-            'profile': request.user.profile,
+            'profile': getattr(request.user, 'profile', None),
             'coin_history': CoinHistory.objects.filter(user=request.user).order_by('-id'),
 
         }
         serializer = self.get_serializer(data)
         return Response(serializer.data)
+
+
+class ProfileViewSet(
+    CreateModelMixin, UpdateModelMixin,
+    viewsets.GenericViewSet,
+):
+    queryset = Profile.objects.all()
+    permission_classes = (IsOwnerUserOrReadonly,)
+    serializer_class = ProfileSerializer
