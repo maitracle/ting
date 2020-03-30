@@ -133,11 +133,11 @@ class UserViewSetTestCase(APITestCase):
             'email': 'testuser@test.com',
             'password': 'password123',
 
-            'gender': 'MALE',
+            'gender': Profile.GENDER_CHOICES.MALE,
             'birthday': birthday,
             'university': UNIVERSITY_CHOICES.HONGIK,
-            'campus_location': 'INTERNATIONAL',
-            'scholarly_status': 'ATTENDING',
+            'campus_location': Profile.CAMPUS_LOCATION_CHOICES.INTERNATIONAL,
+            'scholarly_status': Profile.SCHOLARLY_STATUS_CHOICES.ATTENDING,
         }
 
         # When: user create api를 호출하여 회원가입을 한다.
