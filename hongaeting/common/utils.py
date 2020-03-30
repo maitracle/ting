@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.conf import settings
 from django.core.mail import EmailMessage
 
@@ -17,6 +19,7 @@ class Email:
 
 
 def reformat_datetime(datetime_data):
+    datetime_data += timedelta(hours=9)
     date, time = str(datetime_data).split(' ')
 
-    return f'{date}T{time.split("+")[0]}Z'
+    return f'{date}T{time.split("+")[0]}+09:00'
