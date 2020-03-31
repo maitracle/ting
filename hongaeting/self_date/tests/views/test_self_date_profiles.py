@@ -108,7 +108,7 @@ class ProfileTestCase(APITestCase):
         coin_history = baker.make(
             'coins.CoinHistory',
             user=user,
-            reason=CoinHistory.CHANGE_REASON.SIGNUP,
+            reason=CoinHistory.CHANGE_REASON.CONFIRM_USER,
             rest_coin=SIGNUP_REWARD
         )
 
@@ -273,7 +273,7 @@ class ProfileTestCase(APITestCase):
         coin_history = baker.make(
             'coins.CoinHistory',
             user=user,
-            reason=CoinHistory.CHANGE_REASON.SIGNUP,
+            reason=CoinHistory.CHANGE_REASON.CONFIRM_USER,
             rest_coin=SIGNUP_REWARD
         )
 

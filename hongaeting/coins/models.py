@@ -5,9 +5,9 @@ from common.models import BaseModel
 
 
 class CoinHistory(BaseModel):
-    CHANGE_REASON = Choices('SIGNUP', 'VIEW_PROFILE', 'SEND_MESSAGE', )
+    CHANGE_REASON = Choices('CONFIRM_USER', 'SELF_DATE_PROFILE_VIEW', 'SELF_DATE_SEND_MESSAGE', )
 
-    user = models.ForeignKey('users.User', on_delete=models.CASCADE)
+    profile = models.ForeignKey('self_date.SelfDateProfile', on_delete=models.DO_NOTHING, null=True, blank=True)
+
     rest_coin = models.PositiveSmallIntegerField()
     reason = models.CharField(max_length=50, choices=CHANGE_REASON)
-    profile = models.ForeignKey('self_date.SelfDateProfile', on_delete=models.DO_NOTHING, null=True, blank=True)
