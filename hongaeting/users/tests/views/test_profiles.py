@@ -74,7 +74,8 @@ class ProfileViewSetTestCase(APITestCase):
     def test_should_fail_update_profile(self):
         # Given: 수정될 profile과 바뀔 data가 주어진다.
         another_user = baker.make('users.User')
-        profile = baker.make('users.Profile', scholarly_status=Profile.SCHOLARLY_STATUS_CHOICES.ATTENDING)
+        origin_scholarly_status = Profile.SCHOLARLY_STATUS_CHOICES.ATTENDING
+        profile = baker.make('users.Profile', scholarly_status=origin_scholarly_status)
         updated_data = {
             'scholarly_status': Profile.SCHOLARLY_STATUS_CHOICES.TAKING_OFF,
         }
@@ -87,17 +88,7 @@ class ProfileViewSetTestCase(APITestCase):
         #       수정한 field와 updated_at field가 수정된다.
         assert_that(response.status_code).is_equal_to(status.HTTP_403_FORBIDDEN)
 
-        assert_that(response.data.detail).is_equal_to('You do not have permission to perform this action.')
+        assert_that(response.data['detail']).is_equal_to('You do not have permission to perform this action.')
 
-        # updated_profile = Profile.objects.get(id=profile.id)
-
-        assert_that(response.data['id']).is_equal_to(profile.id)
-        assert_that(response.data['nickname']).is_equal_to(profile.nickname)
-        assert_that(response.data['gender']).is_equal_to(profile.gender)
-        assert_that(response.data['born_year']).is_equal_to(profile.born_year)
-        assert_that(response.data['university']).is_equal_to(profile.university)
-        assert_that(response.data['campus_location']).is_equal_to(profile.campus_location)
-        assert_that(response.data['created_at']).is_equal_to(reformat_datetime(profile.created_at))
-
-        assert_that(response.data['scholarly_status']).is_equal_to(profile.scholarly_status)
-        assert_that(response.data['updated_at']).is_equal_to(reformat_datetime(profile.updated_at))
+        unchanged_profile = Profile.objects.get(id=profile.id)
+        assert_that(unchanged_profile.scholarly_status).is_equal_to(origin_scholarly_status)
