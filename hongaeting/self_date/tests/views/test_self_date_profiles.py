@@ -12,6 +12,7 @@ from coins.models import CoinHistory
 from common.constants import UNIVERSITY_CHOICES, VIEW_PROFILE_COST, SIGNUP_REWARD, SEND_MESSAGE_COST
 from common.decorator import delete_media_root
 from common.utils import reformat_datetime
+from self_date.models import SelfDateProfile
 from users.models import Profile
 
 
@@ -333,3 +334,100 @@ class ProfileTestCase(APITestCase):
 
         created_coin_history = CoinHistory.objects.filter(user=user).last()
         assert_that(created_coin_history.rest_coin).is_equal_to(coin_history.rest_coin)
+
+    def test_should_create_self_date_profile(self):
+        # Given: user와 profile이 하나씩 주어지고 SelfDataProfile data가 주어진다.
+        user = baker.make('users.User')
+        profile = baker.make('users.Profile', user=user)
+        self_date_profile_data = {
+            'profile': profile.id,
+            'nickname': '테스트',
+            'height': 70,
+            'body_type': SelfDateProfile.BODY_TYPE_CHOICES.NORMAL,
+            'religion': SelfDateProfile.RELIGION_CHOICES.NOTHING,
+            'is_smoke': SelfDateProfile.IS_SMOKE_CHOICES.NO,
+            'tags': '#1#2#3#4',
+            'one_sentence': '한 문장 테스트',
+            'appearance': '''가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가
+            나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타
+            파하가나다라마바사아자차카타파하''',
+            'personality': '''가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하
+            가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카
+            타파하가나다라마바사아자차카타파하''',
+            'hobby': '''가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라
+            마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가
+            나다라마바사아자차카타파하''',
+            'date_style': '''가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가
+            나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타
+            파하가나다라마바사아자차카타파하''',
+            'ideal_type': '''가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가
+            나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타
+            파하가나다라마바사아자차카타파하''',
+            'chat_link': 'https://open.kakao.com/test/test'
+        }
+
+        # When: 주어진 user로 로그인 후 SelfDateProfile 생성 api를 호출한다.
+        self.client.force_authenticate(user=user)
+        response = self.client.post('/api/self-date-profiles/', data=self_date_profile_data)
+
+        # Then: status code 201과 생성된 SelfDateProfile이 반환된다.
+        assert_that(response.status_code).is_equal_to(status.HTTP_201_CREATED)
+
+        assert_that(response.data['profile']).is_equal_to(self_date_profile_data['profile'])
+        assert_that(response.data['nickname']).is_equal_to(self_date_profile_data['nickname'])
+        assert_that(response.data['height']).is_equal_to(self_date_profile_data['height'])
+        assert_that(response.data['body_type']).is_equal_to(self_date_profile_data['body_type'])
+        assert_that(response.data['religion']).is_equal_to(self_date_profile_data['religion'])
+        assert_that(response.data['is_smoke']).is_equal_to(self_date_profile_data['is_smoke'])
+        assert_that(response.data['tags']).is_equal_to(self_date_profile_data['tags'])
+        assert_that(response.data['one_sentence']).is_equal_to(self_date_profile_data['one_sentence'])
+        assert_that(response.data['appearance']).is_equal_to(self_date_profile_data['appearance'])
+        assert_that(response.data['personality']).is_equal_to(self_date_profile_data['personality'])
+        assert_that(response.data['hobby']).is_equal_to(self_date_profile_data['hobby'])
+        assert_that(response.data['date_style']).is_equal_to(self_date_profile_data['date_style'])
+        assert_that(response.data['ideal_type']).is_equal_to(self_date_profile_data['ideal_type'])
+        assert_that(response.data['chat_link']).is_equal_to(self_date_profile_data['chat_link'])
+
+    def test_should_not_create_self_date_profile_when_chat_link_is_invalid(self):
+        # Given: user와 profile이 하나씩 생성되고 chat_link가 잘못된 SelfDateProfile data가 주어진다.
+        user = baker.make('users.User')
+        profile = baker.make('users.Profile', user=user)
+        self_date_profile_data = {
+            'profile': profile.id,
+            'nickname': '테스트',
+            'height': 70,
+            'body_type': SelfDateProfile.BODY_TYPE_CHOICES.NORMAL,
+            'religion': SelfDateProfile.RELIGION_CHOICES.NOTHING,
+            'is_smoke': SelfDateProfile.IS_SMOKE_CHOICES.NO,
+            'tags': '#1 #2 #3 #4',
+            'one_sentence': '한 문장 테스트',
+            'appearance': '''가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가
+            나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타
+            파하가나다라마바사아자차카타파하''',
+            'personality': '''가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하
+            가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카
+            타파하가나다라마바사아자차카타파하''',
+            'hobby': '''가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라
+            마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가
+            나다라마바사아자차카타파하''',
+            'date_style': '''가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가
+            나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타
+            파하가나다라마바사아자차카타파하''',
+            'ideal_type': '''가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가
+            나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타
+            파하가나다라마바사아자차카타파하''',
+            'chat_link': 'not URL'
+        }
+
+        # When: 생성된 user로 로그인 후 SelfDateProfile 생성 api를 호출한다.
+        self.client.force_authenticate(user=user)
+        response = self.client.post('/api/self-date-profiles/', data=self_date_profile_data)
+
+        # Then: status code 400이 반환된다.
+        assert_that(response.status_code).is_equal_to(status.HTTP_400_BAD_REQUEST)
+
+        chat_link_validation_error_msg = 'Not valid chat link'
+        assert_that(chat_link_validation_error_msg in response.data['chat_link']).is_true()
+
+        self_date_profiles = SelfDateProfile.objects.filter(profile=profile.id)
+        assert_that(self_date_profiles).is_empty()
