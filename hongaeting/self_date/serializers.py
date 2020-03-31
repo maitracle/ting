@@ -9,11 +9,21 @@ class CreateSelfDateProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = SelfDateProfile
         fields = (
-            'user',
+            'profile',
             'nickname',
-            'gender',
-            'scholarly_status',
-            'campus_location',
+            'height',
+            'body_type',
+            'religion',
+            'is_smoke',
+            'tags',
+            'image',
+            'one_sentence',
+            'appearance',
+            'personality',
+            'hobby',
+            'date_style',
+            'ideal_type',
+            'chat_link'
         )
 
 
