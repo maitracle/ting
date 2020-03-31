@@ -336,7 +336,7 @@ class ProfileTestCase(APITestCase):
         assert_that(created_coin_history.rest_coin).is_equal_to(coin_history.rest_coin)
 
     def test_should_create_self_date_profile(self):
-        # Given: user와 profile이 하나씩 생성되고 생성할 셀소 프로필 데이터가 주어진다.
+        # Given: user와 profile이 하나씩 주어지고 생성할 셀소 프로필 데이터가 주어진다.
         user = baker.make('users.User')
         profile = baker.make('users.Profile', user=user)
         self_date_profile_data = {
@@ -366,11 +366,11 @@ class ProfileTestCase(APITestCase):
             'chat_link': 'https://open.kakao.com/test/test'
         }
 
-        # When: 생성된 user로 로그인 후 셀소 프로필을 생성한다.
+        # When: 주어진 user로 로그인 후 SelfDateProfile 생성 api를 호출한다.
         self.client.force_authenticate(user=user)
         response = self.client.post('/api/self-date-profiles/', data=self_date_profile_data)
 
-        # Then: 올바른 response가 오고 셀소 프로필이 정상적으로 생성된다.
+        # Then: status code 201과 생성된 SelfDateProfile이 반환된다.
         assert_that(response.status_code).is_equal_to(status.HTTP_201_CREATED)
 
         assert_that(response.data['profile']).is_equal_to(self_date_profile_data['profile'])
@@ -423,5 +423,8 @@ class ProfileTestCase(APITestCase):
         self.client.force_authenticate(user=user)
         response = self.client.post('/api/self-date-profiles/', data=self_date_profile_data)
 
-        # Then: 400 에러가 반환된다.
+        # Then: status code 400이 반환된다.
         assert_that(response.status_code).is_equal_to(status.HTTP_400_BAD_REQUEST)
+
+        self_date_profiles = SelfDateProfile.objects.filter(profile=profile.id)
+        assert_that(self_date_profiles).is_empty()
