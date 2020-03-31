@@ -388,5 +388,40 @@ class ProfileTestCase(APITestCase):
         assert_that(response.data['ideal_type']).is_equal_to(self_date_profile_data['ideal_type'])
         assert_that(response.data['chat_link']).is_equal_to(self_date_profile_data['chat_link'])
 
+    def test_should_not_create_self_date_profile_when_chat_link_is_invalid(self):
+        # Given: user와 profile이 하나씩 생성되고 chat_link가 잘못된 셀소 프로필 데이터가 주어진다.
+        user = baker.make('users.User')
+        profile = baker.make('users.Profile', user=user)
+        self_date_profile_data = {
+            'profile': profile.id,
+            'nickname': '테스트',
+            'height': 70,
+            'body_type': SelfDateProfile.BODY_TYPE_CHOICES.NORMAL,
+            'religion': SelfDateProfile.RELIGION_CHOICES.NOTHING,
+            'is_smoke': SelfDateProfile.IS_SMOKE_CHOICES.NO,
+            'tags': '#1#2#3#4',
+            'one_sentence': '한 문장 테스트',
+            'appearance': '''가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가
+            나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타
+            파하가나다라마바사아자차카타파하''',
+            'personality': '''가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하
+            가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카
+            타파하가나다라마바사아자차카타파하''',
+            'hobby': '''가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라
+            마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가
+            나다라마바사아자차카타파하''',
+            'date_style': '''가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가
+            나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타
+            파하가나다라마바사아자차카타파하''',
+            'ideal_type': '''가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가
+            나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타
+            파하가나다라마바사아자차카타파하''',
+            'chat_link': 'not URL'
+        }
 
+        # When: 생성된 user로 로그인 후 셀소 프로필을 생성한다.
+        self.client.force_authenticate(user=user)
+        response = self.client.post('/api/self-date-profiles/', data=self_date_profile_data)
 
+        # Then: 400 에러가 반환된다.
+        assert_that(response.status_code).is_equal_to(status.HTTP_400_BAD_REQUEST)

@@ -36,7 +36,7 @@ class ListSelfDateProfileSerializer(serializers.ModelSerializer):
         model = SelfDateProfile
         fields = (
             'id',
-            'image',
+            'profile',
             'nickname',
             'height',
             'body_type',
@@ -44,14 +44,13 @@ class ListSelfDateProfileSerializer(serializers.ModelSerializer):
             'is_smoke',
             'tags',
             'image',
+            'one_sentence',
             'appearance',
             'personality',
             'hobby',
             'date_style',
             'ideal_type',
-            'one_sentence',
             'is_viewed',
-            'profile',
             'created_at',
             'updated_at',
         )
@@ -65,7 +64,7 @@ class RetrieveSelfDateProfileSerializer(serializers.ModelSerializer):
         model = SelfDateProfile
         fields = (
             'id',
-            'image',
+            'profile',
             'nickname',
             'height',
             'body_type',
@@ -80,7 +79,6 @@ class RetrieveSelfDateProfileSerializer(serializers.ModelSerializer):
             'ideal_type',
             'one_sentence',
             'chat_link',
-            'profile',
             'created_at',
             'updated_at',
         )
@@ -92,21 +90,20 @@ class UpdateSelfDateProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = SelfDateProfile
         fields = (
-            'image',
+            'profile',
             'height',
             'body_type',
             'religion',
             'is_smoke',
             'tags',
             'image',
+            'one_sentence',
             'appearance',
             'personality',
             'hobby',
             'date_style',
             'ideal_type',
-            'one_sentence',
             'chat_link',
-            'profile',
             'created_at',
             'updated_at',
         )
