@@ -1,14 +1,14 @@
 from django_rest_framework_mango.mixins import PermissionMixin, SerializerMixin
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
-from rest_framework.mixins import UpdateModelMixin, DestroyModelMixin, CreateModelMixin
+from rest_framework.mixins import UpdateModelMixin, DestroyModelMixin
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from coins.models import CoinHistory
-from common.permissions import IsOwnerUserOrReadonly
+from common.permissions import IsOwnerUserOnly
 from users.models import User, Profile
 from users.permissions import IsSameUserWithRequestUser
 from users.serializers.profiles import ProfileSerializer
@@ -111,9 +111,20 @@ class UserViewSet(
 
 
 class ProfileViewSet(
-    CreateModelMixin, UpdateModelMixin,
+    UpdateModelMixin,
     viewsets.GenericViewSet,
 ):
     queryset = Profile.objects.all()
-    permission_classes = (IsOwnerUserOrReadonly,)
+    permission_classes = (IsOwnerUserOnly,)
     serializer_class = ProfileSerializer
+
+    def create(self, request, *args, **kwargs):
+        profile_data = {
+            **request.data,
+            'user': request.user.id,
+        }
+        serializer = self.get_serializer(data=profile_data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)

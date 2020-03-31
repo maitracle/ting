@@ -13,18 +13,15 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from coins.models import CoinHistory
-from common.constants import SIGNUP_REWARD, UNIVERSITY_CHOICES
 from common.decorator import delete_media_root
 from common.utils import Email, reformat_datetime
-from users.models import User, Profile
+from users.models import User
 
 
 class UserViewSetTestCase(APITestCase):
 
     def test_create_user(self):
         # Given: 만들어질 user에 관한 데이터가 주어진다.
-        birthday = (datetime.today() - relativedelta(years=20)).strftime('%Y-%m-%d')
         user_data = {
             'email': 'testuser@test.com',
             'password': 'password123',
@@ -52,7 +49,6 @@ class UserViewSetTestCase(APITestCase):
 
     def test_should_not_create(self):
         # Given: 비밀번호가 invalid한 user 데이터가 주어진다.
-        birthday = (datetime.today() - relativedelta(years=20)).strftime('%Y-%m-%d')
         user_data = {
             'email': 'testuser@test.com',
             'password': '',
