@@ -72,7 +72,7 @@ class ProfileViewSetTestCase(APITestCase):
         assert_that(response.data['updated_at']).is_equal_to(reformat_datetime(updated_profile.updated_at))
 
     def test_should_fail_update_profile(self):
-        # Given: 수정될 profile과 바뀔 data가 주어진다.
+        # Given: 수정될 profile과 바뀔 data, another_user가 주어진다.
         another_user = baker.make('users.User')
         origin_scholarly_status = Profile.SCHOLARLY_STATUS_CHOICES.ATTENDING
         profile = baker.make('users.Profile', scholarly_status=origin_scholarly_status)
@@ -80,12 +80,12 @@ class ProfileViewSetTestCase(APITestCase):
             'scholarly_status': Profile.SCHOLARLY_STATUS_CHOICES.TAKING_OFF,
         }
 
-        # When: profile update api를 호출하여 회원가입을 한다.
+        # When: another_user로 로그인한 후 profile update api를 호출한다.
         self.client.force_authenticate(user=another_user)
         response = self.client.patch(f'/api/profiles/{profile.id}/', data=updated_data)
 
-        # Then: 수정된 Profile이 반환된다.
-        #       수정한 field와 updated_at field가 수정된다.
+        # Then: profile이 수정되지 않는다.
+        #       status code가 403이 반환된다.
         assert_that(response.status_code).is_equal_to(status.HTTP_403_FORBIDDEN)
 
         assert_that(response.data['detail']).is_equal_to('You do not have permission to perform this action.')
