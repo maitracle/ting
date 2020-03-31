@@ -1,6 +1,5 @@
 import os
 
-from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
 from django.db import models
 from model_utils import Choices
@@ -9,19 +8,13 @@ from common.Kakao import Kakao
 from common.models import BaseModel
 from common.models import BaseModel
 from common.models import BaseModel
+from self_date.validators import chat_link_validator
 from users.models import User
 
 
 def image_path(instance, original_filename):
     path = f'profiles/{instance.profile.user.get_full_name()}/image{os.path.splitext(original_filename)[1]}'
     return path
-
-
-def chat_link_validator(value):
-    if not 'kakao' in value:
-        raise ValidationError('Not Valid chat link')
-    else:
-        return value
 
 
 class SelfDateProfile(BaseModel):
