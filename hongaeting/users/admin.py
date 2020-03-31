@@ -8,7 +8,7 @@ from users.models import User, Profile
 class UserAdmin(admin.ModelAdmin):
     list_display = (
         'id', 'email', 'university_email', 'is_confirmed_student', 'student_id_card_image', 'user_code', 'is_staff',
-        'is_superuser', 'is_active')
+        'is_superuser', 'is_active', 'created_at', 'updated_at')
     list_filter = ('is_active', 'is_confirmed_student',)
     ordering = ('-id', 'student_id_card_image',)
     actions = ('confirm_user',)
