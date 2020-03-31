@@ -336,7 +336,7 @@ class ProfileTestCase(APITestCase):
         assert_that(created_coin_history.rest_coin).is_equal_to(coin_history.rest_coin)
 
     def test_should_create_self_date_profile(self):
-        # Given: user와 profile이 하나씩 주어지고 생성할 셀소 프로필 데이터가 주어진다.
+        # Given: user와 profile이 하나씩 주어지고 SelfDataProfile data가 주어진다.
         user = baker.make('users.User')
         profile = baker.make('users.Profile', user=user)
         self_date_profile_data = {
@@ -389,7 +389,7 @@ class ProfileTestCase(APITestCase):
         assert_that(response.data['chat_link']).is_equal_to(self_date_profile_data['chat_link'])
 
     def test_should_not_create_self_date_profile_when_chat_link_is_invalid(self):
-        # Given: user와 profile이 하나씩 생성되고 chat_link가 잘못된 셀소 프로필 데이터가 주어진다.
+        # Given: user와 profile이 하나씩 생성되고 chat_link가 잘못된 SelfDateProfile data가 주어진다.
         user = baker.make('users.User')
         profile = baker.make('users.Profile', user=user)
         self_date_profile_data = {
@@ -399,7 +399,7 @@ class ProfileTestCase(APITestCase):
             'body_type': SelfDateProfile.BODY_TYPE_CHOICES.NORMAL,
             'religion': SelfDateProfile.RELIGION_CHOICES.NOTHING,
             'is_smoke': SelfDateProfile.IS_SMOKE_CHOICES.NO,
-            'tags': '#1#2#3#4',
+            'tags': '#1 #2 #3 #4',
             'one_sentence': '한 문장 테스트',
             'appearance': '''가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가
             나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타
@@ -419,12 +419,15 @@ class ProfileTestCase(APITestCase):
             'chat_link': 'not URL'
         }
 
-        # When: 생성된 user로 로그인 후 셀소 프로필을 생성한다.
+        # When: 생성된 user로 로그인 후 SelfDateProfile 생성 api를 호출한다.
         self.client.force_authenticate(user=user)
         response = self.client.post('/api/self-date-profiles/', data=self_date_profile_data)
 
         # Then: status code 400이 반환된다.
         assert_that(response.status_code).is_equal_to(status.HTTP_400_BAD_REQUEST)
+
+        chat_link_validation_error_msg = 'Not valid chat link'
+        assert_that(chat_link_validation_error_msg in response.data['chat_link']).is_true()
 
         self_date_profiles = SelfDateProfile.objects.filter(profile=profile.id)
         assert_that(self_date_profiles).is_empty()
