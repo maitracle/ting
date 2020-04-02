@@ -3,6 +3,7 @@ import os
 
 from django.conf import settings
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.template.loader import render_to_string
 from django.utils.crypto import get_random_string
@@ -116,6 +117,10 @@ class User(BaseModel, AbstractBaseUser):
             self.set_user_code()
 
 
+def max_value_current_year(value):
+    return MaxValueValidator(datetime.date.today().year)(value)
+
+
 class Profile(BaseModel):
     GENDER_CHOICES = Choices('MALE', 'FEMALE')
     SCHOLARLY_STATUS_CHOICES = Choices('ATTENDING', 'TAKING_OFF')
@@ -123,8 +128,9 @@ class Profile(BaseModel):
 
     user = models.OneToOneField('users.User', on_delete=models.CASCADE)
 
+    nickname = models.CharField(max_length=8, unique=True)
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
-    birthday = models.DateField()
+    born_year = models.SmallIntegerField(validators=[MinValueValidator(1980), max_value_current_year])
 
     university = models.CharField(max_length=10, blank=True, null=True, choices=UNIVERSITY_CHOICES)
     campus_location = models.CharField(max_length=20, choices=CAMPUS_LOCATION_CHOICES)
@@ -132,4 +138,4 @@ class Profile(BaseModel):
 
     @property
     def age(self):
-        return datetime.datetime.now().year - self.birthday.year
+        return datetime.datetime.now().year - self.born_year

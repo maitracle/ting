@@ -1,4 +1,3 @@
-from django.db import transaction
 from django_rest_framework_mango.mixins import PermissionMixin, SerializerMixin
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
@@ -9,9 +8,8 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from coins.models import CoinHistory
-from coins.serializers import CreateCoinHistorySerializer
-from common.constants import SIGNUP_REWARD
-from users.models import User
+from common.permissions import IsOwnerUserOnly
+from users.models import User, Profile
 from users.permissions import IsSameUserWithRequestUser
 from users.serializers.profiles import ProfileSerializer
 from users.serializers.users import UserSerializer, TokenSerializer, UserCheckUnivSerializer, MySerializer
@@ -48,40 +46,21 @@ class UserViewSet(
         response_data = {
             **token_obtain_pair_serializer.validated_data,
             'user': user,
-            'profile': user.profile,
+            'profile': getattr(user, 'profile', None),
             'coin_history': coin_history_list,
         }
 
         serializer = self.get_serializer(response_data)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
 
-    @transaction.atomic
     def create(self, request, *args, **kwargs):
         user_serializer = self.get_serializer(data=request.data)
         user_serializer.is_valid(raise_exception=True)
         created_user = user_serializer.save()
+
         created_user.set_user_code()
         created_user.set_password(request.data['password'])
         created_user.save()
-
-        profile_data = {
-            'user': created_user.id,
-            **request.data,
-        }
-
-        profile_serializer = ProfileSerializer(data=profile_data)
-        profile_serializer.is_valid(raise_exception=True)
-        profile_serializer.save()
-
-        coin_history_data = {
-            'user': created_user.id,
-            'rest_coin': SIGNUP_REWARD,
-            'reason': CoinHistory.CHANGE_REASON.SIGNUP,
-        }
-
-        coin_history_serializer = CreateCoinHistorySerializer(data=coin_history_data)
-        coin_history_serializer.is_valid(raise_exception=True)
-        coin_history_serializer.save()
 
         refresh = RefreshToken.for_user(created_user)
 
@@ -89,8 +68,6 @@ class UserViewSet(
             'refresh': str(refresh),
             'access': str(refresh.access_token),
             'user': user_serializer.data,
-            'profile': profile_serializer.data,
-            'coin_history': [coin_history_serializer.data],
         }
 
         return Response(response_data, status=status.HTTP_201_CREATED)
@@ -125,9 +102,29 @@ class UserViewSet(
     def my(self, request, *args, **kwargs):
         data = {
             'user': request.user,
-            'profile': request.user.profile,
+            'profile': getattr(request.user, 'profile', None),
             'coin_history': CoinHistory.objects.filter(user=request.user).order_by('-id'),
 
         }
         serializer = self.get_serializer(data)
         return Response(serializer.data)
+
+
+class ProfileViewSet(
+    UpdateModelMixin,
+    viewsets.GenericViewSet,
+):
+    queryset = Profile.objects.all()
+    permission_classes = (IsOwnerUserOnly,)
+    serializer_class = ProfileSerializer
+
+    def create(self, request, *args, **kwargs):
+        profile_data = {
+            **request.data,
+            'user': request.user.id,
+        }
+        serializer = self.get_serializer(data=profile_data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)

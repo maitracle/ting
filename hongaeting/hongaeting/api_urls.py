@@ -4,10 +4,11 @@ from rest_framework_simplejwt.views import TokenRefreshView
 
 from coins.views import CoinHistoryViewSet
 from self_date.views import LikeViewSet, SelfDateProfileViewSet
-from users.views import UserViewSet
+from users.views import UserViewSet, ProfileViewSet
 
 router = SimpleRouter()
 router.register('users', UserViewSet)
+router.register('profiles', ProfileViewSet)
 router.register('coin-histories', CoinHistoryViewSet)
 router.register('likes', LikeViewSet)
 router.register('self-date-profiles', SelfDateProfileViewSet)
