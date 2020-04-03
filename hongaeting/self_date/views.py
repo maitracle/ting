@@ -10,7 +10,7 @@ from rest_framework.response import Response
 
 from coins.models import CoinHistory
 from coins.serializers import CreateCoinHistorySerializer
-from common.constants import VIEW_PROFILE_COST, SEND_MESSAGE_COST
+from common.constants import COST_COUNT
 from common.permissions import IsOwnerProfileOrReadonly
 from common.permissions import IsOwnerUserOrReadonly
 from self_date.serializers import ListSelfDateProfileSerializer, UpdateSelfDateProfileSerializer, \
@@ -66,8 +66,8 @@ class SelfDateProfileViewSet(
                 rest_coin = CoinHistory.objects.filter(user=request.user).last().rest_coin
                 coin_history_data = {
                     'user': request.user.id,
-                    'rest_coin': rest_coin - VIEW_PROFILE_COST,
-                    'reason': CoinHistory.CHANGE_REASON.VIEW_PROFILE,
+                    'rest_coin': rest_coin - COST_COUNT[CoinHistory.CHANGE_REASON.SELF_DATE_PROFILE_VIEW],
+                    'reason': CoinHistory.CHANGE_REASON.SELF_DATE_PROFILE_VIEW,
                     'profile': int(kwargs['pk'])
                 }
 

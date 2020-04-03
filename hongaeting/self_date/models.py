@@ -1,15 +1,26 @@
 import os
 
+from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
 from django.db import models
 from model_utils import Choices
 
 from common.Kakao import Kakao
+from common.constants import COST_COUNT
 from common.models import BaseModel
 from common.models import BaseModel
 from common.models import BaseModel
 from self_date.validators import chat_link_validator
 from users.models import User
+
+
+class SelfDateProfileRight(BaseModel):
+    buying_self_date_profile = models.ForeignKey('self_date.SelfDateProfile', related_name='buying_self_date_rights',
+                                                 on_delete=models.CASCADE)
+    target_self_date_profile = models.ForeignKey('self_date.SelfDateProfile',
+                                                 related_name='target_self_date_rights',
+                                                 on_delete=models.CASCADE)
+    coin_history = models.OneToOneField('coins.CoinHistory', on_delete=models.PROTECT)
 
 
 def image_path(instance, original_filename):
@@ -50,6 +61,50 @@ class SelfDateProfile(BaseModel):
         except:
             is_valid = False
         return is_valid
+
+    def buy_right_for_target_self_date_profile(self, target_self_date_profile, right_type):
+        """
+        rest_coin을 감소시킨 coin_history와 self_date_profile_right를 생성한다.
+        :param target_self_date_profile: right의 대상이 되는 profile
+        :param right_type: right 종류 (ex: SELF_DATE_PROFILE_VIEW, SELF_DATE_SEND_MESSAGE 등)
+        :return: 생성된 self_date_profile_right
+        """
+        from coins.models import CoinHistory
+
+        coin_history_kwargs = self._get_kwargs_for_coin_history(target_self_date_profile, right_type)
+
+        coin_history = CoinHistory(**coin_history_kwargs)
+        coin_history.save()
+
+        self_date_profile_right = SelfDateProfileRight(buying_self_date_profile=self,
+                                                       target_self_date_profile=target_self_date_profile,
+                                                       coin_history=coin_history)
+        self_date_profile_right.save()
+
+        return self_date_profile_right
+
+    def _get_kwargs_for_coin_history(self, target_self_date_profile, right_type):
+        from coins.models import CoinHistory
+
+        map_right_type_to_message = {
+            CoinHistory.CHANGE_REASON.SELF_DATE_PROFILE_VIEW: '조회',
+            CoinHistory.CHANGE_REASON.SELF_DATE_SEND_MESSAGE: 'chat link 조회',
+        }
+
+        try:
+            message_suffix = map_right_type_to_message[right_type]
+
+            new_coin_history_args = {
+                'profile': self.profile,
+                'rest_coin': self.profile.coin_histories.last().rest_coin - COST_COUNT[right_type],
+                'reason': right_type,
+                'message': f'{target_self_date_profile.nickname}의 self date profile {message_suffix}',
+            }
+
+            return new_coin_history_args
+
+        except KeyError:
+            raise ValidationError('잘못된 right_type으로 인한 validation error')
 
 
 class Like(BaseModel):
