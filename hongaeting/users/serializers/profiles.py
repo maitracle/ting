@@ -5,12 +5,6 @@ from users.models import Profile
 
 
 class ProfileSerializer(serializers.ModelSerializer):
-    def validate(self, attrs):
-        if not attrs['campus_location'] in MAP_UNIVERSITY_WITH_CAMPUS[attrs['university']]:
-            raise serializers.ValidationError('Wrong campus location.')
-
-        return attrs
-
     class Meta:
         model = Profile
         fields = (
@@ -25,3 +19,9 @@ class ProfileSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at',
         )
+
+    def validate(self, attrs):
+        if not attrs['campus_location'] in MAP_UNIVERSITY_WITH_CAMPUS[attrs['university']]:
+            raise serializers.ValidationError('Wrong campus location.')
+
+        return attrs
