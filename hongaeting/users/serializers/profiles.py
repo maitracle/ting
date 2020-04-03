@@ -21,7 +21,8 @@ class ProfileSerializer(serializers.ModelSerializer):
         )
 
     def validate(self, attrs):
-        if not attrs['campus_location'] in MAP_UNIVERSITY_WITH_CAMPUS[attrs['university']]:
-            raise serializers.ValidationError('Wrong campus location.')
+        if 'campus_location' in attrs:
+            if not attrs['campus_location'] in MAP_UNIVERSITY_WITH_CAMPUS[attrs['university']]:
+                raise serializers.ValidationError('Wrong campus location.')
 
         return attrs
