@@ -1,6 +1,11 @@
 from rest_framework import permissions
 
 
+class IsOwnerUserOnly(permissions.BasePermission):
+    def has_object_permission(self, request, views, obj):
+        return obj.user == request.user
+
+
 class IsOwnerUserOrReadonly(permissions.BasePermission):
     # 인증된 유저에 대해 목록 조회 / 포스팅 등록 허용
     def has_permission(self, request, view):

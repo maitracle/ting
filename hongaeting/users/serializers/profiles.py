@@ -16,8 +16,9 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'user',
+            'nickname',
             'gender',
-            'birthday',
+            'born_year',
             'university',
             'campus_location',
             'scholarly_status',

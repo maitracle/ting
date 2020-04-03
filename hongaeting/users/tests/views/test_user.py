@@ -13,36 +13,25 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from coins.models import CoinHistory
-from common.constants import SIGNUP_REWARD, UNIVERSITY_CHOICES
 from common.decorator import delete_media_root
 from common.utils import Email, reformat_datetime
-from users.models import User, Profile
+from users.models import User
 
 
 class UserViewSetTestCase(APITestCase):
 
-    def test_should_create_profile_and_coin_history_when_create_user(self):
+    def test_create_user(self):
         # Given: 만들어질 user에 관한 데이터가 주어진다.
-        birthday = (datetime.today() - relativedelta(years=20)).strftime('%Y-%m-%d')
         user_data = {
             'email': 'testuser@test.com',
             'password': 'password123',
-
-            'gender': 'MALE',
-            'birthday': birthday,
-            'university': UNIVERSITY_CHOICES.HONGIK,
-            'campus_location': 'SEOUL',
-            'scholarly_status': 'ATTENDING',
         }
         user_code_length = 8
 
         # When: user create api를 호출하여 회원가입을 한다.
         response = self.client.post('/api/users/', data=json.dumps(user_data), content_type='application/json')
 
-        # Then: user와 profile이 만들어진다.
-        #       user의 user_code가 만들어진다.
-        #       reason이 sign up coin_history가 만들어진다.
+        # Then: 만들어진 User가 반환된다.
         #       access token, refresh token이 반환된다.
         assert_that(response.status_code).is_equal_to(status.HTTP_201_CREATED)
 
@@ -58,59 +47,11 @@ class UserViewSetTestCase(APITestCase):
         assert_that(response.data['user']['is_confirmed_student']).is_false()
         assert_that(user.user_code).is_length(user_code_length)
 
-        assert_that(response.data['profile']['id']).is_equal_to(user.profile.id)
-        assert_that(response.data['profile']['user']).is_equal_to(user.id)
-        assert_that(response.data['profile']['gender']).is_equal_to(user_data['gender'])
-        assert_that(response.data['profile']['birthday']).is_equal_to(user_data['birthday'])
-        assert_that(response.data['profile']['university']).is_equal_to(user_data['university'])
-        assert_that(response.data['profile']['campus_location']).is_equal_to(user_data['campus_location'])
-        assert_that(response.data['profile']['scholarly_status']).is_equal_to(user_data['scholarly_status'])
-        assert_that(response.data['profile']['created_at']).is_equal_to(reformat_datetime(user.profile.created_at))
-        assert_that(response.data['profile']['updated_at']).is_equal_to(reformat_datetime(user.profile.updated_at))
-
-        assert_that(response.data['coin_history']).is_length(1)
-        assert_that(response.data['coin_history'][0]['rest_coin']).is_equal_to(SIGNUP_REWARD)
-        assert_that(response.data['coin_history'][0]['reason']).is_equal_to(CoinHistory.CHANGE_REASON.SIGNUP)
-
-    def test_should_not_create_when_profile_invalid(self):
-        # Given: profile 관련 데이터가 invalid한 user 데이터가 주어진다.
-        birthday = (datetime.today() - relativedelta(years=20)).strftime('%Y-%m-%d')
-        user_data = {
-            'email': 'testuser@test.com',
-            'password': 'password123',
-            'university': UNIVERSITY_CHOICES.HONGIK,
-
-            'gender': '',
-            'birthday': birthday,
-            'scholarly_status': 'ATTENDING',
-            'campus_location': 'SEOUL',
-        }
-
-        # When: user create api를 호출하여 회원가입을 시도한다.
-        response = self.client.post('/api/users/', data=user_data)
-
-        # Then: user와 profile 둘 다 생성되지 않는다.
-        assert_that(response.status_code).is_equal_to(status.HTTP_400_BAD_REQUEST)
-
-        user = User.objects.filter(email=user_data['email'])
-        assert_that(user).is_empty()
-        profile = Profile.objects.filter(user__email=user_data['email'])
-        assert_that(profile).is_empty()
-        coin_history = CoinHistory.objects.filter(user__email=user_data['email'])
-        assert_that(coin_history).is_empty()
-
-    def test_should_not_create_when_user_invalid(self):
-        # Given: user 관련 데이터가 invalid한 user 데이터가 주어진다.
-        birthday = (datetime.today() - relativedelta(years=20)).strftime('%Y-%m-%d')
+    def test_should_not_create(self):
+        # Given: 비밀번호가 invalid한 user 데이터가 주어진다.
         user_data = {
             'email': 'testuser@test.com',
             'password': '',
-            'university': UNIVERSITY_CHOICES.HONGIK,
-
-            'gender': 'MALE',
-            'birthday': birthday,
-            'scholarly_status': 'ATTENDING',
-            'campus_location': 'SEOUL',
         }
 
         # When: user create api를 호출하여 회원가입을 시도한다.
@@ -121,10 +62,6 @@ class UserViewSetTestCase(APITestCase):
 
         user = User.objects.filter(email=user_data['email'])
         assert_that(user).is_empty()
-        profile = Profile.objects.filter(user__email=user_data['email'])
-        assert_that(profile).is_empty()
-        coin_history = CoinHistory.objects.filter(user__email=user_data['email'])
-        assert_that(coin_history).is_empty()
 
     def test_should_not_create_user_when_invalid_campus_location(self):
         # Given: campus_location이 잘못된 user 데이터가 주어진다.
@@ -392,7 +329,7 @@ class UserViewSetTestCase(APITestCase):
         assert_that(responsed_profile['id']).is_equal_to(expected_profile.id)
         assert_that(responsed_profile['user']).is_equal_to(expected_profile.user.id)
         assert_that(responsed_profile['gender']).is_equal_to(expected_profile.gender)
-        assert_that(responsed_profile['birthday']).is_equal_to(expected_profile.birthday.strftime('%Y-%m-%d'))
+        assert_that(responsed_profile['born_year']).is_equal_to(expected_profile.born_year)
         assert_that(responsed_profile['university']).is_equal_to(expected_profile.university)
         assert_that(responsed_profile['campus_location']).is_equal_to(expected_profile.campus_location)
         assert_that(responsed_profile['scholarly_status']).is_equal_to(expected_profile.scholarly_status)
