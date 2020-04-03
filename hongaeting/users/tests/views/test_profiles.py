@@ -43,7 +43,7 @@ class ProfileViewSetTestCase(APITestCase):
         assert_that(response.data['created_at']).is_equal_to(reformat_datetime(expected_profile.created_at))
         assert_that(response.data['updated_at']).is_equal_to(reformat_datetime(expected_profile.updated_at))
 
-    def test_should_not_create_user_when_invalid_campus_location(self):
+    def test_should_not_create_profile_when_invalid_campus_location(self):
         # Given: user가 만들어지고, campus_location 필드가 잘못된 profile에 관한 데이터가 주어진다.
         user = baker.make('users.User')
         profile_data = {
