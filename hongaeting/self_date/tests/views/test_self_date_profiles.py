@@ -9,7 +9,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from coins.models import CoinHistory
-from common.constants import UNIVERSITY_CHOICES, VIEW_PROFILE_COST, SIGNUP_REWARD, SEND_MESSAGE_COST
+from common.constants import UNIVERSITY_CHOICES, COIN_CHANGE_REASON, REWORD_COUNT, COST_COUNT
 from common.decorator import delete_media_root
 from common.utils import reformat_datetime
 from self_date.models import SelfDateProfile
@@ -103,25 +103,25 @@ class ProfileTestCase(APITestCase):
 
     def test_should_get_retrieved_profile(self):
         # Given: user 1명과 profile이 주어진다.
-        user = baker.make('users.User')
+        request_self_date_profile = baker.make('self_date.SelfDateProfile')
         expected_profile = baker.make('self_date.SelfDateProfile')
         coin_history = baker.make(
             'coins.CoinHistory',
-            user=user,
-            reason=CoinHistory.CHANGE_REASON.CONFIRM_USER,
-            rest_coin=SIGNUP_REWARD
+            profile=request_self_date_profile.profile,
+            reason=COIN_CHANGE_REASON.CONFIRM_USER,
+            rest_coin=REWORD_COUNT['CONFIRM_USER']
         )
 
         # When: user가 retrieve api를 호출한다.
-        self.client.force_authenticate(user=user)
+        self.client.force_authenticate(user=request_self_date_profile.profile.user)
         response = self.client.get(f'/api/self-date-profiles/{expected_profile.id}/')
 
         # Then: profile 데이터를 반환한다.
         #       coin 개수가 줄어든다.
         assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
         self._check_response_and_expected(response.data, expected_profile)
-        rest_coin = CoinHistory.objects.filter(user=user).last().rest_coin
-        assert_that(rest_coin).is_equal_to(coin_history.rest_coin - VIEW_PROFILE_COST)
+        rest_coin = CoinHistory.objects.filter(profile=request_self_date_profile.profile).last().rest_coin
+        assert_that(rest_coin).is_equal_to(coin_history.rest_coin - COST_COUNT[COIN_CHANGE_REASON.SELF_DATE_PROFILE_VIEW])
 
     def test_should_get_retrieved_profile_which_user_viewed(self):
         # Given: user 1명과 임의의 프로필 1개가 주어진다. 해당 프로필 조회 coin_history가 주어진다.

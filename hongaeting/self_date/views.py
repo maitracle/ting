@@ -10,7 +10,6 @@ from rest_framework.response import Response
 
 from coins.models import CoinHistory
 from coins.serializers import CreateCoinHistorySerializer
-from common.constants import COST_COUNT
 from common.permissions import IsOwnerProfileOrReadonly
 from common.permissions import IsOwnerUserOrReadonly
 from self_date.serializers import ListSelfDateProfileSerializer, UpdateSelfDateProfileSerializer, \
@@ -55,33 +54,14 @@ class SelfDateProfileViewSet(
         )
 
     def retrieve(self, request, *args, **kwargs):
-        isViewed = CoinHistory.objects.filter(
-            user=request.user,
-            reason=CoinHistory.CHANGE_REASON.VIEW_PROFILE,
-            profile=kwargs['pk']
-        ).exists()
+        request_self_date_profile = request.user.profile.selfdateprofile
+        target_self_date_profile = self.get_object()
 
-        if not isViewed:
-            try:
-                rest_coin = CoinHistory.objects.filter(user=request.user).last().rest_coin
-                coin_history_data = {
-                    'user': request.user.id,
-                    'rest_coin': rest_coin - COST_COUNT[CoinHistory.CHANGE_REASON.SELF_DATE_PROFILE_VIEW],
-                    'reason': CoinHistory.CHANGE_REASON.SELF_DATE_PROFILE_VIEW,
-                    'profile': int(kwargs['pk'])
-                }
+        response_self_date_profile = request_self_date_profile.get_target_self_date_profile_to_retrieve(target_self_date_profile)
 
-                coin_history_instance = CreateCoinHistorySerializer(data=coin_history_data)
-                coin_history_instance.is_valid(raise_exception=True)
-                coin_history_instance.save()
+        self_date_profile_serializer = self.get_serializer(response_self_date_profile)
 
-            except ValidationError:
-                return Response(status=status.HTTP_403_FORBIDDEN)
-
-        profile = self.get_object()
-        profile_serializer = self.get_serializer(profile)
-
-        return Response(profile_serializer.data)
+        return Response(self_date_profile_serializer.data)
 
     @action(detail=True, methods=['get'], url_path='chat-link')
     def get_chat_link(self, request, *arg, **kwargs):

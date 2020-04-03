@@ -2,11 +2,11 @@ import os
 
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
-from django.db import models
+from django.db import models, transaction
 from model_utils import Choices
 
 from common.Kakao import Kakao
-from common.constants import COST_COUNT
+from common.constants import COST_COUNT, COIN_CHANGE_REASON
 from common.models import BaseModel
 from common.models import BaseModel
 from common.models import BaseModel
@@ -20,7 +20,8 @@ class SelfDateProfileRight(BaseModel):
     target_self_date_profile = models.ForeignKey('self_date.SelfDateProfile',
                                                  related_name='target_self_date_rights',
                                                  on_delete=models.CASCADE)
-    coin_history = models.OneToOneField('coins.CoinHistory', on_delete=models.PROTECT)
+    right_type = models.CharField(max_length=50, choices=COIN_CHANGE_REASON)
+    coin_history = models.OneToOneField('coins.CoinHistory', null=True, on_delete=models.PROTECT)
 
 
 def image_path(instance, original_filename):
@@ -62,6 +63,30 @@ class SelfDateProfile(BaseModel):
             is_valid = False
         return is_valid
 
+    def get_target_self_date_profile_to_retrieve(self, target_self_date_profile):
+        """
+        self가 target_self_date_profile 내용을 조회 가능한지 확인 후 target_self_date_profile을 반환한다.
+        """
+        is_having_view_right = self.check_having_right(
+            target_self_date_profile, COIN_CHANGE_REASON.SELF_DATE_PROFILE_VIEW)
+
+        if not is_having_view_right:
+            self.buy_right_for_target_self_date_profile(
+                target_self_date_profile=target_self_date_profile, right_type=COIN_CHANGE_REASON.SELF_DATE_PROFILE_VIEW)
+
+        return target_self_date_profile
+
+    def check_having_right(self, target_self_date_profile, right_type):
+        right_queryset = SelfDateProfileRight.objects.filter(
+            buying_self_date_profile=self.id
+        ).filter(
+            target_self_date_profile=target_self_date_profile
+        ).filter(
+            right_type=right_type
+        )
+
+        return right_queryset.exists()
+
     def buy_right_for_target_self_date_profile(self, target_self_date_profile, right_type):
         """
         rest_coin을 감소시킨 coin_history와 self_date_profile_right를 생성한다.
@@ -73,22 +98,22 @@ class SelfDateProfile(BaseModel):
 
         coin_history_kwargs = self._get_kwargs_for_coin_history(target_self_date_profile, right_type)
 
-        coin_history = CoinHistory(**coin_history_kwargs)
-        coin_history.save()
+        with transaction.atomic():
+            coin_history = CoinHistory(**coin_history_kwargs)
+            coin_history.save()
 
-        self_date_profile_right = SelfDateProfileRight(buying_self_date_profile=self,
-                                                       target_self_date_profile=target_self_date_profile,
-                                                       coin_history=coin_history)
-        self_date_profile_right.save()
+            self_date_profile_right = SelfDateProfileRight(buying_self_date_profile=self,
+                                                           target_self_date_profile=target_self_date_profile,
+                                                           coin_history=coin_history,
+                                                           right_type=right_type)
+            self_date_profile_right.save()
 
         return self_date_profile_right
 
     def _get_kwargs_for_coin_history(self, target_self_date_profile, right_type):
-        from coins.models import CoinHistory
-
         map_right_type_to_message = {
-            CoinHistory.CHANGE_REASON.SELF_DATE_PROFILE_VIEW: '조회',
-            CoinHistory.CHANGE_REASON.SELF_DATE_SEND_MESSAGE: 'chat link 조회',
+            COIN_CHANGE_REASON.SELF_DATE_PROFILE_VIEW: '조회',
+            COIN_CHANGE_REASON.SELF_DATE_SEND_MESSAGE: 'chat link 조회',
         }
 
         try:
