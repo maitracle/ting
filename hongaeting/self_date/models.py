@@ -1,9 +1,9 @@
 import os
 
-from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
 from django.db import models, transaction
 from model_utils import Choices
+from rest_framework.exceptions import ValidationError, PermissionDenied
 
 from common.Kakao import Kakao
 from common.constants import COST_COUNT, COIN_CHANGE_REASON
@@ -115,6 +115,9 @@ class SelfDateProfile(BaseModel):
             COIN_CHANGE_REASON.SELF_DATE_PROFILE_VIEW: '조회',
             COIN_CHANGE_REASON.SELF_DATE_SEND_MESSAGE: 'chat link 조회',
         }
+
+        if self.profile.coin_histories.last().rest_coin - COST_COUNT[right_type] < 0:
+            raise PermissionDenied('코인 개수 부족으로 인한 permission denied')
 
         try:
             message_suffix = map_right_type_to_message[right_type]

@@ -117,7 +117,7 @@ class ProfileTestCase(APITestCase):
         response = self.client.get(f'/api/self-date-profiles/{target_self_date_profile.id}/')
 
         # Then: status code 200이 반환된다.
-        #       profile 데이터가 반환된다..
+        #       profile 데이터가 반환된다.
         #       self_date_profile_right가 생성된다.
         #       coin 개수가 줄어든다.
         assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
@@ -127,7 +127,7 @@ class ProfileTestCase(APITestCase):
         self_date_profile_right = SelfDateProfileRight.objects.filter(
             buying_self_date_profile=request_self_date_profile,
             target_self_date_profile=target_self_date_profile,
-            right_type=COIN_CHANGE_REASON.SELF_DATE_PROFILE_VIEW
+            right_type=COIN_CHANGE_REASON.SELF_DATE_PROFILE_VIEW,
         )
         assert_that(self_date_profile_right.exists()).is_true()
 
@@ -135,47 +135,52 @@ class ProfileTestCase(APITestCase):
         assert_that(rest_coin).is_equal_to(
             coin_history.rest_coin - COST_COUNT[COIN_CHANGE_REASON.SELF_DATE_PROFILE_VIEW])
 
-    def test_should_get_retrieved_profile_which_user_viewed(self):
-        # Given: user 1명과 임의의 프로필 1개가 주어진다. 해당 프로필 조회 coin_history가 주어진다.
-        user = baker.make('users.User')
-        expected_profile = baker.make('self_date.SelfDateProfile')
-        view_profile_coin_history = baker.make(
-            'coins.CoinHistory',
-            user=user,
-            reason=CoinHistory.CHANGE_REASON.VIEW_PROFILE,
-            rest_coin=28,
-            profile=expected_profile,
-        )
+    def test_should_get_retrieved_profile_when_already_have_viewing_right(self):
+        # Given: target에 대한 view 권한을 가진 request_self_date_profile이 주어진다.
+        #        target_self_date_profile이 주어진다.
+        request_self_date_profile = baker.make('self_date.SelfDateProfile')
+        target_self_date_profile = baker.make('self_date.SelfDateProfile')
 
-        # When: user가 retrieve api를 호출한다.
-        self.client.force_authenticate(user=user)
-        response = self.client.get(f'/api/self-date-profiles/{expected_profile.id}/')
+        baker.make('self_date.SelfDateProfileRight',
+                   buying_self_date_profile=request_self_date_profile,
+                   target_self_date_profile=target_self_date_profile,
+                   right_type=COIN_CHANGE_REASON.SELF_DATE_PROFILE_VIEW)
 
-        # Then: profile이 반환된다. coin 개수가 감소하지 않는다.
+        expected_rest_coin = 30
+        baker.make('coins.CoinHistory', profile=request_self_date_profile.profile, rest_coin=expected_rest_coin)
+
+        # When: request_self_date_profile의 user가 retrieve api를 호출한다.
+        self.client.force_authenticate(user=request_self_date_profile.profile.user)
+        response = self.client.get(f'/api/self-date-profiles/{target_self_date_profile.id}/')
+
+        # Then: status code 200이 반환된다.
+        #       profile이 반환된다.
+        #       coin 개수가 감소하지 않는다.
         assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
-        self._check_response_and_expected(response.data, expected_profile)
-        rest_coin = CoinHistory.objects.filter(user=user).last().rest_coin
-        assert_that(rest_coin).is_equal_to(view_profile_coin_history.rest_coin)
+        self._check_response_and_expected(response.data, target_self_date_profile)
+        rest_coin = CoinHistory.objects.filter(profile=request_self_date_profile.profile).last().rest_coin
+        assert_that(rest_coin).is_equal_to(expected_rest_coin)
 
     def test_should_not_get_retrieved_profile_when_user_does_not_have_coin(self):
-        # Given: user 1명과 profile이 주어지고, coin이 남아있지 않은 coin_history가 주어진다.
-        user = baker.make('users.User')
-        expected_profile = baker.make('self_date.SelfDateProfile')
-        final_coin_history = baker.make(
-            'coins.CoinHistory',
-            user=user,
-            reason=CoinHistory.CHANGE_REASON.VIEW_PROFILE,
-            rest_coin=0
-        )
+        # Given: target에 대한 view 권한을 가진 request_self_date_profile이 주어진다.
+        #        target_self_date_profile이 주어진다.
+        request_self_date_profile = baker.make('self_date.SelfDateProfile')
+        target_self_date_profile = baker.make('self_date.SelfDateProfile')
 
-        # When: user가 retrieve api를 호출한다.
-        self.client.force_authenticate(user=user)
-        response = self.client.get(f'/api/self-date-profiles/{expected_profile.id}/')
+        expected_rest_coin = 0
+        baker.make('coins.CoinHistory', profile=request_self_date_profile.profile, rest_coin=expected_rest_coin)
 
-        # Then: 코인이 부족하여 403 forbidden 오류가 응답된다.
+        # When: request_self_date_profile의 user가 retrieve api를 호출한다.
+        self.client.force_authenticate(user=request_self_date_profile.profile.user)
+        response = self.client.get(f'/api/self-date-profiles/{target_self_date_profile.id}/')
+
+        # Then: status code 403이 반환된다.
+        #       코인 개수 부족 에러메시지가 반환된다.
+        #       coin 개수가 감소하지 않는다.
         assert_that(response.status_code).is_equal_to(status.HTTP_403_FORBIDDEN)
-        rest_coin = CoinHistory.objects.filter(user=user).last().rest_coin
-        assert_that(rest_coin).is_equal_to(final_coin_history.rest_coin)
+        assert_that(response.data['detail']).is_equal_to('코인 개수 부족으로 인한 permission denied')
+        rest_coin = CoinHistory.objects.filter(profile=request_self_date_profile.profile).last().rest_coin
+        assert_that(rest_coin).is_equal_to(expected_rest_coin)
 
     def _check_response_and_expected(self, dictionary, instance):
         assert_that(dictionary['image']).is_equal_to(instance.image)
