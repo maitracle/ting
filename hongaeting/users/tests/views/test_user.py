@@ -126,6 +126,34 @@ class UserViewSetTestCase(APITestCase):
         coin_history = CoinHistory.objects.filter(user__email=user_data['email'])
         assert_that(coin_history).is_empty()
 
+    def test_should_not_create_user_when_invalid_campus_location(self):
+        # Given: campus_location이 잘못된 user 데이터가 주어진다.
+        birthday = (datetime.today() - relativedelta(years=20)).strftime('%Y-%m-%d')
+        user_data = {
+            'email': 'testuser@test.com',
+            'password': 'password123',
+
+            'gender': 'MALE',
+            'birthday': birthday,
+            'university': UNIVERSITY_CHOICES.HONGIK,
+            'campus_location': 'SINCHON',
+            'scholarly_status': 'ATTENDING',
+        }
+
+        # When: user create api를 호출하여 회원가입을 시도한다.
+        response = self.client.post('/api/users/', data=json.dumps(user_data), content_type='application/json')
+
+        # Then: user와 profile 둘 다 생성되지 않고 ValidationError가 발생한다.
+        assert_that(response.status_code).is_equal_to(status.HTTP_400_BAD_REQUEST)
+        assert_that(response.data['non_field_errors'][0]).is_equal_to('Wrong campus location.')
+
+        user = User.objects.filter(email=user_data['email'])
+        assert_that(user).is_empty()
+        profile = Profile.objects.filter(user__email=user_data['email'])
+        assert_that(profile).is_empty()
+        coin_history = CoinHistory.objects.filter(user__email=user_data['email'])
+        assert_that(coin_history).is_empty()
+
     def test_should_update_user(self):
         # Given: user와 바꿀 user data가 주어진다
         user = baker.make('users.User',
