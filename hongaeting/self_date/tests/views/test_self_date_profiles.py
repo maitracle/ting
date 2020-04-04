@@ -1,5 +1,4 @@
 import os
-from unittest import skip
 
 from PIL import Image
 from assertpy import assert_that
@@ -16,37 +15,44 @@ from self_date.models import SelfDateProfile, SelfDateProfileRight
 from users.models import Profile
 
 
-class ProfileTestCase(APITestCase):
+class SelfDateProfileTestCase(APITestCase):
     def test_should_get_profile_list(self):
-        # Given: user 1명과 profile이 주어진다.
+        # Given: user, profile, self_date_profile, 다른 사람의 self_date_profile_list가 주어진다.
         user = baker.make('users.User')
-        profile_quantity = 10
-        expected_profile_list = baker.make('self_date.SelfDateProfile', _quantity=profile_quantity)
+        profile = baker.make('users.Profile', user=user)
+        self_date_profile = baker.make('self_date.SelfDateProfile', profile=profile)
+        self_date_profile_quantity = 10
+        expected_self_date_profile_list = baker.make('self_date.SelfDateProfile', _quantity=self_date_profile_quantity)
 
-        # When: user가 list api를 호출한다.
+        # When: user가 self date profile list api를 호출한다.
         self.client.force_authenticate(user=user)
         response = self.client.get('/api/self-date-profiles/')
 
-        # Then: response가 정상적으로 온다.
+        # Then: status code 200이 반환된다.
+        #       self date profile list가 반환된다.
         assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
-        assert_that(response.data).is_length(profile_quantity)
+        assert_that(response.data).is_length(self_date_profile_quantity + 1)
 
+        expected_self_date_profile_list = [self_date_profile] + expected_self_date_profile_list
         expected_is_viewed_value = False
-        for response_profile, expected_profile in zip(response.data, expected_profile_list):
+        for response_profile, expected_profile in zip(response.data, expected_self_date_profile_list):
             self._check_response_and_expected(response_profile, expected_profile)
             assert_that(response_profile['is_viewed']).is_equal_to(expected_is_viewed_value)
 
     def test_should_get_filtered_list(self):
-        # Given: 로그인용 user 1명과 임의의 profile 1개가 주어진다.
+        # Given: user, profile, self_date_profile과 gender, university가 다른 self_date_profile 여러개가 주어진다.
         user = baker.make('users.User')
+        profile = baker.make('users.Profile', user=user, gender='FEMALE')
+        baker.make('self_date.SelfDateProfile', profile=profile)
 
-        expected_profile_data = {
+        expected_self_date_profile_data = {
             'gender': 'MALE',
             'university': UNIVERSITY_CHOICES.HONGIK,
         }
 
-        expected_profile = baker.make('self_date.SelfDateProfile', profile__gender=expected_profile_data['gender'],
-                                      profile__university=expected_profile_data['university'])
+        expected_profile = baker.make('self_date.SelfDateProfile',
+                                      profile__gender=expected_self_date_profile_data['gender'],
+                                      profile__university=expected_self_date_profile_data['university'])
         baker.make('self_date.SelfDateProfile', profile__gender=Profile.GENDER_CHOICES.FEMALE,
                    profile__university=UNIVERSITY_CHOICES.HONGIK)
         baker.make('self_date.SelfDateProfile', profile__gender=Profile.GENDER_CHOICES.MALE,
@@ -58,44 +64,55 @@ class ProfileTestCase(APITestCase):
         baker.make('self_date.SelfDateProfile', profile__gender=Profile.GENDER_CHOICES.FEMALE,
                    profile__university=UNIVERSITY_CHOICES.YONSEI)
 
-        # When: user가 필터링 된 list api를 호출한다.
+        # When: 필터링 된 list api를 호출한다.
         self.client.force_authenticate(user=user)
         response = self.client.get(f'/api/self-date-profiles/?'
-                                   f'profile__gender={expected_profile_data["gender"]}'
-                                   f'&profile__university={expected_profile_data["university"]}')
+                                   f'profile__gender={expected_self_date_profile_data["gender"]}'
+                                   f'&profile__university={expected_self_date_profile_data["university"]}')
 
-        # Then: 필터링 된 response가 온다.
-        filtered_profile_quantity = 1
+        # Then: status code 200이 반환된다.
+        #       필터링된 self_date_profile이 반환된다.
+        filtered_self_date_profile_quantity = 1
         assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
-        assert_that(response.data).is_length(filtered_profile_quantity)
+        assert_that(response.data).is_length(filtered_self_date_profile_quantity)
 
         expected_is_viewed_value = False
         for response in response.data:
             self._check_response_and_expected(response, expected_profile)
             assert_that(response['is_viewed']).is_equal_to(expected_is_viewed_value)
 
-    @skip('coin history가 만들어질 때까지 테스트를 건너뛴다.')
     def test_is_viewed_in_list(self):
         # Given: user 하나와 여러 조합의 coin_history가 주어진다.
         user = baker.make('users.User')
+        profile = baker.make('users.Profile', user=user)
+        self_date_profile = baker.make('self_date.SelfDateProfile', profile=profile)
 
         profile_quantity = 5
-        profile_list = baker.make('self_date.SelfDateProfile', _quantity=profile_quantity)
+        self_date_profile_list = baker.make('self_date.SelfDateProfile', _quantity=profile_quantity)
+        self_date_profile_list = [self_date_profile] + self_date_profile_list
 
-        baker.make('coins.CoinHistory', user=user, reason=CoinHistory.CHANGE_REASON.VIEW_PROFILE,
-                   profile=profile_list[1])
-        baker.make('coins.CoinHistory', user=user, reason=CoinHistory.CHANGE_REASON.SEND_MESSAGE,
-                   profile=profile_list[2])
-        baker.make('coins.CoinHistory', reason=CoinHistory.CHANGE_REASON.VIEW_PROFILE,
-                   profile=profile_list[3])
-        baker.make('coins.CoinHistory', user=user, reason=CoinHistory.CHANGE_REASON.VIEW_PROFILE,
-                   profile=profile_list[4])
+        baker.make('self_date.SelfDateProfileRight',
+                   buying_self_date_profile=self_date_profile,
+                   target_self_date_profile=self_date_profile_list[2],
+                   right_type=COIN_CHANGE_REASON.SELF_DATE_PROFILE_VIEW)
+        baker.make('self_date.SelfDateProfileRight',
+                   buying_self_date_profile=self_date_profile,
+                   target_self_date_profile=self_date_profile_list[3],
+                   right_type=COIN_CHANGE_REASON.SELF_DATE_SEND_MESSAGE)
+        baker.make('self_date.SelfDateProfileRight',
+                   buying_self_date_profile=self_date_profile,
+                   target_self_date_profile=self_date_profile_list[4],
+                   right_type=COIN_CHANGE_REASON.SELF_DATE_PROFILE_VIEW)
+        baker.make('self_date.SelfDateProfileRight',
+                   buying_self_date_profile=self_date_profile,
+                   target_self_date_profile=self_date_profile_list[5],
+                   right_type=COIN_CHANGE_REASON.SELF_DATE_PROFILE_VIEW)
 
-        expected_is_viewed_list = [False, True, False, False, True]
+        expected_is_viewed_list = [False, False, True, False, True, True]
 
         # When: user가 list api를 호출한다.
         self.client.force_authenticate(user=user)
-        response = self.client.get('/api/profiles/')
+        response = self.client.get('/api/self-date-profiles/')
 
         # Then: user가 조회한 profile은 is_viewed값이 True이다.
         for response_profile, expected_is_viewed in zip(response.data, expected_is_viewed_list):

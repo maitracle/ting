@@ -10,11 +10,12 @@ from rest_framework.response import Response
 
 from coins.models import CoinHistory
 from coins.serializers import CreateCoinHistorySerializer
+from common.constants import COIN_CHANGE_REASON
 from common.permissions import IsOwnerProfileOrReadonly
 from common.permissions import IsOwnerUserOrReadonly
 from self_date.serializers import ListSelfDateProfileSerializer, UpdateSelfDateProfileSerializer, \
     RetrieveSelfDateProfileSerializer, LikeSerializer, CreateSelfDateProfileSerializer
-from .models import SelfDateProfile, Like
+from .models import SelfDateProfile, Like, SelfDateProfileRight
 
 
 class SelfDateProfileViewSet(
@@ -35,14 +36,18 @@ class SelfDateProfileViewSet(
     filterset_fields = ('profile__gender', 'profile__university',)
 
     def list_queryset(self, queryset):
-        coin_history_queryset = CoinHistory.objects.filter(user=self.request.user).filter(
-            reason=CoinHistory.CHANGE_REASON.VIEW_PROFILE) \
-            .filter(profile_id=OuterRef('id'))
+        self_date_profile_right_queryset = SelfDateProfileRight.objects.filter(
+            buying_self_date_profile=self.request.user.profile.selfdateprofile
+        ).filter(
+            right_type=COIN_CHANGE_REASON.SELF_DATE_PROFILE_VIEW
+        ).filter(
+            target_self_date_profile_id=OuterRef('id')
+        )
 
         return queryset.filter(
             is_active=True
         ).annotate(
-            view_count=Count(Subquery(coin_history_queryset.values('id')))
+            view_count=Count(Subquery(self_date_profile_right_queryset.values('id')))
         ).annotate(
             is_viewed=Case(
                 When(view_count__gt=0,
