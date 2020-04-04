@@ -10,7 +10,7 @@ from rest_framework.response import Response
 
 from coins.models import CoinHistory
 from coins.serializers import CreateCoinHistorySerializer
-from common.constants import COIN_CHANGE_REASON
+from common.constants import COIN_CHANGE_REASON, COST_COUNT
 from common.permissions import IsOwnerProfileOrReadonly
 from common.permissions import IsOwnerUserOrReadonly
 from self_date.serializers import ListSelfDateProfileSerializer, UpdateSelfDateProfileSerializer, \
@@ -62,7 +62,8 @@ class SelfDateProfileViewSet(
         request_self_date_profile = request.user.profile.selfdateprofile
         target_self_date_profile = self.get_object()
 
-        response_self_date_profile = request_self_date_profile.get_target_self_date_profile_to_retrieve(target_self_date_profile)
+        response_self_date_profile = request_self_date_profile.get_target_self_date_profile_to_retrieve(
+            target_self_date_profile)
 
         self_date_profile_serializer = self.get_serializer(response_self_date_profile)
 
@@ -86,8 +87,8 @@ class SelfDateProfileViewSet(
                 rest_coin = CoinHistory.objects.filter(user=request.user).last().rest_coin
                 coin_history_data = {
                     'user': request.user.id,
-                    'rest_coin': rest_coin - SEND_MESSAGE_COST,
-                    'reason': CoinHistory.CHANGE_REASON.SEND_MESSAGE,
+                    'rest_coin': rest_coin - COST_COUNT[COIN_CHANGE_REASON.SELF_DATE_SEND_MESSAGE],
+                    'reason': COIN_CHANGE_REASON.SELF_DATE_SEND_MESSAGE,
                     'profile': profile.id
                 }
 
