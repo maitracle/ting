@@ -71,14 +71,17 @@ class SelfDateProfileViewSet(
     @action(detail=True, methods=['get'], url_path='chat-link')
     def get_chat_link(self, request, *arg, **kwargs):
         profile = self.get_object()
+
         if not profile.is_valid_chat_link:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        isSent = CoinHistory.objects.filter(
-            user=request.user,
-            reason=CoinHistory.CHANGE_REASON.SEND_MESSAGE,
-            profile=profile.id
+
+        is_sent = SelfDateProfileRight.objects.filter(
+            buying_self_date_profile=self.request.user.profile.selfdateprofile,
+            target_self_date_profile=profile,
+            right_type=COIN_CHANGE_REASON.SELF_DATE_SEND_MESSAGE
         )
-        if not isSent:
+
+        if not is_sent:
             try:
                 rest_coin = CoinHistory.objects.filter(user=request.user).last().rest_coin
                 coin_history_data = {
@@ -97,6 +100,7 @@ class SelfDateProfileViewSet(
         chat_link = {
             'chat_link': profile.chat_link,
         }
+
         return Response(chat_link)
 
 
