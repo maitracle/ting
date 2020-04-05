@@ -44,24 +44,24 @@ class ProfileViewSetTestCase(APITestCase):
         assert_that(response.data['updated_at']).is_equal_to(reformat_datetime(expected_profile.updated_at))
 
     def test_should_not_create_profile_when_invalid_campus_location(self):
-        # Given: user가 만들어지고, campus_location 필드가 잘못된 profile에 관한 데이터가 주어진다.
+        # Given: user가 주어지고, campus_location 필드가 잘못된 profile에 관한 데이터가 주어진다.
         user = baker.make('users.User')
         profile_data = {
             'nickname': 'nickname',
             'gender': Profile.GENDER_CHOICES.MALE,
             'born_year': 1999,
             'university': UNIVERSITY_CHOICES.HONGIK,
-            'campus_location': MAP_UNIVERSITY_WITH_CAMPUS[UNIVERSITY_CHOICES.YONSEI][0],
+            'campus_location': 'WRONG CAMPUS LOCATION',
             'scholarly_status': Profile.SCHOLARLY_STATUS_CHOICES.ATTENDING,
         }
 
-        # When: user create api를 호출하여 회원가입을 한다.
+        # When: profile create api를 호출한다.
         self.client.force_authenticate(user=user)
         response = self.client.post('/api/profiles/', data=json.dumps(profile_data), content_type='application/json')
 
-        # Then: user와 profile 둘 다 생성되지 않고 ValidationError가 발생한다.
+        # Then: profile이 생성되지 않고 ValidationError가 발생한다.
         assert_that(response.status_code).is_equal_to(status.HTTP_400_BAD_REQUEST)
-        assert_that(response.data['non_field_errors'][0]).is_equal_to('Wrong campus location.')
+        assert_that(response.data['campus_location'][0]).is_equal_to('"WRONG CAMPUS LOCATION" is not a valid choice.')
 
         profile = Profile.objects.filter(nickname=profile_data['nickname'])
         assert_that(profile).is_empty()
