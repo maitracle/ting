@@ -24,15 +24,18 @@ class Kakao(ABC):
 
 
 class KakaoWithRequest(Kakao):
+
     @classmethod
     def is_valid_kakao_link(cls, kakao_link):
-        if settings.TEST:
-            return True
         request = Request.instance()
 
-        response = request.get(kakao_link)
+        try:
+            html_text = request.get(kakao_link).text
 
-        soup = BeautifulSoup(response.text.encode('utf8'), 'html.parser')
+        except AttributeError:
+            return False
+
+        soup = BeautifulSoup(html_text.encode('utf8'), 'html.parser')
 
         for string_tag in soup.find_all('strong'):
             if cls.deleted_link_string in string_tag.contents:
