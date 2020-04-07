@@ -42,12 +42,14 @@ class UserViewSet(
 
         token_obtain_pair_serializer.is_valid(raise_exception=True)
         user = User.objects.get(email=request.data['email'])
-        coin_history_list = CoinHistory.objects.filter(user=user).order_by('-id')
+
+        is_exist_profile = hasattr(user, 'profile')
+
         response_data = {
             **token_obtain_pair_serializer.validated_data,
             'user': user,
-            'profile': getattr(user, 'profile', None),
-            'coin_history': coin_history_list,
+            'profile': user.profile if is_exist_profile else None,
+            'coin_history': CoinHistory.objects.filter(profile=user.profile).order_by('-id') if is_exist_profile else [],
         }
 
         serializer = self.get_serializer(response_data)
@@ -100,10 +102,14 @@ class UserViewSet(
 
     @action(detail=False, methods=['get'])
     def my(self, request, *args, **kwargs):
+
+        user = request.user
+        is_exist_profile = hasattr(user, 'profile')
+
         data = {
-            'user': request.user,
-            'profile': getattr(request.user, 'profile', None),
-            'coin_history': CoinHistory.objects.filter(user=request.user).order_by('-id'),
+            'user': user,
+            'profile': user.profile if hasattr(user, 'profile') else None,
+            'coin_history': CoinHistory.objects.filter(profile=user.profile).order_by('-id') if is_exist_profile else [],
 
         }
         serializer = self.get_serializer(data)

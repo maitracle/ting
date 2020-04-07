@@ -18,8 +18,8 @@ class CoinHistoryViewSet(
     filter_backends = [filters.OrderingFilter]
     ordering = ['-id', ]
 
-    def filtered_queryset_by_user(self, queryset):
-        return queryset.filter(user=self.request.user)
+    def filtered_queryset_by_profile(self, queryset):
+        return queryset.filter(profile=self.request.user.profile)
 
     def list_queryset(self, queryset):
-        return self.filtered_queryset_by_user(queryset)
+        return self.filtered_queryset_by_profile(queryset)

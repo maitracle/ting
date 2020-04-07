@@ -10,12 +10,12 @@ from rest_framework.response import Response
 
 from coins.models import CoinHistory
 from coins.serializers import CreateCoinHistorySerializer
-from common.constants import VIEW_PROFILE_COST, SEND_MESSAGE_COST
+from common.constants import COIN_CHANGE_REASON, COST_COUNT
 from common.permissions import IsOwnerProfileOrReadonly
 from common.permissions import IsOwnerUserOrReadonly
 from self_date.serializers import ListSelfDateProfileSerializer, UpdateSelfDateProfileSerializer, \
     RetrieveSelfDateProfileSerializer, LikeSerializer, CreateSelfDateProfileSerializer
-from .models import SelfDateProfile, Like
+from .models import SelfDateProfile, Like, SelfDateProfileRight
 
 
 class SelfDateProfileViewSet(
@@ -36,14 +36,18 @@ class SelfDateProfileViewSet(
     filterset_fields = ('profile__gender', 'profile__university',)
 
     def list_queryset(self, queryset):
-        coin_history_queryset = CoinHistory.objects.filter(user=self.request.user).filter(
-            reason=CoinHistory.CHANGE_REASON.VIEW_PROFILE) \
-            .filter(profile_id=OuterRef('id'))
+        self_date_profile_right_queryset = SelfDateProfileRight.objects.filter(
+            buying_self_date_profile=self.request.user.profile.selfdateprofile
+        ).filter(
+            right_type=COIN_CHANGE_REASON.SELF_DATE_PROFILE_VIEW
+        ).filter(
+            target_self_date_profile_id=OuterRef('id')
+        )
 
         return queryset.filter(
             is_active=True
         ).annotate(
-            view_count=Count(Subquery(coin_history_queryset.values('id')))
+            view_count=Count(Subquery(self_date_profile_right_queryset.values('id')))
         ).annotate(
             is_viewed=Case(
                 When(view_count__gt=0,
@@ -55,51 +59,36 @@ class SelfDateProfileViewSet(
         )
 
     def retrieve(self, request, *args, **kwargs):
-        isViewed = CoinHistory.objects.filter(
-            user=request.user,
-            reason=CoinHistory.CHANGE_REASON.VIEW_PROFILE,
-            profile=kwargs['pk']
-        ).exists()
+        request_self_date_profile = request.user.profile.selfdateprofile
+        target_self_date_profile = self.get_object()
 
-        if not isViewed:
-            try:
-                rest_coin = CoinHistory.objects.filter(user=request.user).last().rest_coin
-                coin_history_data = {
-                    'user': request.user.id,
-                    'rest_coin': rest_coin - VIEW_PROFILE_COST,
-                    'reason': CoinHistory.CHANGE_REASON.VIEW_PROFILE,
-                    'profile': int(kwargs['pk'])
-                }
+        response_self_date_profile = request_self_date_profile.get_target_self_date_profile_to_retrieve(
+            target_self_date_profile)
 
-                coin_history_instance = CreateCoinHistorySerializer(data=coin_history_data)
-                coin_history_instance.is_valid(raise_exception=True)
-                coin_history_instance.save()
+        self_date_profile_serializer = self.get_serializer(response_self_date_profile)
 
-            except ValidationError:
-                return Response(status=status.HTTP_403_FORBIDDEN)
-
-        profile = self.get_object()
-        profile_serializer = self.get_serializer(profile)
-
-        return Response(profile_serializer.data)
+        return Response(self_date_profile_serializer.data)
 
     @action(detail=True, methods=['get'], url_path='chat-link')
     def get_chat_link(self, request, *arg, **kwargs):
         profile = self.get_object()
+
         if not profile.is_valid_chat_link:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        isSent = CoinHistory.objects.filter(
-            user=request.user,
-            reason=CoinHistory.CHANGE_REASON.SEND_MESSAGE,
-            profile=profile.id
+
+        is_sent = SelfDateProfileRight.objects.filter(
+            buying_self_date_profile=self.request.user.profile.selfdateprofile,
+            target_self_date_profile=profile,
+            right_type=COIN_CHANGE_REASON.SELF_DATE_SEND_MESSAGE
         )
-        if not isSent:
+
+        if not is_sent:
             try:
                 rest_coin = CoinHistory.objects.filter(user=request.user).last().rest_coin
                 coin_history_data = {
                     'user': request.user.id,
-                    'rest_coin': rest_coin - SEND_MESSAGE_COST,
-                    'reason': CoinHistory.CHANGE_REASON.SEND_MESSAGE,
+                    'rest_coin': rest_coin - COST_COUNT[COIN_CHANGE_REASON.SELF_DATE_SEND_MESSAGE],
+                    'reason': COIN_CHANGE_REASON.SELF_DATE_SEND_MESSAGE,
                     'profile': profile.id
                 }
 
@@ -112,6 +101,7 @@ class SelfDateProfileViewSet(
         chat_link = {
             'chat_link': profile.chat_link,
         }
+
         return Response(chat_link)
 
 

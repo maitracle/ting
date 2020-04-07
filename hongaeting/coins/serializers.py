@@ -10,10 +10,10 @@ class CreateCoinHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = CoinHistory
         fields = (
-            'user',
+            'profile',
             'rest_coin',
             'reason',
-            'profile',
+            'message',
         )
 
 
@@ -22,10 +22,10 @@ class ListCoinHistorySerializer(serializers.ModelSerializer):
         model = CoinHistory
         fields = (
             'id',
-            'user',
+            'profile',
             'rest_coin',
             'reason',
-            'profile',
+            'message',
             'created_at',
             'updated_at',
         )
