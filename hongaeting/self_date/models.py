@@ -58,7 +58,7 @@ class SelfDateProfile(BaseModel):
     @property
     def is_valid_chat_link(self):
         try:
-            is_valid = Kakao.is_valid_kakao_link(self.chat_link)
+            is_valid = Kakao.instance().is_valid_kakao_link(self.chat_link)
         except:
             is_valid = False
         return is_valid
