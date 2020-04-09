@@ -71,35 +71,15 @@ class SelfDateProfileViewSet(
 
     @action(detail=True, methods=['get'], url_path='chat-link')
     def get_chat_link(self, request, *arg, **kwargs):
-        profile = self.get_object()
+        request_self_date_profile = request.user.profile.selfdateprofile
+        target_self_date_profile = self.get_object()
 
-        if not profile.is_valid_chat_link:
+        if not target_self_date_profile.is_valid_chat_link:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        is_sent = SelfDateProfileRight.objects.filter(
-            buying_self_date_profile=self.request.user.profile.selfdateprofile,
-            target_self_date_profile=profile,
-            right_type=COIN_CHANGE_REASON.SELF_DATE_SEND_MESSAGE
-        )
-
-        if not is_sent:
-            try:
-                rest_coin = CoinHistory.objects.filter(user=request.user).last().rest_coin
-                coin_history_data = {
-                    'user': request.user.id,
-                    'rest_coin': rest_coin - COST_COUNT[COIN_CHANGE_REASON.SELF_DATE_SEND_MESSAGE],
-                    'reason': COIN_CHANGE_REASON.SELF_DATE_SEND_MESSAGE,
-                    'profile': profile.id
-                }
-
-                coin_history_instance = CreateCoinHistorySerializer(data=coin_history_data)
-                coin_history_instance.is_valid(raise_exception=True)
-                coin_history_instance.save()
-            except ValidationError:
-                return Response(status=status.HTTP_403_FORBIDDEN)
-
+        response_target_chat_link = request_self_date_profile.get_target_chat_link(target_self_date_profile)
         chat_link = {
-            'chat_link': profile.chat_link,
+            'chat_link': response_target_chat_link,
         }
 
         return Response(chat_link)

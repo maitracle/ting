@@ -76,6 +76,16 @@ class SelfDateProfile(BaseModel):
 
         return target_self_date_profile
 
+    def get_target_chat_link(self, target_self_date_profile):
+        is_having_message_right = self.check_having_right(
+            target_self_date_profile, COIN_CHANGE_REASON.SELF_DATE_SEND_MESSAGE)
+
+        if not is_having_message_right:
+            self.buy_right_for_target_self_date_profile(
+                target_self_date_profile=target_self_date_profile, right_type=COIN_CHANGE_REASON.SELF_DATE_SEND_MESSAGE)
+
+        return target_self_date_profile.chat_link
+
     def check_having_right(self, target_self_date_profile, right_type):
         right_queryset = SelfDateProfileRight.objects.filter(
             buying_self_date_profile=self.id
