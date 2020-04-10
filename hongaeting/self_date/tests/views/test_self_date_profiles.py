@@ -302,78 +302,81 @@ class SelfDateProfileTestCase(APITestCase):
         assert_that(response.data['detail'].code).is_equal_to(error_code)
 
     def test_should_get_chat_link(self):
-        # Given: user 1명과 메시지를 보낼 profile이 1개 주어진다. user의 rest_coin이 충분한 coin_history가 주어진다.
+        # Given: user 1명과 메시지를 보낼 profile이 1개 주어진다.
+        # user가 인증될 때 생기는 coinHistory가 주어진다.
         user = baker.make('users.User')
         profile = baker.make('users.Profile', user=user)
         self_date_profile = baker.make('self_date.SelfDateProfile', profile=profile)
         expected_profile = baker.make('self_date.SelfDateProfile', chat_link='chatlink@test.com')
         baker.make(
-            'self_date.SelfDateProfileRight',
-            buying_self_date_profile=self_date_profile,
-            target_self_date_profile=expected_profile,
-            right_type=COIN_CHANGE_REASON.SELF_DATE_SEND_MESSAGE
+            'coins.CoinHistory',
+            profile=profile,
+            rest_coin=REWORD_COUNT['CONFIRM_USER'],
+            reason=COIN_CHANGE_REASON.CONFIRM_USER
         )
+        rest_coin = CoinHistory.objects.filter(profile=profile).last().rest_coin
 
         # When: user가 send_message api를 호출한다.
         self.client.force_authenticate(user=user)
         response = self.client.get(f'/api/self-date-profiles/{expected_profile.id}/chat-link/')
 
-        # Then: 정상적으로 chat_link가 반환되고 user의 코인 개수가 비용만큼 줄어든다.
+        # Then: 정상적으로 chat_link가 반환되고 user의 코인 개수는 비용만큼 감소한다.
         assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
         assert_that(response.data['chat_link']).is_equal_to(expected_profile.chat_link)
 
-        # created_coin_history = CoinHistory.objects.filter(user=user).last()
-        # assert_that(created_coin_history.rest_coin).is_equal_to(coin_history.rest_coin - SEND_MESSAGE_COST)
-        # assert_that(created_coin_history.profile).is_equal_to(expected_profile)
+        assert_that(rest_coin - COST_COUNT['SELF_DATE_SEND_MESSAGE']).is_equal_to(
+            CoinHistory.objects.filter(profile=profile).last().rest_coin
+        )
 
     def test_should_get_chat_link_which_user_sent(self):
         # Given: user 1명과 메시지를 보낼 profile이 1개 주어진다.
-        # user가 profile에게 메시지를 보냈적이 있음을 알리는 coin_history가 주어진다.
+        # user가 메시지를 보낼 profile에 대한 SelfDateProfileRight와 coinHisotry가 주어진다.
         user = baker.make('users.User')
         profile = baker.make('users.Profile', user=user)
         self_date_profile = baker.make('self_date.SelfDateProfile', profile=profile)
         expected_profile = baker.make('self_date.SelfDateProfile', chat_link='chatlink@test.com')
+        coin_history = baker.make('coins.CoinHistory', profile=profile)
         baker.make(
             'self_date.SelfDateProfileRight',
             buying_self_date_profile=self_date_profile,
             target_self_date_profile=expected_profile,
-            right_type=COIN_CHANGE_REASON.SELF_DATE_SEND_MESSAGE
+            right_type=COIN_CHANGE_REASON.SELF_DATE_SEND_MESSAGE,
+            coin_history=coin_history
         )
+        rest_coin = CoinHistory.objects.filter(profile=profile).last().rest_coin
 
         # When: user가 send_message api를 호출한다.
         self.client.force_authenticate(user=user)
         response = self.client.get(f'/api/self-date-profiles/{expected_profile.id}/chat-link/')
 
-        # Then: 정상적으로 chat_link가 반환되고 user의 코인 개수는 줄어들지 않는다.
+        # Then: 정상적으로 chat_link가 반환되고 user의 코인 개수는 변화가 없다.
         assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
         assert_that(response.data['chat_link']).is_equal_to(expected_profile.chat_link)
 
-        # created_coin_history = CoinHistory.objects.filter(user=user).last()
-        # assert_that(created_coin_history.rest_coin).is_equal_to(coin_history.rest_coin)
-        # assert_that(created_coin_history.profile).is_equal_to(expected_profile)
+        assert_that(rest_coin).is_equal_to(CoinHistory.objects.filter(profile=profile).last().rest_coin)
 
     def test_should_not_get_chat_link_when_user_does_not_have_coin(self):
-        # Given: user 1명과 메시지를 보낼 profile이 1개 주어진다. user의 rest_coin이 0인 coin_history가 주어진다.
+        # Given: user 1명과 메시지를 보낼 profile이 1개 주어진다.
+        # user의 rest_coin이 0인 coin_history가 주어진다.
         user = baker.make('users.User')
         profile = baker.make('users.Profile', user=user)
-        baker.make('self_date.SelfDateProfile', profile=profile)
-        expected_self_date_profile = baker.make('self_date.SelfDateProfile')
-        coin_history = baker.make(
+        self_date_profile = baker.make('self_date.SelfDateProfile', profile=profile)
+        expected_profile = baker.make('self_date.SelfDateProfile', chat_link='chatlink@test.com')
+        baker.make(
             'coins.CoinHistory',
             profile=profile,
-            reason=COIN_CHANGE_REASON.SELF_DATE_SEND_MESSAGE,
-            rest_coin=0,
+            rest_coin=0
         )
+        rest_coin = CoinHistory.objects.filter(profile=profile).last().rest_coin
 
         # When: user가 send_message api를 호출한다.
         self.client.force_authenticate(user=user)
-        response = self.client.get(f'/api/self-date-profiles/{expected_self_date_profile.id}/chat-link/')
+        response = self.client.get(f'/api/self-date-profiles/{expected_profile.id}/chat-link/')
 
         # Then: 403 에러가 반환되고 user의 코인 개수는 줄어들지 않는다.
         assert_that(response.status_code).is_equal_to(status.HTTP_403_FORBIDDEN)
 
-        created_coin_history = CoinHistory.objects.filter(profile=profile).last()
-        assert_that(created_coin_history.rest_coin).is_equal_to(coin_history.rest_coin)
+        assert_that(rest_coin).is_equal_to(CoinHistory.objects.filter(profile=profile).last().rest_coin)
 
     def test_should_create_self_date_profile(self):
         # Given: user와 profile이 하나씩 주어지고 SelfDataProfile data가 주어진다.
