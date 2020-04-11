@@ -57,7 +57,6 @@ class ProfileSerializerTestCase(APITestCase):
 
         # Then: ValidationError가 발생한다.
         except ValidationError as e:
-            assert_that(e).is_instance_of(ValidationError)
             assert_that(e.args[0]).is_equal_to('Wrong campus location.')
         else:
             self.fail()
