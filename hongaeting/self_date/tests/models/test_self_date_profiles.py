@@ -2,7 +2,7 @@ from assertpy import assert_that
 from django.test import TestCase
 from model_bakery import baker
 
-from common.Kakao import KakaoWithTest
+from common.KakaoClient import KakaoClientWithTest
 from common.constants import COST_COUNT, COIN_CHANGE_REASON
 
 
@@ -35,7 +35,7 @@ class SelfDateProfileTestCase(TestCase):
 
     def test_is_valid_chat_link_should_be_true(self):
         # Given: valid한 kakao link를 가진 self_date_profile이 주어진다.
-        valid_kakao_link = KakaoWithTest.valid_kakao_link
+        valid_kakao_link = KakaoClientWithTest.open_room_kakao_link
         self_date_profile = baker.make('self_date.SelfDateProfile', chat_link=valid_kakao_link)
 
         # When: is_valid_chat_link property를 확인한다.
@@ -46,7 +46,7 @@ class SelfDateProfileTestCase(TestCase):
 
     def test_is_valid_chat_link_should_be_false(self):
         # Given: invalid한 kakao link를 가진 self_date_profile이 주어진다.
-        valid_kakao_link = KakaoWithTest.invalid_kakao_link
+        valid_kakao_link = KakaoClientWithTest.close_room_kakao_link
         self_date_profile = baker.make('self_date.SelfDateProfile', chat_link=valid_kakao_link)
 
         # When: is_valid_chat_link property를 확인한다.
