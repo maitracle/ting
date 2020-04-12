@@ -3,7 +3,7 @@ import os
 from django.core.validators import MinLengthValidator
 from django.db import models, transaction
 from model_utils import Choices
-from rest_framework.exceptions import ValidationError, PermissionDenied
+from rest_framework.exceptions import ValidationError, PermissionDenied, NotFound
 
 from common.Kakao import Kakao
 from common.constants import COST_COUNT, COIN_CHANGE_REASON
@@ -77,6 +77,9 @@ class SelfDateProfile(BaseModel):
         return target_self_date_profile
 
     def get_target_chat_link(self, target_self_date_profile):
+        if not target_self_date_profile.is_valid_chat_link:
+            raise NotFound
+
         is_having_message_right = self.check_having_right(
             target_self_date_profile, COIN_CHANGE_REASON.SELF_DATE_SEND_MESSAGE)
 

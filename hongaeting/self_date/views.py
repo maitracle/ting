@@ -3,14 +3,11 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django_rest_framework_mango.mixins import QuerysetMixin, SerializerMixin
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
-from rest_framework.exceptions import ValidationError
 from rest_framework.mixins import DestroyModelMixin, CreateModelMixin, ListModelMixin, UpdateModelMixin, \
     RetrieveModelMixin
 from rest_framework.response import Response
 
-from coins.models import CoinHistory
-from coins.serializers import CreateCoinHistorySerializer
-from common.constants import COIN_CHANGE_REASON, COST_COUNT
+from common.constants import COIN_CHANGE_REASON
 from common.permissions import IsOwnerProfileOrReadonly
 from common.permissions import IsOwnerUserOrReadonly
 from self_date.serializers import ListSelfDateProfileSerializer, UpdateSelfDateProfileSerializer, \
@@ -73,9 +70,6 @@ class SelfDateProfileViewSet(
     def get_chat_link(self, request, *arg, **kwargs):
         request_self_date_profile = request.user.profile.selfdateprofile
         target_self_date_profile = self.get_object()
-
-        if not target_self_date_profile.is_valid_chat_link:
-            return Response(status=status.HTTP_404_NOT_FOUND)
 
         response_target_chat_link = request_self_date_profile.get_target_chat_link(target_self_date_profile)
         chat_link = {
