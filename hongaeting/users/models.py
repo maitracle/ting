@@ -138,4 +138,5 @@ class Profile(BaseModel):
 
     @property
     def age(self):
-        return datetime.datetime.now().year - self.born_year
+        korean_age_orrection = 1
+        return datetime.datetime.now().year - self.born_year + korean_age_orrection
