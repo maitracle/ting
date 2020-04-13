@@ -11,7 +11,7 @@ from coins.models import CoinHistory
 from common.permissions import IsOwnerUserOnly
 from users.models import User, Profile
 from users.permissions import IsSameUserWithRequestUser
-from users.serializers.profiles import ProfileSerializer
+from users.serializers.profiles import ProfileSerializer, CreateOrUpdateProfileSerializer
 from users.serializers.users import UserSerializer, TokenSerializer, UserCheckUnivSerializer, MySerializer
 
 
@@ -117,12 +117,17 @@ class UserViewSet(
 
 
 class ProfileViewSet(
-    UpdateModelMixin,
+    UpdateModelMixin, SerializerMixin,
     viewsets.GenericViewSet,
 ):
     queryset = Profile.objects.all()
     permission_classes = (IsOwnerUserOnly,)
     serializer_class = ProfileSerializer
+    serializer_class_by_actions = {
+        'create': CreateOrUpdateProfileSerializer,
+        'update': CreateOrUpdateProfileSerializer,
+        'partial_update': CreateOrUpdateProfileSerializer,
+    }
 
     def create(self, request, *args, **kwargs):
         profile_data = {

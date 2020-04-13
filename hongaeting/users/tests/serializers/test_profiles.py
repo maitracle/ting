@@ -5,10 +5,10 @@ from rest_framework.test import APITestCase
 
 from common.constants import UNIVERSITY_CHOICES, MAP_UNIVERSITY_WITH_CAMPUS
 from users.models import Profile
-from users.serializers.profiles import ProfileSerializer
+from users.serializers.profiles import CreateOrUpdateProfileSerializer
 
 
-class ProfileSerializerTestCase(APITestCase):
+class CreateOrUpdateProfileSerializerTestCase(APITestCase):
 
     def test_validate_when_valid(self):
         # Given: user가 주어지고, 유효한 profile_serializer가 주어진다.
@@ -22,7 +22,7 @@ class ProfileSerializerTestCase(APITestCase):
             'campus_location': MAP_UNIVERSITY_WITH_CAMPUS[UNIVERSITY_CHOICES.HONGIK][0],
             'scholarly_status': Profile.SCHOLARLY_STATUS_CHOICES.ATTENDING,
         }
-        profile_serializer = ProfileSerializer(data=profile_data)
+        profile_serializer = CreateOrUpdateProfileSerializer(data=profile_data)
 
         # When: validate 메소드를 실행한다.
         attrs = profile_serializer.validate(profile_serializer.initial_data)
@@ -49,7 +49,7 @@ class ProfileSerializerTestCase(APITestCase):
             'campus_location': MAP_UNIVERSITY_WITH_CAMPUS[UNIVERSITY_CHOICES.YONSEI][0],
             'scholarly_status': Profile.SCHOLARLY_STATUS_CHOICES.ATTENDING,
         }
-        profile_serializer = ProfileSerializer(data=profile_data)
+        profile_serializer = CreateOrUpdateProfileSerializer(data=profile_data)
 
         # When: validate 메소드를 실행한다.
         try:

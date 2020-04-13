@@ -336,7 +336,7 @@ class UserViewSetTestCase(APITestCase):
         assert_that(responsed_profile['id']).is_equal_to(expected_profile.id)
         assert_that(responsed_profile['user']).is_equal_to(expected_profile.user.id)
         assert_that(responsed_profile['gender']).is_equal_to(expected_profile.gender)
-        assert_that(responsed_profile['born_year']).is_equal_to(expected_profile.born_year)
+        assert_that(responsed_profile['age']).is_equal_to(expected_profile.age)
         assert_that(responsed_profile['university']).is_equal_to(expected_profile.university)
         assert_that(responsed_profile['campus_location']).is_equal_to(expected_profile.campus_location)
         assert_that(responsed_profile['scholarly_status']).is_equal_to(expected_profile.scholarly_status)

@@ -220,7 +220,7 @@ class SelfDateProfileTestCase(APITestCase):
         assert_that(dictionary['profile']['id']).is_equal_to(instance.profile.id)
         assert_that(dictionary['profile']['user']).is_equal_to(instance.profile.user.id)
         assert_that(dictionary['profile']['gender']).is_equal_to(instance.profile.gender)
-        assert_that(dictionary['profile']['born_year']).is_equal_to(instance.profile.born_year)
+        assert_that(dictionary['profile']['age']).is_equal_to(instance.profile.age)
         assert_that(dictionary['profile']['university']).is_equal_to(instance.profile.university)
         assert_that(dictionary['profile']['campus_location']).is_equal_to(instance.profile.campus_location)
         assert_that(dictionary['profile']['scholarly_status']).is_equal_to(instance.profile.scholarly_status)
