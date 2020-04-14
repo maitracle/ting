@@ -11,13 +11,13 @@ class UserAdmin(admin.ModelAdmin):
         'is_superuser', 'is_active', 'created_at', 'updated_at')
     list_filter = ('is_active', 'is_confirmed_student',)
     ordering = ('-id', 'student_id_card_image',)
-    actions = ('confirm_user',)
+    actions = ('confirm_users',)
 
-    def confirm_user(self, request, queryset):
+    def confirm_users(self, request, queryset):
         updated_count = queryset.update(is_confirmed_student=True)
         self.message_user(request, f'{updated_count}명의 user를 confirm상태로 변경')
 
-    confirm_user.short_description = '여러명의 user를 한번에 confirm'
+    confirm_users.short_description = '여러명의 user를 한번에 confirm'
 
 
 @register(Profile)
