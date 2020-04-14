@@ -43,7 +43,7 @@ class ProfileTestCase(TestCase):
         # Then: 현재 남은 코인 개수가 반환된다.
         assert_that(rest_coin).is_equal_to(0)
 
-    def test_earn_coin(self):
+    def test_change_coin_count(self):
         # Given: coin_history가 있는 profile가 주어진다.
         #        생성할 coin history에 대한 정보가 주어진다.
         profile = baker.make('users.Profile')
@@ -52,41 +52,41 @@ class ProfileTestCase(TestCase):
         baker.make('coins.CoinHistory', rest_coin=rest_coin, profile=profile)
 
         expected_coin_history_data = {
-            'earn_coin_count': REWORD_COUNT['CONFIRM_USER'],
+            'change_amount': REWORD_COUNT['CONFIRM_USER'],
             'reason': COIN_CHANGE_REASON.CONFIRM_USER,
             'message': '학교 인증 완료 보상',
         }
 
         # When: profile의 get_coin method를 실행한다.
-        created_coin_history = profile.earn_coin(expected_coin_history_data['earn_coin_count'],
-                                                 expected_coin_history_data['reason'],
-                                                 expected_coin_history_data['message'])
+        created_coin_history = profile.change_coin_count(expected_coin_history_data['change_amount'],
+                                                         expected_coin_history_data['reason'],
+                                                         expected_coin_history_data['message'])
 
         # Then: coin_history가 생성된다.
         assert_that(created_coin_history.profile).is_equal_to(profile)
         assert_that(created_coin_history.rest_coin).is_equal_to(
-            rest_coin + expected_coin_history_data['earn_coin_count'])
+            rest_coin + expected_coin_history_data['change_amount'])
         assert_that(created_coin_history.reason).is_equal_to(expected_coin_history_data['reason'])
         assert_that(created_coin_history.message).is_equal_to(expected_coin_history_data['message'])
 
-    def test_earn_coin_when_coin_history_is_none(self):
+    def test_change_coin_count_when_coin_history_is_none(self):
         # Given: coin_history가 없는 profile가 주어진다.
         #        생성할 coin history에 대한 정보가 주어진다.
         profile = baker.make('users.Profile')
 
         expected_coin_history_data = {
-            'earn_coin_count': REWORD_COUNT['CONFIRM_USER'],
+            'change_amount': REWORD_COUNT['CONFIRM_USER'],
             'reason': COIN_CHANGE_REASON.CONFIRM_USER,
             'message': '학교 인증 완료 보상',
         }
 
         # When: profile의 get_coin method를 실행한다.
-        created_coin_history = profile.earn_coin(expected_coin_history_data['earn_coin_count'],
-                                                 expected_coin_history_data['reason'],
-                                                 expected_coin_history_data['message'])
+        created_coin_history = profile.change_coin_count(expected_coin_history_data['change_amount'],
+                                                         expected_coin_history_data['reason'],
+                                                         expected_coin_history_data['message'])
 
         # Then: coin_history가 생성된다.
         assert_that(created_coin_history.profile).is_equal_to(profile)
-        assert_that(created_coin_history.rest_coin).is_equal_to(expected_coin_history_data['earn_coin_count'])
+        assert_that(created_coin_history.rest_coin).is_equal_to(expected_coin_history_data['change_amount'])
         assert_that(created_coin_history.reason).is_equal_to(expected_coin_history_data['reason'])
         assert_that(created_coin_history.message).is_equal_to(expected_coin_history_data['message'])

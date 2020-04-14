@@ -141,16 +141,14 @@ class Profile(BaseModel):
         korean_age_correction = 1
         return datetime.datetime.now().year - self.born_year + korean_age_correction
 
-    def earn_coin(self, earn_coin_count, reason, message):
+    def change_coin_count(self, change_amount, reason, message):
         from coins.models import CoinHistory
 
-        last_coin_history = CoinHistory.objects.filter(profile=self).last()
-        total_coin_count = last_coin_history.rest_coin if last_coin_history else 0
-
-        return CoinHistory.objects.create(profile=self, rest_coin=total_coin_count + earn_coin_count, reason=reason,
+        return CoinHistory.objects.create(profile=self, rest_coin=self.get_rest_coin() + change_amount, reason=reason,
                                           message=message)
 
     def get_rest_coin(self):
+        """이 프로필이 가지고있는 coin 개수를 반환한다."""
         from coins.models import CoinHistory
 
         last_coin_history = CoinHistory.objects.filter(profile=self).last()
