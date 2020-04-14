@@ -15,7 +15,7 @@ class UserAdminTestCase(APITestCase):
         self.user = User.objects.create_superuser(self.email, self.password)
 
     def test_confirm_user(self):
-        # Given: superuser 계정과 이 주어진다.
+        # Given: superuser 계정과 confirm_user action data가 주어진다.
         baker.make('users.User', is_staff=False, _quantity=10)
         user_queryset = User.objects.filter(is_staff=False)
 

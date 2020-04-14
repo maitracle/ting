@@ -40,7 +40,7 @@ class ProfileTestCase(TestCase):
         # When: profile의 get_test_coin method를 실행한다.
         rest_coin = profile.get_rest_coin()
 
-        # Then: 현재 남은 코인 개수가 반환된다.
+        # Then: 현재 남은 코인 개수 0이 반환된다.
         assert_that(rest_coin).is_equal_to(0)
 
     def test_change_coin_count(self):
@@ -62,7 +62,7 @@ class ProfileTestCase(TestCase):
                                                          expected_coin_history_data['reason'],
                                                          expected_coin_history_data['message'])
 
-        # Then: coin_history가 생성된다.
+        # Then: 생성된 coin_history가 반환된다.
         assert_that(created_coin_history.profile).is_equal_to(profile)
         assert_that(created_coin_history.rest_coin).is_equal_to(
             rest_coin + expected_coin_history_data['change_amount'])
@@ -85,7 +85,7 @@ class ProfileTestCase(TestCase):
                                                          expected_coin_history_data['reason'],
                                                          expected_coin_history_data['message'])
 
-        # Then: coin_history가 생성된다.
+        # Then: 생성된 coin_history가 반환된다.
         assert_that(created_coin_history.profile).is_equal_to(profile)
         assert_that(created_coin_history.rest_coin).is_equal_to(expected_coin_history_data['change_amount'])
         assert_that(created_coin_history.reason).is_equal_to(expected_coin_history_data['reason'])
