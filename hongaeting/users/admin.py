@@ -21,6 +21,8 @@ class UserAdmin(admin.ModelAdmin):
         # confirm_users의 실행시간을 줄이기 위해 bulk create를 사용하여 코인지급을 한다.
         bulk_list = []
         for user in queryset:
+            if not hasattr(user, 'profile'):
+                continue
             coin_history = CoinHistory(profile=user.profile,
                                        rest_coin=user.profile.get_rest_coin() + REWORD_COUNT['CONFIRM_USER'],
                                        reason=COIN_CHANGE_REASON.CONFIRM_USER,
