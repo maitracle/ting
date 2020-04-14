@@ -4,12 +4,12 @@ import os
 from django.conf import settings
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.core.validators import MinValueValidator, MaxValueValidator
-from django.db import models
+from django.db import models, transaction
 from django.template.loader import render_to_string
 from django.utils.crypto import get_random_string
 from model_utils import Choices
 
-from common.constants import UNIVERSITY_CHOICES
+from common.constants import UNIVERSITY_CHOICES, REWORD_COUNT, COIN_CHANGE_REASON
 from common.models import BaseModel
 from common.utils import Email
 
@@ -96,8 +96,16 @@ class User(BaseModel, AbstractBaseUser):
         self.is_active = False
         self.save()
 
+    @transaction.atomic()
     def confirm_student(self):
         self.is_confirmed_student = True
+
+        profile = getattr(self, 'profile', None)
+
+        if profile:
+            profile.change_coin_count(self.profile.get_rest_coin() + REWORD_COUNT['CONFIRM_USER'],
+                                      COIN_CHANGE_REASON.CONFIRM_USER)
+
         self.save()
 
     def send_email(self):
