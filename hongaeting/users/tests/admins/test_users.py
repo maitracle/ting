@@ -3,6 +3,7 @@ from django.urls import reverse
 from model_bakery import baker
 from rest_framework.test import APITestCase
 
+from common.constants import REWORD_COUNT
 from users.models import User
 
 
@@ -17,6 +18,9 @@ class UserAdminTestCase(APITestCase):
         # Given: superuser 계정과 이 주어진다.
         baker.make('users.User', is_staff=False, _quantity=10)
         user_queryset = User.objects.filter(is_staff=False)
+
+        for user in user_queryset:
+            baker.make('users.Profile', user=user)
 
         data = {
             'action': 'confirm_users',
@@ -33,3 +37,4 @@ class UserAdminTestCase(APITestCase):
         changed_user_queryset = User.objects.filter(id__in=data['_selected_action'])
         for user in changed_user_queryset:
             assert_that(user.is_confirmed_student).is_true()
+            assert_that(user.profile.coin_histories.last().rest_coin).is_equal_to(REWORD_COUNT['CONFIRM_USER'])
