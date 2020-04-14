@@ -138,5 +138,21 @@ class Profile(BaseModel):
 
     @property
     def age(self):
-        korean_age_orrection = 1
-        return datetime.datetime.now().year - self.born_year + korean_age_orrection
+        korean_age_correction = 1
+        return datetime.datetime.now().year - self.born_year + korean_age_correction
+
+    def earn_coin(self, earn_coin_count, reason, message):
+        from coins.models import CoinHistory
+
+        last_coin_history = CoinHistory.objects.filter(profile=self).last()
+        total_coin_count = last_coin_history.rest_coin if last_coin_history else 0
+
+        return CoinHistory.objects.create(profile=self, rest_coin=total_coin_count + earn_coin_count, reason=reason,
+                                          message=message)
+
+    def get_rest_coin(self):
+        from coins.models import CoinHistory
+
+        last_coin_history = CoinHistory.objects.filter(profile=self).last()
+
+        return last_coin_history.rest_coin if last_coin_history else 0
