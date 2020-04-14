@@ -141,7 +141,7 @@ class Profile(BaseModel):
         korean_age_correction = 1
         return datetime.datetime.now().year - self.born_year + korean_age_correction
 
-    def change_coin_count(self, change_amount, reason, message):
+    def change_coin_count(self, change_amount, reason, message=''):
         from coins.models import CoinHistory
 
         return CoinHistory.objects.create(profile=self, rest_coin=self.get_rest_coin() + change_amount, reason=reason,
