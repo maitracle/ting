@@ -78,6 +78,13 @@ class SelfDateProfileViewSet(
 
         return Response(chat_link)
 
+    @action(detail=False, methods=['get'], url_path='my')
+    def my(self, request, *arg, **kwargs):
+
+        my_self_date_profile_serializer = UpdateSelfDateProfileSerializer(request.user.profile.selfdateprofile)
+
+        return Response(my_self_date_profile_serializer.data)
+
 
 class LikeViewSet(
     QuerysetMixin,
