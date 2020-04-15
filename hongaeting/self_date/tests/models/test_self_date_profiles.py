@@ -2,6 +2,7 @@ from assertpy import assert_that
 from django.test import TestCase
 from model_bakery import baker
 
+from common.KakaoClient import KakaoClientWithTest
 from common.constants import COST_COUNT, COIN_CHANGE_REASON
 
 
@@ -31,3 +32,25 @@ class SelfDateProfileTestCase(TestCase):
         assert_that(self_date_profile_right.coin_history.reason).is_equal_to(right_type)
         assert_that(self_date_profile_right.coin_history.message).is_equal_to(
             f'{target_self_date_profile.nickname}의 self date profile 조회')
+
+    def test_is_valid_chat_link_should_be_true(self):
+        # Given: valid한 kakao link를 가진 self_date_profile이 주어진다.
+        valid_kakao_link = KakaoClientWithTest.open_room_kakao_link
+        self_date_profile = baker.make('self_date.SelfDateProfile', chat_link=valid_kakao_link)
+
+        # When: is_valid_chat_link property를 확인한다.
+        is_valid = self_date_profile.is_valid_chat_link
+
+        # Then: true가 반환된다.
+        assert_that(is_valid).is_true()
+
+    def test_is_valid_chat_link_should_be_false(self):
+        # Given: invalid한 kakao link를 가진 self_date_profile이 주어진다.
+        valid_kakao_link = KakaoClientWithTest.close_room_kakao_link
+        self_date_profile = baker.make('self_date.SelfDateProfile', chat_link=valid_kakao_link)
+
+        # When: is_valid_chat_link property를 확인한다.
+        is_valid = self_date_profile.is_valid_chat_link
+
+        # Then: false가 반환된다.
+        assert_that(is_valid).is_false()
