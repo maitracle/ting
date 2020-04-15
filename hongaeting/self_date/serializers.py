@@ -85,11 +85,14 @@ class RetrieveSelfDateProfileSerializer(serializers.ModelSerializer):
 
 
 class UpdateSelfDateProfileSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField(use_url=True)
+
     class Meta:
         model = SelfDateProfile
         fields = (
             'id',
             'tags',
+            'image',
             'one_sentence',
             'appearance',
             'personality',
