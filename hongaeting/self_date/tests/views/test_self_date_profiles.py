@@ -488,7 +488,6 @@ class SelfDateProfileTestCase(APITestCase):
         # Then: status code 200과 SelfDateProfile이 반환된다.
         assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
         assert_that(response.data['tags']).is_equal_to(self_date_profile_data.tags)
-        assert_that(response.data['image']).is_equal_to(self_date_profile_data.image)
         assert_that(response.data['one_sentence']).is_equal_to(self_date_profile_data.one_sentence)
         assert_that(response.data['appearance']).is_equal_to(self_date_profile_data.appearance)
         assert_that(response.data['personality']).is_equal_to(self_date_profile_data.personality)
