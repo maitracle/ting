@@ -1,5 +1,4 @@
 import os
-from unittest import skip
 
 from PIL import Image
 from assertpy import assert_that
@@ -9,6 +8,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from coins.models import CoinHistory
+from common.KakaoClient import KakaoClientWithTest
 from common.constants import UNIVERSITY_CHOICES, COIN_CHANGE_REASON, REWORD_COUNT, COST_COUNT
 from common.decorator import delete_media_root
 from common.utils import reformat_datetime
@@ -306,8 +306,8 @@ class SelfDateProfileTestCase(APITestCase):
         #        user가 인증될 때 생기는 coin_history가 주어진다.
         user = baker.make('users.User')
         profile = baker.make('users.Profile', user=user)
-        self_date_profile = baker.make('self_date.SelfDateProfile', profile=profile)
-        expected_profile = baker.make('self_date.SelfDateProfile', chat_link='chatlink@test.com')
+        baker.make('self_date.SelfDateProfile', profile=profile)
+        expected_profile = baker.make('self_date.SelfDateProfile', chat_link=KakaoClientWithTest.open_room_kakao_link)
         baker.make(
             'coins.CoinHistory',
             profile=profile,
@@ -334,7 +334,7 @@ class SelfDateProfileTestCase(APITestCase):
         user = baker.make('users.User')
         profile = baker.make('users.Profile', user=user)
         self_date_profile = baker.make('self_date.SelfDateProfile', profile=profile)
-        expected_profile = baker.make('self_date.SelfDateProfile', chat_link='chatlink@test.com')
+        expected_profile = baker.make('self_date.SelfDateProfile', chat_link=KakaoClientWithTest.open_room_kakao_link)
         coin_history = baker.make('coins.CoinHistory', profile=profile)
         baker.make(
             'self_date.SelfDateProfileRight',
@@ -361,7 +361,8 @@ class SelfDateProfileTestCase(APITestCase):
         user = baker.make('users.User')
         profile = baker.make('users.Profile', user=user)
         self_date_profile = baker.make('self_date.SelfDateProfile', profile=profile)
-        expected_self_date_profile = baker.make('self_date.SelfDateProfile', chat_link='chatlink@test.com')
+        expected_self_date_profile = baker.make('self_date.SelfDateProfile',
+                                                chat_link=KakaoClientWithTest.open_room_kakao_link)
         baker.make(
             'coins.CoinHistory',
             profile=profile,
