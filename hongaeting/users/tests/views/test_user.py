@@ -266,7 +266,7 @@ class UserViewSetTestCase(APITestCase):
         coin_history = user.profile.coin_histories.last()
         assert_that(coin_history.rest_coin).is_equal_to(origin_coin_history_count + REWORD_COUNT['CONFIRM_USER'])
         assert_that(coin_history.reason).is_equal_to(COIN_CHANGE_REASON.CONFIRM_USER)
-        assert_that(coin_history.message).is_equal_to('')
+        assert_that(coin_history.message).is_equal_to('학생 인증으로 인한 coin 지급')
 
     def test_should_not_confirm_user(self):
         # Given: user, profile 1개와 존재하지 않는 user_code가 하나 주어진다.

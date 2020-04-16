@@ -104,7 +104,8 @@ class User(BaseModel, AbstractBaseUser):
 
         if profile:
             profile.change_coin_count(self.profile.get_rest_coin() + REWORD_COUNT['CONFIRM_USER'],
-                                      COIN_CHANGE_REASON.CONFIRM_USER)
+                                      COIN_CHANGE_REASON.CONFIRM_USER,
+                                      '학생 인증으로 인한 coin 지급')
 
         self.save()
 

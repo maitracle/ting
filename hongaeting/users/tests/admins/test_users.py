@@ -42,4 +42,4 @@ class UserAdminTestCase(APITestCase):
             last_coin_history = user.profile.coin_histories.last()
             assert_that(last_coin_history.rest_coin).is_equal_to(REWORD_COUNT['CONFIRM_USER'])
             assert_that(last_coin_history.reason).is_equal_to(COIN_CHANGE_REASON.CONFIRM_USER)
-            assert_that(last_coin_history.message).is_equal_to('')
+            assert_that(last_coin_history.message).is_equal_to('학생 인증으로 인한 coin 지급')

@@ -26,7 +26,7 @@ class UserAdmin(admin.ModelAdmin):
             coin_history = CoinHistory(profile=user.profile,
                                        rest_coin=user.profile.get_rest_coin() + REWORD_COUNT['CONFIRM_USER'],
                                        reason=COIN_CHANGE_REASON.CONFIRM_USER,
-                                       message='')
+                                       message='학생 인증으로 인한 coin 지급')
             bulk_list.append(coin_history)
 
         CoinHistory.objects.bulk_create(bulk_list)
