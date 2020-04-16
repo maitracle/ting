@@ -5,7 +5,7 @@ from django.db import models, transaction
 from model_utils import Choices
 from rest_framework.exceptions import ValidationError, PermissionDenied, NotFound
 
-from common.Kakao import Kakao
+from common.KakaoClient import KakaoClient
 from common.constants import COST_COUNT, COIN_CHANGE_REASON
 from common.models import BaseModel
 from common.models import BaseModel
@@ -57,11 +57,7 @@ class SelfDateProfile(BaseModel):
 
     @property
     def is_valid_chat_link(self):
-        try:
-            is_valid = Kakao.is_valid_kakao_link(self.chat_link)
-        except:
-            is_valid = False
-        return is_valid
+        return KakaoClient.instance().is_valid_kakao_link(self.chat_link)
 
     def get_target_self_date_profile_to_retrieve(self, target_self_date_profile):
         """
