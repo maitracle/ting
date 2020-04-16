@@ -135,6 +135,7 @@ class SelfDateProfile(BaseModel):
             raise ValidationError('잘못된 right_type으로 인한 validation error')
 
 
-class Like(BaseModel):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    liked_user = models.ForeignKey(User, related_name='liked_user', on_delete=models.CASCADE)
+class SelfDateLike(BaseModel):
+    self_date_profile = models.ForeignKey(SelfDateProfile, on_delete=models.CASCADE)
+    liked_self_date_profile = models.ForeignKey(SelfDateProfile,
+                                                related_name='liked_self_date_profile', on_delete=models.CASCADE)

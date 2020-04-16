@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from self_date.models import Like
+from self_date.models import SelfDateLike
 from users.serializers.profiles import ProfileSerializer
 from .models import SelfDateProfile
 
@@ -109,12 +109,12 @@ class UpdateSelfDateProfileSerializer(serializers.ModelSerializer):
         )
 
 
-class LikeSerializer(serializers.ModelSerializer):
+class SelfDateLikeSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Like
+        model = SelfDateLike
         fields = (
-            'user',
-            'liked_user',
+            'self_date_profile',
+            'liked_self_date_profile',
             'created_at',
             'updated_at',
         )
