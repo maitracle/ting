@@ -103,22 +103,6 @@ class UpdateSelfDateProfileSerializer(serializers.ModelSerializer):
         )
 
 
-class UpdateMySelfDateProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = SelfDateProfile
-        fields = (
-            'id',
-            'tags',
-            'one_sentence',
-            'appearance',
-            'personality',
-            'hobby',
-            'date_style',
-            'ideal_type',
-            'chat_link',
-        )
-
-
 class LikeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Like

@@ -11,8 +11,7 @@ from common.constants import COIN_CHANGE_REASON
 from common.permissions import IsOwnerProfileOrReadonly
 from common.permissions import IsOwnerUserOrReadonly
 from self_date.serializers import ListSelfDateProfileSerializer, UpdateSelfDateProfileSerializer, \
-    RetrieveSelfDateProfileSerializer, LikeSerializer, CreateSelfDateProfileSerializer, \
-    UpdateMySelfDateProfileSerializer
+    RetrieveSelfDateProfileSerializer, LikeSerializer, CreateSelfDateProfileSerializer
 from .models import SelfDateProfile, Like, SelfDateProfileRight
 
 
@@ -82,7 +81,7 @@ class SelfDateProfileViewSet(
     @action(detail=False, methods=['get'], url_path='my')
     def my(self, request, *arg, **kwargs):
 
-        my_self_date_profile_serializer = UpdateMySelfDateProfileSerializer(request.user.profile.selfdateprofile)
+        my_self_date_profile_serializer = RetrieveSelfDateProfileSerializer(request.user.profile.selfdateprofile)
 
         return Response(my_self_date_profile_serializer.data)
 
