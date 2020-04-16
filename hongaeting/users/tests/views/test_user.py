@@ -11,6 +11,8 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from coins.models import CoinHistory
+from common.constants import REWORD_COUNT, COIN_CHANGE_REASON
 from common.decorator import delete_media_root
 from common.utils import Email, reformat_datetime
 from users.models import User
@@ -240,6 +242,55 @@ class UserViewSetTestCase(APITestCase):
         assert_that(user.university_email).is_equal_to(user.university_email)
 
     def test_confirm_user(self):
+        # Given: user, profile과 user의 user_code가 제공된다.
+        user_code = 'abcdefgh'
+        user = baker.make('users.user', user_code=user_code)
+        profile = baker.make('users.Profile', user=user)
+        assert_that(user.is_confirmed_student).is_false()
+        data = {
+            'user_code': user_code,
+        }
+
+        origin_coin_history_count = profile.get_rest_coin()
+
+        # When: confirm-user api를 호출한다.
+        response = self.client.post('/api/users/confirm-user/', data=data)
+
+        # Then: status code 200이 반환된다.
+        #       user의 is_confirmed field가 True로 수정된다.
+        #       confirm user coin_history가 생성된다.
+        user = User.objects.get(user_code=user_code)
+        assert_that(user.is_confirmed_student).is_true()
+        assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
+
+        coin_history = user.profile.coin_histories.last()
+        assert_that(coin_history.rest_coin).is_equal_to(origin_coin_history_count + REWORD_COUNT['CONFIRM_USER'])
+        assert_that(coin_history.reason).is_equal_to(COIN_CHANGE_REASON.CONFIRM_USER)
+        assert_that(coin_history.message).is_equal_to('학생 인증으로 인한 coin 지급')
+
+    def test_should_not_confirm_user(self):
+        # Given: user, profile 1개와 존재하지 않는 user_code가 하나 주어진다.
+        not_exist_user_code = 'abcdefgh'
+        user = baker.make('users.user', user_code='testtest')
+        baker.make('users.Profile', user=user)
+        data = {
+            'user_code': not_exist_user_code,
+        }
+
+        origin_coin_history_ids = CoinHistory.objects.all().values_list('pk', flat=True)
+
+        # When: confirm-user api를 호출한다.
+        response = self.client.post('/api/users/confirm-user/', data=data)
+
+        # Then: 찾고자 하는 user가 없다는 오류가 발생하고, 기존 유저는 인증되지 않는다.
+        #       coin_history가 새로 생성되지 않는다.
+        user = User.objects.get(user_code='testtest')
+        assert_that(response.status_code).is_equal_to(status.HTTP_400_BAD_REQUEST)
+        assert_that(user.is_confirmed_student).is_false()
+
+        assert_that(CoinHistory.objects.all().exclude(id__in=origin_coin_history_ids).exists()).is_false()
+
+    def test_confirm_user_without_profile(self):
         # Given: user와 user의 user_code가 제공된다.
         user_code = 'abcdefgh'
         user = baker.make('users.user', user_code=user_code)
@@ -248,29 +299,18 @@ class UserViewSetTestCase(APITestCase):
             'user_code': user_code,
         }
 
+        origin_coin_history_ids = CoinHistory.objects.all().values_list('pk', flat=True)
+
         # When: confirm-user api를 호출한다.
         response = self.client.post('/api/users/confirm-user/', data=data)
 
         # Then: user의 is_confirmed field가 True로 바뀐 후 정상적으로 응답이 도달한다.
+        #       coin_history가 새로 생성되지 않는다.
         user = User.objects.get(user_code=user_code)
         assert_that(user.is_confirmed_student).is_true()
         assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
 
-    def test_should_not_confirm_user(self):
-        # Given: user 1명과 존재하지 않는 user_code가 하나 주어진다.
-        not_exist_user_code = 'abcdefgh'
-        user = baker.make('users.user', user_code='testtest')
-        data = {
-            'user_code': not_exist_user_code,
-        }
-
-        # When: confirm-user api를 호출한다.
-        response = self.client.post('/api/users/confirm-user/', data=data)
-
-        # Then: 찾고자 하는 user가 없다는 오류가 발생하고, 기존 유저는 인증되지 않는다.
-        user = User.objects.get(user_code='testtest')
-        assert_that(response.status_code).is_equal_to(status.HTTP_400_BAD_REQUEST)
-        assert_that(user.is_confirmed_student).is_false()
+        assert_that(CoinHistory.objects.all().exclude(id__in=origin_coin_history_ids).exists()).is_false()
 
     def test_should_get_jwt_token_user_profile_and_coin_history(self):
         # Given: user, profile, coin_history, 올바른 email, password가 주어진다.
