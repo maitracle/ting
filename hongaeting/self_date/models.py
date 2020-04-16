@@ -3,9 +3,9 @@ import os
 from django.core.validators import MinLengthValidator
 from django.db import models, transaction
 from model_utils import Choices
-from rest_framework.exceptions import ValidationError, PermissionDenied
+from rest_framework.exceptions import ValidationError, PermissionDenied, NotFound
 
-from common.Kakao import Kakao
+from common.KakaoClient import KakaoClient
 from common.constants import COST_COUNT, COIN_CHANGE_REASON
 from common.models import BaseModel
 from common.models import BaseModel
@@ -57,11 +57,7 @@ class SelfDateProfile(BaseModel):
 
     @property
     def is_valid_chat_link(self):
-        try:
-            is_valid = Kakao.is_valid_kakao_link(self.chat_link)
-        except:
-            is_valid = False
-        return is_valid
+        return KakaoClient.instance().is_valid_kakao_link(self.chat_link)
 
     def get_target_self_date_profile_to_retrieve(self, target_self_date_profile):
         """
@@ -75,6 +71,19 @@ class SelfDateProfile(BaseModel):
                 target_self_date_profile=target_self_date_profile, right_type=COIN_CHANGE_REASON.SELF_DATE_PROFILE_VIEW)
 
         return target_self_date_profile
+
+    def get_target_chat_link(self, target_self_date_profile):
+        if not target_self_date_profile.is_valid_chat_link:
+            raise NotFound('상대방의 채팅방 삭제로 인한 not found')
+
+        is_having_message_right = self.check_having_right(
+            target_self_date_profile, COIN_CHANGE_REASON.SELF_DATE_SEND_MESSAGE)
+
+        if not is_having_message_right:
+            self.buy_right_for_target_self_date_profile(
+                target_self_date_profile=target_self_date_profile, right_type=COIN_CHANGE_REASON.SELF_DATE_SEND_MESSAGE)
+
+        return target_self_date_profile.chat_link
 
     def check_having_right(self, target_self_date_profile, right_type):
         right_queryset = SelfDateProfileRight.objects.filter(

@@ -4,12 +4,12 @@ import os
 from django.conf import settings
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.core.validators import MinValueValidator, MaxValueValidator
-from django.db import models
+from django.db import models, transaction
 from django.template.loader import render_to_string
 from django.utils.crypto import get_random_string
 from model_utils import Choices
 
-from common.constants import UNIVERSITY_CHOICES
+from common.constants import UNIVERSITY_CHOICES, REWORD_COUNT, COIN_CHANGE_REASON
 from common.models import BaseModel
 from common.utils import Email
 
@@ -96,8 +96,17 @@ class User(BaseModel, AbstractBaseUser):
         self.is_active = False
         self.save()
 
+    @transaction.atomic()
     def confirm_student(self):
         self.is_confirmed_student = True
+
+        profile = getattr(self, 'profile', None)
+
+        if profile:
+            profile.change_coin_count(self.profile.get_rest_coin() + REWORD_COUNT['CONFIRM_USER'],
+                                      COIN_CHANGE_REASON.CONFIRM_USER,
+                                      '학생 인증으로 인한 coin 지급')
+
         self.save()
 
     def send_email(self):
@@ -138,4 +147,19 @@ class Profile(BaseModel):
 
     @property
     def age(self):
-        return datetime.datetime.now().year - self.born_year
+        korean_age_correction = 1
+        return datetime.datetime.now().year - self.born_year + korean_age_correction
+
+    def change_coin_count(self, change_amount, reason, message=''):
+        from coins.models import CoinHistory
+
+        return CoinHistory.objects.create(profile=self, rest_coin=self.get_rest_coin() + change_amount, reason=reason,
+                                          message=message)
+
+    def get_rest_coin(self):
+        """이 프로필이 가지고있는 coin 개수를 반환한다."""
+        from coins.models import CoinHistory
+
+        last_coin_history = CoinHistory.objects.filter(profile=self).last()
+
+        return last_coin_history.rest_coin if last_coin_history else 0
