@@ -43,7 +43,7 @@ class SelfDateProfile(BaseModel):
     is_smoke = models.CharField(max_length=10, choices=IS_SMOKE_CHOICES)
 
     tags = models.CharField(max_length=500)
-    image = models.ImageField(upload_to=image_path, max_length=1000)
+    image = models.ImageField(upload_to=image_path, null=True, blank=True, max_length=1000)
     one_sentence = models.CharField(max_length=35)
 
     appearance = models.CharField(max_length=1000, validators=[MinLengthValidator(120)])
