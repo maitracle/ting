@@ -477,7 +477,7 @@ class SelfDateProfileTestCase(APITestCase):
         assert_that(self_date_profiles).is_empty()
 
     def test_should_get_my_profile(self):
-        # Given: user와 profile, self_date_profile이 생성된다.
+        # Given: user와 profile, self_date_profile이 주어진다.
         user = baker.make('users.User')
         profile = baker.make('users.Profile', user=user)
         self_date_profile_data = baker.make('self_date.SelfDateProfile', profile=profile)
@@ -499,11 +499,11 @@ class SelfDateProfileTestCase(APITestCase):
         assert_that(response.data['chat_link']).is_equal_to(self_date_profile_data.chat_link)
 
     def test_should_not_get_my_profile_when_user_do_not_have_self_date_profile(self):
-        # Given: user와 profile이 생성된다.
+        # Given: user와, self_date_profile이 없는 profile이 주어진다.
         user = baker.make('users.User')
         baker.make('users.Profile', user=user)
 
-        # When: 생성된 user로 로그인 후 my api를 호출한다.
+        # When: 주어진 user로 로그인 후 my api를 호출한다.
         self.client.force_authenticate(user=user)
         response = self.client.get('/api/self-date-profiles/my/')
 
