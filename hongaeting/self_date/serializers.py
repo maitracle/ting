@@ -90,11 +90,7 @@ class UpdateSelfDateProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = SelfDateProfile
         fields = (
-            'profile',
-            'height',
-            'body_type',
-            'religion',
-            'is_smoke',
+            'id',
             'tags',
             'image',
             'one_sentence',
@@ -104,8 +100,6 @@ class UpdateSelfDateProfileSerializer(serializers.ModelSerializer):
             'date_style',
             'ideal_type',
             'chat_link',
-            'created_at',
-            'updated_at',
         )
 
 
