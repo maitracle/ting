@@ -103,7 +103,7 @@ class SelfDateLikeViewSet(
 
     def create(self, request, *args, **kwargs):
         data = {
-            'self_date_profile': request.data['self_date_profile'],
+            'self_date_profile': request.user.profile.selfdateprofile.id,
             'liked_self_date_profile': request.data['liked_self_date_profile'],
         }
         serializer = self.get_serializer(data=data)

@@ -10,7 +10,7 @@ router = SimpleRouter()
 router.register('users', UserViewSet)
 router.register('profiles', ProfileViewSet)
 router.register('coin-histories', CoinHistoryViewSet)
-router.register('likes', SelfDateLikeViewSet)
+router.register('self-date-likes', SelfDateLikeViewSet)
 router.register('self-date-profiles', SelfDateProfileViewSet)
 
 urlpatterns = [

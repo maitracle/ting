@@ -21,7 +21,7 @@ class LikeTestCase(APITestCase):
 
         # When: sef_date_like_list api를 호출한다
         self.client.force_authenticate(user=self_date_profile.profile.user)
-        response = self.client.get('/api/likes/')
+        response = self.client.get('/api/self-date-likes/')
 
         # Then: response값이 정상적으로 온다.
         assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
@@ -43,7 +43,7 @@ class LikeTestCase(APITestCase):
 
         # When: liked_self_date_profile을 가진 user가 self_date_like_list api를 호출한다
         self.client.force_authenticate(user=liked_self_date_profile.profile.user)
-        response = self.client.get('/api/likes/liked/')
+        response = self.client.get('/api/self-date-likes/liked/')
 
         # Then: response값이 정상적으로 온다.
         assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
@@ -58,13 +58,12 @@ class LikeTestCase(APITestCase):
         self_date_profile = baker.make('self_date.SelfDateProfile')
         liked_self_date_profile = baker.make('self_date.SelfDateProfile')
         like_data = {
-            'self_date_profile': self_date_profile.id,
             'liked_self_date_profile': liked_self_date_profile.id,
         }
 
         # When: user가 like_create api를 호출한다.
         self.client.force_authenticate(user=self_date_profile.profile.user)
-        response = self.client.post('/api/likes/', data=like_data)
+        response = self.client.post('/api/self-date-likes/', data=like_data)
 
         # Then: like 모델이 정상적으로 생성된다.
         assert_that(response.status_code).is_equal_to(status.HTTP_201_CREATED)
@@ -79,7 +78,7 @@ class LikeTestCase(APITestCase):
 
         # When: user가 destroy api를 호출한다.
         self.client.force_authenticate(user=self_date_profile.profile.user)
-        response = self.client.delete(f'/api/likes/{like_id}/')
+        response = self.client.delete(f'/api/self-date-likes/{like_id}/')
 
         # Then: like 모델이 삭제된다.
         assert_that(response.status_code).is_equal_to(status.HTTP_204_NO_CONTENT)
