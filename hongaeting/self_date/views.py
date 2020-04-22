@@ -13,7 +13,7 @@ from common.permissions import IsOwnerProfileOrReadonly
 from self_date.serializers import ListSelfDateProfileSerializer, UpdateSelfDateProfileSerializer, \
     RetrieveSelfDateProfileSerializer, SelfDateLikeSerializer, CreateSelfDateProfileSerializer
 from .models import SelfDateProfile, SelfDateProfileRight, SelfDateLike
-
+from users.models import Profile
 
 class SelfDateProfileViewSet(
     QuerysetMixin, SerializerMixin,
@@ -28,6 +28,7 @@ class SelfDateProfileViewSet(
         'update': UpdateSelfDateProfileSerializer,
         'partial_update': UpdateSelfDateProfileSerializer,
         'retrieve': RetrieveSelfDateProfileSerializer,
+        'my': RetrieveSelfDateProfileSerializer,
     }
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('profile__gender', 'profile__university',)
@@ -77,6 +78,16 @@ class SelfDateProfileViewSet(
         }
 
         return Response(chat_link)
+
+    @action(detail=False, methods=['get'], url_path='my')
+    def my(self, request, *arg, **kwargs):
+        try:
+            self_date_profile = getattr(request.user.profile, 'selfdateprofile')
+            my_self_date_profile_serializer = self.get_serializer(self_date_profile)
+        except Profile.selfdateprofile.RelatedObjectDoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        return Response(my_self_date_profile_serializer.data)
 
 
 class SelfDateLikeViewSet(

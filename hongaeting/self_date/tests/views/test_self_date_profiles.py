@@ -475,3 +475,37 @@ class SelfDateProfileTestCase(APITestCase):
 
         self_date_profiles = SelfDateProfile.objects.filter(profile=profile.id)
         assert_that(self_date_profiles).is_empty()
+
+    def test_should_get_my_profile(self):
+        # Given: user와 profile, self_date_profile이 주어진다.
+        user = baker.make('users.User')
+        profile = baker.make('users.Profile', user=user)
+        self_date_profile_data = baker.make('self_date.SelfDateProfile', profile=profile)
+
+        # When: 생성된 user로 로그인 후 my api를 호출한다.
+        self.client.force_authenticate(user=user)
+        response = self.client.get('/api/self-date-profiles/my/')
+
+        # Then: status code 200과 SelfDateProfile이 반환된다.
+        assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
+        assert_that(response.data['id']).is_equal_to(self_date_profile_data.id)
+        assert_that(response.data['tags']).is_equal_to(self_date_profile_data.tags)
+        assert_that(response.data['one_sentence']).is_equal_to(self_date_profile_data.one_sentence)
+        assert_that(response.data['appearance']).is_equal_to(self_date_profile_data.appearance)
+        assert_that(response.data['personality']).is_equal_to(self_date_profile_data.personality)
+        assert_that(response.data['hobby']).is_equal_to(self_date_profile_data.hobby)
+        assert_that(response.data['date_style']).is_equal_to(self_date_profile_data.date_style)
+        assert_that(response.data['ideal_type']).is_equal_to(self_date_profile_data.ideal_type)
+        assert_that(response.data['chat_link']).is_equal_to(self_date_profile_data.chat_link)
+
+    def test_should_not_get_my_profile_when_user_do_not_have_self_date_profile(self):
+        # Given: user와, self_date_profile이 없는 profile이 주어진다.
+        user = baker.make('users.User')
+        baker.make('users.Profile', user=user)
+
+        # When: 주어진 user로 로그인 후 my api를 호출한다.
+        self.client.force_authenticate(user=user)
+        response = self.client.get('/api/self-date-profiles/my/')
+
+        # Then: status code 404이 반환된다.
+        assert_that(response.status_code).is_equal_to(status.HTTP_404_NOT_FOUND)
