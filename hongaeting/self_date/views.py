@@ -5,16 +5,15 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.mixins import DestroyModelMixin, CreateModelMixin, ListModelMixin, UpdateModelMixin, \
     RetrieveModelMixin
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from common.constants import COIN_CHANGE_REASON
 from common.permissions import IsOwnerProfileOrReadonly
-from common.permissions import IsOwnerUserOrReadonly
 from self_date.serializers import ListSelfDateProfileSerializer, UpdateSelfDateProfileSerializer, \
-    RetrieveSelfDateProfileSerializer, LikeSerializer, CreateSelfDateProfileSerializer
+    RetrieveSelfDateProfileSerializer, SelfDateLikeSerializer, CreateSelfDateProfileSerializer
+from .models import SelfDateProfile, SelfDateProfileRight, SelfDateLike
 from users.models import Profile
-from .models import SelfDateProfile, Like, SelfDateProfileRight
-
 
 class SelfDateProfileViewSet(
     QuerysetMixin, SerializerMixin,
@@ -91,20 +90,20 @@ class SelfDateProfileViewSet(
         return Response(my_self_date_profile_serializer.data)
 
 
-class LikeViewSet(
+class SelfDateLikeViewSet(
     QuerysetMixin,
     ListModelMixin, DestroyModelMixin,
     viewsets.GenericViewSet
 ):
-    queryset = Like.objects.all()
-    permission_classes = (IsOwnerUserOrReadonly,)
-    serializer_class = LikeSerializer
+    queryset = SelfDateLike.objects.all()
+    permission_classes = (IsAuthenticated,)
+    serializer_class = SelfDateLikeSerializer
 
     def list_queryset(self, queryset):
-        return queryset.filter(user=self.request.user)
+        return queryset.filter(self_date_profile=self.request.user.profile.selfdateprofile)
 
     def get_liked_queryset(self, queryset):
-        return queryset.filter(liked_user=self.request.user)
+        return queryset.filter(liked_self_date_profile=self.request.user.profile.selfdateprofile)
 
     @action(detail=False, methods=['get'], url_path='liked')
     def get_liked(self, request):
@@ -115,8 +114,8 @@ class LikeViewSet(
 
     def create(self, request, *args, **kwargs):
         data = {
-            'user': request.user.id,
-            'liked_user': request.data['liked_user'],
+            'self_date_profile': request.user.profile.selfdateprofile.id,
+            'liked_self_date_profile': request.data['liked_self_date_profile'],
         }
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
