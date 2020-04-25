@@ -133,7 +133,7 @@ def max_value_current_year(value):
 class Profile(BaseModel):
     GENDER_CHOICES = Choices('MALE', 'FEMALE')
     SCHOLARLY_STATUS_CHOICES = Choices('ATTENDING', 'TAKING_OFF')
-    CAMPUS_LOCATION_CHOICES = Choices('SEOUL', 'INTERNATIONAL', 'SINCHON')
+    CAMPUS_LOCATION_CHOICES = Choices('SEOUL', 'INTERNATIONAL', 'SINCHON', 'GYEONGSAN')
 
     user = models.OneToOneField('users.User', on_delete=models.CASCADE)
 
