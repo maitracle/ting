@@ -30,6 +30,10 @@ def image_path(instance, original_filename):
 
 
 class SelfDateProfile(BaseModel):
+    """
+    셀소를 위한 프로필에 들어가는 정보들입니다.
+    셀프데이트프로필은 'users.Profile' 과 1:1 관계 입니다.
+    """
     BODY_TYPE_CHOICES = Choices('SKINNY', 'SLIM', 'SLIM_TONED', 'NORMAL', 'BUFF', 'CHUBBY')
     RELIGION_CHOICES = Choices('NOTHING', 'CHRISTIANITY', 'BUDDHISM', 'CATHOLIC', 'ETC')
     IS_SMOKE_CHOICES = Choices('YES', 'NO')
