@@ -66,7 +66,7 @@ class User(BaseModel, AbstractBaseUser):
     university_email = NullableEmailField(max_length=100, null=True, blank=True, unique=True,
                                           help_text='학교 인증을 위한 메일')
     student_id_card_image = models.ImageField(upload_to=student_id_card_image_path, blank=True, null=True,
-                                              max_length=1000)
+                                              max_length=1000, verbose_name='학생증 사진')
     is_confirmed_student = models.BooleanField(default=False, help_text='학교 인증을 받았는지 여부')
 
     user_code = models.CharField(max_length=10, blank=True)
@@ -137,18 +137,23 @@ class Profile(BaseModel):
 
     user = models.OneToOneField('users.User', on_delete=models.CASCADE)
 
-    nickname = models.CharField(max_length=8, unique=True)
-    gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
-    born_year = models.SmallIntegerField(validators=[MinValueValidator(1980), max_value_current_year])
+    nickname = models.CharField(max_length=8, unique=True, verbose_name='공통닉네임')
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES, verbose_name='성별')
+    born_year = models.SmallIntegerField(validators=[MinValueValidator(1980), max_value_current_year],
+                                         verbose_name='태어난 년도')
 
-    university = models.CharField(max_length=10, blank=True, null=True, choices=UNIVERSITY_CHOICES)
-    campus_location = models.CharField(max_length=20, choices=CAMPUS_LOCATION_CHOICES)
-    scholarly_status = models.CharField(max_length=10, choices=SCHOLARLY_STATUS_CHOICES)
+    university = models.CharField(max_length=10, blank=True, null=True, choices=UNIVERSITY_CHOICES, verbose_name='학교')
+    campus_location = models.CharField(max_length=20, choices=CAMPUS_LOCATION_CHOICES, verbose_name='캠퍼스')
+    scholarly_status = models.CharField(max_length=10, choices=SCHOLARLY_STATUS_CHOICES, verbose_name='재학여부')
+
+    def __str__(self):
+        return self.nickname
 
     @property
     def age(self):
         korean_age_correction = 1
         return datetime.datetime.now().year - self.born_year + korean_age_correction
+        age.short_description = '나이'
 
     def change_coin_count(self, change_amount, reason, message=''):
         from coins.models import CoinHistory
