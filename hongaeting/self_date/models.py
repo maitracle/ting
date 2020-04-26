@@ -30,17 +30,13 @@ def image_path(instance, original_filename):
 
 
 class SelfDateProfile(BaseModel):
-    """
-    셀소를 위한 프로필에 들어가는 정보들입니다.
-    셀프데이트프로필은 'users.Profile' 과 1:1 관계 입니다.
-    """
     BODY_TYPE_CHOICES = Choices('SKINNY', 'SLIM', 'SLIM_TONED', 'NORMAL', 'BUFF', 'CHUBBY')
     RELIGION_CHOICES = Choices('NOTHING', 'CHRISTIANITY', 'BUDDHISM', 'CATHOLIC', 'ETC')
     IS_SMOKE_CHOICES = Choices('YES', 'NO')
 
-    profile = models.OneToOneField('users.Profile', on_delete=models.CASCADE, verbose_name='공통 닉네임')
+    profile = models.OneToOneField('users.Profile', on_delete=models.CASCADE, verbose_name='공통프로필')
 
-    nickname = models.CharField(max_length=8, unique=True, verbose_name='셀소 닉네임')
+    nickname = models.CharField(max_length=8, unique=True, verbose_name='셀프데이트 닉네임')
     height = models.PositiveSmallIntegerField(verbose_name='키')
     body_type = models.CharField(max_length=10, choices=BODY_TYPE_CHOICES, verbose_name='체형')
     religion = models.CharField(max_length=20, choices=RELIGION_CHOICES, verbose_name='종교')

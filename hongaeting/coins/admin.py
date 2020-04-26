@@ -12,4 +12,3 @@ class SelfDateCoinHistoryAdmin(admin.ModelAdmin):
     list_display_links = ('id', 'profile')
     search_fields = ('profile',)
     ordering = ('-id',)
-    pass

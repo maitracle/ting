@@ -13,10 +13,10 @@ class SelfDateProfileAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ('기본정보', {
-            'fields': ('profile', 'nickname', 'height', 'body_type', 'religion', 'is_smoke',)
+            'fields': ('profile', 'is_active', 'nickname', 'height', 'body_type', 'religion', 'is_smoke',)
         }),
         ('리스트정보', {
-            'fields': ('tags', 'image', 'is_active', 'one_sentence')
+            'fields': ('tags', 'image', 'one_sentence')
         }),
         ('서술형정보', {
             'fields': ('appearance', 'personality', 'hobby', 'date_style', 'ideal_type',)
@@ -26,15 +26,9 @@ class SelfDateProfileAdmin(admin.ModelAdmin):
         })
     )
 
+
 @register(SelfDateLike)
 class SelfDateLikeAdmin(admin.ModelAdmin):
     list_display = ('id', 'self_date_profile', 'liked_self_date_profile')
     list_display_links = ('id',)
     ordering = ('-id',)
-
-    fieldsets = (
-        ('좋아요', {
-            'fields': (('self_date_profile', 'liked_self_date_profile'), )
-        }),
-    )
-    pass

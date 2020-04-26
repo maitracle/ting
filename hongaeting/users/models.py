@@ -131,15 +131,11 @@ def max_value_current_year(value):
 
 
 class Profile(BaseModel):
-    """
-    인증과 권한을 제외한 user의 프로필을 저장합니다.
-    Profile은 'users.User'와 1:1 관계입니다.
-    """
     GENDER_CHOICES = Choices('MALE', 'FEMALE')
     SCHOLARLY_STATUS_CHOICES = Choices('ATTENDING', 'TAKING_OFF')
     CAMPUS_LOCATION_CHOICES = Choices('SEOUL', 'INTERNATIONAL', 'SINCHON')
 
-    user = models.OneToOneField('users.User', on_delete=models.CASCADE, verbose_name='유저이메일')
+    user = models.OneToOneField('users.User', on_delete=models.CASCADE, verbose_name='사용자')
 
     nickname = models.CharField(max_length=8, unique=True, verbose_name='공통닉네임')
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES, verbose_name='성별')
