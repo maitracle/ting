@@ -79,6 +79,7 @@ class RetrieveSelfDateProfileSerializer(serializers.ModelSerializer):
             'ideal_type',
             'one_sentence',
             'chat_link',
+            'is_active',
             'created_at',
             'updated_at',
         )
@@ -100,6 +101,7 @@ class UpdateSelfDateProfileSerializer(serializers.ModelSerializer):
             'date_style',
             'ideal_type',
             'chat_link',
+            'is_active',
         )
 
 
