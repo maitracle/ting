@@ -32,3 +32,13 @@ class IsOwnerProfileOrReadonly(permissions.BasePermission):
             return True
         # PUT, DELETE 요청에 한해, 작성자에게만 허용
         return obj.profile.user == request.user
+
+
+class IsHaveSelfDateProfileAndIsActive(permissions.BasePermission):
+    # 자신의 SelfDateProfile 이 존재하고 is_active가 True이면 retrieve 허용
+    # 거절되었을 때 보내주는 에러메세지
+    message = 'Inactive users not alloewed.'
+
+    def has_permission(self, request, view):
+        return bool(request.user.profile.selfdateprofile and
+                    request.user.profile.selfdateprofile.is_active)

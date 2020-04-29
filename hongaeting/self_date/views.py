@@ -1,6 +1,6 @@
 from django.db.models import Count, Case, When, Value, BooleanField, Subquery, OuterRef
 from django_filters.rest_framework import DjangoFilterBackend
-from django_rest_framework_mango.mixins import QuerysetMixin, SerializerMixin
+from django_rest_framework_mango.mixins import QuerysetMixin, SerializerMixin, PermissionMixin
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.mixins import DestroyModelMixin, CreateModelMixin, ListModelMixin, UpdateModelMixin, \
@@ -9,19 +9,23 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from common.constants import COIN_CHANGE_REASON
-from common.permissions import IsOwnerProfileOrReadonly
+from common.permissions import IsOwnerProfileOrReadonly, IsHaveSelfDateProfileAndIsActive
 from self_date.serializers import ListSelfDateProfileSerializer, UpdateSelfDateProfileSerializer, \
     RetrieveSelfDateProfileSerializer, SelfDateLikeSerializer, CreateSelfDateProfileSerializer
 from .models import SelfDateProfile, SelfDateProfileRight, SelfDateLike
 from users.models import Profile
 
+
 class SelfDateProfileViewSet(
-    QuerysetMixin, SerializerMixin,
+    QuerysetMixin, SerializerMixin, PermissionMixin,
     CreateModelMixin, UpdateModelMixin, ListModelMixin, RetrieveModelMixin,
     viewsets.GenericViewSet,
 ):
     queryset = SelfDateProfile.objects.all()
     permission_classes = (IsOwnerProfileOrReadonly,)
+    permission_by_actions = {
+        'retrieve': (IsHaveSelfDateProfileAndIsActive,),
+    }
     serializer_class_by_actions = {
         'create': CreateSelfDateProfileSerializer,
         'list': ListSelfDateProfileSerializer,
