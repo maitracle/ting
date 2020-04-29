@@ -23,6 +23,10 @@ ALLOWED_HOSTS = []
 TEST = False
 
 
+# Deploy Info
+ENVIRONMENT = os.environ['ENVIRONMENT']
+
+
 # Application definition
 
 DJANGO_APPS = [

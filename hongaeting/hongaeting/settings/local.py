@@ -1,9 +1,21 @@
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
 from hongaeting.settings.base import *
 
 
 PROFILE = 'Local'
 
 DEBUG = True
+
+
+# sentry
+sentry_sdk.init(
+    dsn=os.environ['SENTRY_DSN'],
+    integrations=[DjangoIntegration()],
+    environment=ENVIRONMENT,
+)
+
 
 CORS_ORIGIN_ALLOW_ALL = True
 

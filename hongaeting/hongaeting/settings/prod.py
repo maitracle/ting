@@ -1,9 +1,21 @@
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
 from hongaeting.settings.base import *
 
 
 PROFILE = 'Production'
 
 DEBUG = False
+
+
+# sentry
+sentry_sdk.init(
+    dsn=os.environ['SENTRY_DSN'],
+    integrations=[DjangoIntegration()],
+    environment=ENVIRONMENT,
+)
+
 
 ALLOWED_HOSTS = ['*']
 
