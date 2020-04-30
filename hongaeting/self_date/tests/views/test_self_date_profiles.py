@@ -382,8 +382,8 @@ class SelfDateProfileTestCase(APITestCase):
 
         # Then: 403 에러가 반환되고 user의 코인 개수는 줄어들지 않는다.
         assert_that(response.status_code).is_equal_to(status.HTTP_403_FORBIDDEN)
-        assert_that(response.data['coin_history_last']['rest_coin']).is_equal_to(rest_coin)
-        # assert_that(CoinHistory.objects.filter(profile=profile).last().rest_coin).is_equal_to(rest_coin)
+
+        assert_that(CoinHistory.objects.filter(profile=profile).last().rest_coin).is_equal_to(rest_coin)
 
     def test_should_create_self_date_profile(self):
         # Given: user와 profile이 하나씩 주어지고 SelfDataProfile data가 주어진다.
