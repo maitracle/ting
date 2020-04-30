@@ -10,6 +10,5 @@ class SelfDateCoinHistoryAdmin(admin.ModelAdmin):
         'id', 'profile', 'rest_coin', 'reason', 'message', 'created_at', 'updated_at',
     )
     list_filter = ('reason', 'profile',)
-    list_display_links = ('id', 'profile',)
     search_fields = ('profile',)
     ordering = ('-id',)
