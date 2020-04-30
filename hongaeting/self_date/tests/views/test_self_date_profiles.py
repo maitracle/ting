@@ -497,6 +497,7 @@ class SelfDateProfileTestCase(APITestCase):
         assert_that(response.data['date_style']).is_equal_to(self_date_profile_data.date_style)
         assert_that(response.data['ideal_type']).is_equal_to(self_date_profile_data.ideal_type)
         assert_that(response.data['chat_link']).is_equal_to(self_date_profile_data.chat_link)
+        assert_that(response.data['is_active']).is_equal_to(self_date_profile_data.is_active)
 
     def test_should_not_get_my_profile_when_user_do_not_have_self_date_profile(self):
         # Given: user와, self_date_profile이 없는 profile이 주어진다.
