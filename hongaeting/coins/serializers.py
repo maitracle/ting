@@ -34,4 +34,9 @@ class ListCoinHistorySerializer(serializers.ModelSerializer):
 class RetrieveCoinHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = CoinHistory
-        exclude = ('reason', 'message',)
+        fields = (
+            'id',
+            'profile',
+            'rest_coin',
+            'reason',
+            'message',)
