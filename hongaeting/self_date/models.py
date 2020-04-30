@@ -148,6 +148,7 @@ class SelfDateProfile(BaseModel):
 
 
 class SelfDateLike(BaseModel):
-    self_date_profile = models.ForeignKey(SelfDateProfile, related_name='self_date_likes', on_delete=models.CASCADE)
+    self_date_profile = models.ForeignKey(SelfDateProfile, related_name='self_date_likes', on_delete=models.CASCADE,
+                                          help_text='like를 보낸 사람')
     liked_self_date_profile = models.ForeignKey(SelfDateProfile, related_name='accepted_self_date_likes',
-                                                on_delete=models.CASCADE)
+                                                on_delete=models.CASCADE, help_text='like를 받은 사람')
