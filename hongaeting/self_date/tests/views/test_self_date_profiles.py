@@ -358,8 +358,8 @@ class SelfDateProfileTestCase(APITestCase):
         # Then: 정상적으로 chat_link가 반환되고 user의 코인 개수는 변화가 없다.
         assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
         assert_that(response.data['chat_link']).is_equal_to(expected_profile.chat_link)
-
-        assert_that(CoinHistory.objects.filter(profile=profile).last().rest_coin).is_equal_to(rest_coin)
+        assert_that(response.data['coin_history_last']['rest_coin']).is_equal_to(rest_coin)
+        # assert_that(CoinHistory.objects.filter(profile=profile).last().rest_coin).is_equal_to(rest_coin)
 
     def test_should_not_get_chat_link_when_user_does_not_have_coin(self):
         # Given: user 1명과 메시지를 보낼 profile이 1개 주어진다.
@@ -382,8 +382,8 @@ class SelfDateProfileTestCase(APITestCase):
 
         # Then: 403 에러가 반환되고 user의 코인 개수는 줄어들지 않는다.
         assert_that(response.status_code).is_equal_to(status.HTTP_403_FORBIDDEN)
-
-        assert_that(CoinHistory.objects.filter(profile=profile).last().rest_coin).is_equal_to(rest_coin)
+        assert_that(response.data['coin_history_last']['rest_coin']).is_equal_to(rest_coin)
+        # assert_that(CoinHistory.objects.filter(profile=profile).last().rest_coin).is_equal_to(rest_coin)
 
     def test_should_create_self_date_profile(self):
         # Given: user와 profile이 하나씩 주어지고 SelfDataProfile data가 주어진다.
