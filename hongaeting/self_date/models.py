@@ -15,10 +15,11 @@ from users.models import User
 
 
 class SelfDateProfileRight(BaseModel):
-    buying_self_date_profile = models.ForeignKey('self_date.SelfDateProfile', related_name='buying_self_date_rights',
+    buying_self_date_profile = models.ForeignKey('self_date.SelfDateProfile',
+                                                 related_name='buying_self_date_profile_rights',
                                                  on_delete=models.CASCADE)
     target_self_date_profile = models.ForeignKey('self_date.SelfDateProfile',
-                                                 related_name='target_self_date_rights',
+                                                 related_name='target_self_date_profile_rights',
                                                  on_delete=models.CASCADE)
     right_type = models.CharField(max_length=50, choices=COIN_CHANGE_REASON)
     coin_history = models.OneToOneField('coins.CoinHistory', null=True, on_delete=models.PROTECT)
@@ -34,7 +35,8 @@ class SelfDateProfile(BaseModel):
     RELIGION_CHOICES = Choices('NOTHING', 'CHRISTIANITY', 'BUDDHISM', 'CATHOLIC', 'ETC')
     IS_SMOKE_CHOICES = Choices('YES', 'NO')
 
-    profile = models.OneToOneField('users.Profile', on_delete=models.CASCADE, verbose_name='프로필')
+    profile = models.OneToOneField('users.Profile', related_name='self_date_profile', on_delete=models.CASCADE,
+                                   verbose_name='프로필')
 
     nickname = models.CharField(max_length=8, unique=True, verbose_name='셀프데이트 닉네임')
     height = models.PositiveSmallIntegerField(verbose_name='키')
