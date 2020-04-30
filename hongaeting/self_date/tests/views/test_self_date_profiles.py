@@ -153,6 +153,9 @@ class SelfDateProfileTestCase(APITestCase):
         assert_that(rest_coin).is_equal_to(
             coin_history.rest_coin - COST_COUNT[COIN_CHANGE_REASON.SELF_DATE_PROFILE_VIEW])
 
+
+
+
     def test_should_get_retrieved_profile_when_already_have_viewing_right(self):
         # Given: target에 대한 view 권한을 가진 request_self_date_profile이 주어진다.
         #        target_self_date_profile이 주어진다.
@@ -321,13 +324,15 @@ class SelfDateProfileTestCase(APITestCase):
         self.client.force_authenticate(user=user)
         response = self.client.get(f'/api/self-date-profiles/{expected_profile.id}/chat-link/')
 
-        # Then: 정상적으로 chat_link가 반환되고 user의 코인 개수는 비용만큼 감소한다.
+        # Then: 정상적으로 response_link_coin (chat_link,coin_history_last)가 반환되고 user의 코인 개수는 비용만큼 감소한다.
         assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
         assert_that(response.data['chat_link']).is_equal_to(expected_profile.chat_link)
+        assert_that(response.data['coin_history_last']['rest_coin']).is_equal_to(rest_coin - COST_COUNT['SELF_DATE_SEND_MESSAGE'])
 
-        assert_that(CoinHistory.objects.filter(profile=profile).last().rest_coin).is_equal_to(
-            rest_coin - COST_COUNT['SELF_DATE_SEND_MESSAGE']
-        )
+        #
+        # assert_that(CoinHistory.objects.filter(profile=profile).last().rest_coin).is_equal_to(
+        #     rest_coin - COST_COUNT['SELF_DATE_SEND_MESSAGE']
+        # )
 
     def test_should_get_chat_link_which_user_sent(self):
         # Given: user 1명과 메시지를 보낼 profile이 1개 주어진다.
