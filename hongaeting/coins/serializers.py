@@ -39,4 +39,7 @@ class RetrieveCoinHistorySerializer(serializers.ModelSerializer):
             'profile',
             'rest_coin',
             'reason',
-            'message',)
+            'message',
+            'created_at',
+            'updated_at',
+        )
