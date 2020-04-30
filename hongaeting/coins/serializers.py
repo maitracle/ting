@@ -29,3 +29,17 @@ class ListCoinHistorySerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at',
         )
+
+
+class RetrieveCoinHistorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CoinHistory
+        fields = (
+            'id',
+            'profile',
+            'rest_coin',
+            'reason',
+            'message',
+            'created_at',
+            'updated_at',
+        )

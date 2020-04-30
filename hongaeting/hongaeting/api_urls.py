@@ -1,7 +1,6 @@
 from django.urls import path
 from rest_framework.routers import SimpleRouter
 from rest_framework_simplejwt.views import TokenRefreshView
-
 from coins.views import CoinHistoryViewSet
 from self_date.views import SelfDateLikeViewSet, SelfDateProfileViewSet
 from users.views import UserViewSet, ProfileViewSet

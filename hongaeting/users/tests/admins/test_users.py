@@ -3,6 +3,7 @@ from django.urls import reverse
 from model_bakery import baker
 from rest_framework.test import APITestCase
 
+from coins.serializers import RetrieveCoinHistorySerializer
 from common.constants import REWORD_COUNT, COIN_CHANGE_REASON
 from users.models import User
 

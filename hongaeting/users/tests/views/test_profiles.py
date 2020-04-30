@@ -30,9 +30,7 @@ class ProfileViewSetTestCase(APITestCase):
 
         # Then: 만들어진 Profile이 반환된다.
         assert_that(response.status_code).is_equal_to(status.HTTP_201_CREATED)
-
         expected_profile = Profile.objects.get(nickname=profile_data['nickname'])
-
         assert_that(response.data['id']).is_equal_to(expected_profile.id)
         assert_that(response.data['nickname']).is_equal_to(profile_data['nickname'])
         assert_that(response.data['gender']).is_equal_to(profile_data['gender'])
@@ -115,3 +113,6 @@ class ProfileViewSetTestCase(APITestCase):
 
         unchanged_profile = Profile.objects.get(id=profile.id)
         assert_that(unchanged_profile.scholarly_status).is_equal_to(origin_scholarly_status)
+
+
+

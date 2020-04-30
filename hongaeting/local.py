@@ -1,0 +1,23 @@
+import os
+
+# python -m pip install XXX
+os.system('doskey ga= git add .')
+os.system('doskey pmg=python manage.py migrate --settings=hongaeting.settings.local')
+os.system('doskey pmm=python manage.py makemigrations --settings=hongaeting.settings.local')
+os.system('doskey pmsm=python manage.py showmigrations --settings=hongaeting.settings.local')
+os.system('doskey pcs=python manage.py createsuperuser --settings=hongaeting.settings.local')
+os.system('doskey rs=python manage.py runserver --settings=hongaeting.settings.local')
+os.system('doskey pms=python manage.py shell --settings=hongaeting.settings.local')
+os.system('doskey pmsp=python3 manage.py shell_plus --settings=hongaeting.settings.local')
+os.system('doskey jupyternotebook=python manage.py shell_plus --notebook --settings=hongaeting.settings.local')
+os.system('doskey psm=python manage.py showmigrations --settings=hongaeting.settings.local')
+os.system('doskey pip install -r requirements.txt=python -m pip install  requirements.txt')
+print('doskey ga= git add .')
+print('doskey pmg=python manage.py migrate --settings=hongaeting.settings.local')
+print('doskey pmm=python manage.py makemigrations --settings=hongaeting.settings.local')
+print('doskey psm=python manage.py showmigrations --settings=hongaeting.settings.local')
+print('doskey pcs=python manage.py createsuperuser --settings=hongaeting.settings.local')
+print('doskey rs=python manage.py runserver --settings=hongaeting.settings.local')
+print('doskey pms=python manage.py shell --settings=hongaeting.settings.local')
+print('doskey pmsp=python3 manage.py shell_plus --settings=hongaeting.settings.local')
+print('doskey jupyternotebook=python manage.py shell_plus --notebook --settings=hongaeting.settings.local')

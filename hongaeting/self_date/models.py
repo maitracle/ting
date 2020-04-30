@@ -21,6 +21,7 @@ class SelfDateProfileRight(BaseModel):
                                                  related_name='target_self_date_rights',
                                                  on_delete=models.CASCADE)
     right_type = models.CharField(max_length=50, choices=COIN_CHANGE_REASON)
+
     coin_history = models.OneToOneField('coins.CoinHistory', null=True, on_delete=models.PROTECT)
 
 
