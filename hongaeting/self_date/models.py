@@ -31,8 +31,7 @@ def image_path(instance, original_filename):
 
 
 class SelfDateProfile(BaseModel):
-
-    BODY_TYPE_CHOICES = Choices('SKINNY', 'SLIM', 'SLIM_TONED', 'NORMAL', 'BUFF', 'CHUBBY')
+    BODY_TYPE_CHOICES = Choices('SLIM', 'SLIM_TONED', 'NORMAL', 'BUFF', 'CHUBBY')
     RELIGION_CHOICES = Choices('NOTHING', 'CHRISTIANITY', 'BUDDHISM', 'CATHOLIC', 'ETC')
     IS_SMOKE_CHOICES = Choices('YES', 'NO')
 
