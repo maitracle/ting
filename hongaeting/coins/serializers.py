@@ -29,3 +29,9 @@ class ListCoinHistorySerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at',
         )
+
+
+class RetrieveCoinHistorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CoinHistory
+        exclude = ('reason', 'message',)

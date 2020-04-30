@@ -21,6 +21,7 @@ class SelfDateProfileRight(BaseModel):
                                                  related_name='target_self_date_rights',
                                                  on_delete=models.CASCADE)
     right_type = models.CharField(max_length=50, choices=COIN_CHANGE_REASON)
+
     coin_history = models.OneToOneField('coins.CoinHistory', null=True, on_delete=models.PROTECT)
 
 
@@ -30,6 +31,7 @@ def image_path(instance, original_filename):
 
 
 class SelfDateProfile(BaseModel):
+
     BODY_TYPE_CHOICES = Choices('SKINNY', 'SLIM', 'SLIM_TONED', 'NORMAL', 'BUFF', 'CHUBBY')
     RELIGION_CHOICES = Choices('NOTHING', 'CHRISTIANITY', 'BUDDHISM', 'CATHOLIC', 'ETC')
     IS_SMOKE_CHOICES = Choices('YES', 'NO')

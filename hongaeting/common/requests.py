@@ -14,13 +14,10 @@ class Request(ABC):
             return RequestWithTest()
 
         return RequestWithHttp()
-
     def get(self, url, data=None, json=None, timeout=None, auth=None, **options):
         return self.request('GET', url, data=data, json=json, timeout=timeout, auth=auth, *options)
-
     def post(self, url, data=None, json=None, timeout=None, auth=None, **options):
         return self.request('POST', url, data=data, json=json, timeout=timeout, auth=auth, *options)
-
     @abstractmethod
     def request(self, method, url, data=None, json=None, timeout=None, auth=None, **options):
         pass

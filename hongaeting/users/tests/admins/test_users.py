@@ -3,6 +3,7 @@ from django.urls import reverse
 from model_bakery import baker
 from rest_framework.test import APITestCase
 
+from coins.serializers import RetrieveCoinHistorySerializer
 from common.constants import REWORD_COUNT, COIN_CHANGE_REASON
 from users.models import User
 
@@ -40,6 +41,7 @@ class UserAdminTestCase(APITestCase):
             assert_that(user.is_confirmed_student).is_true()
 
             last_coin_history = user.profile.coin_histories.last()
+            last_coin_history = RetrieveCoinHistorySerializer(last_coin_history)
             assert_that(last_coin_history.rest_coin).is_equal_to(REWORD_COUNT['CONFIRM_USER'])
             assert_that(last_coin_history.reason).is_equal_to(COIN_CHANGE_REASON.CONFIRM_USER)
             assert_that(last_coin_history.message).is_equal_to('학생 인증으로 인한 coin 지급')

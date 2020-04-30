@@ -201,6 +201,7 @@ class SelfDateProfileTestCase(APITestCase):
         assert_that(rest_coin).is_equal_to(expected_rest_coin)
 
     def _check_response_and_expected(self, dictionary, instance):
+
         assert_that(dictionary['image']).is_equal_to(instance.image)
         assert_that(dictionary['nickname']).is_equal_to(instance.nickname)
         assert_that(dictionary['height']).is_equal_to(instance.height)

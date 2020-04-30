@@ -8,12 +8,14 @@ from rest_framework.mixins import DestroyModelMixin, CreateModelMixin, ListModel
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from coins.serializers import RetrieveCoinHistorySerializer
 from common.constants import COIN_CHANGE_REASON
 from common.permissions import IsOwnerProfileOrReadonly
 from self_date.serializers import ListSelfDateProfileSerializer, UpdateSelfDateProfileSerializer, \
     RetrieveSelfDateProfileSerializer, SelfDateLikeSerializer, CreateSelfDateProfileSerializer
 from .models import SelfDateProfile, SelfDateProfileRight, SelfDateLike
 from users.models import Profile
+
 
 class SelfDateProfileViewSet(
     QuerysetMixin, SerializerMixin,
@@ -73,11 +75,15 @@ class SelfDateProfileViewSet(
         target_self_date_profile = self.get_object()
 
         response_target_chat_link = request_self_date_profile.get_target_chat_link(target_self_date_profile)
-        chat_link = {
+        coin_history_last = request.user.profile.coin_histories.last()
+        coin_history_last = RetrieveCoinHistorySerializer(coin_history_last)
+
+        response_link_coin = {
             'chat_link': response_target_chat_link,
+            'coin_history_last': coin_history_last.data
         }
 
-        return Response(chat_link)
+        return Response(response_link_coin)
 
     @action(detail=False, methods=['get'], url_path='my')
     def my(self, request, *arg, **kwargs):
