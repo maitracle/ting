@@ -34,7 +34,7 @@ class SelfDateProfile(BaseModel):
     RELIGION_CHOICES = Choices('NOTHING', 'CHRISTIANITY', 'BUDDHISM', 'CATHOLIC', 'ETC')
     IS_SMOKE_CHOICES = Choices('YES', 'NO')
 
-    profile = models.OneToOneField('users.Profile', on_delete=models.CASCADE, verbose_name='공통프로필')
+    profile = models.OneToOneField('users.Profile', on_delete=models.CASCADE, verbose_name='프로필')
 
     nickname = models.CharField(max_length=8, unique=True, verbose_name='셀프데이트 닉네임')
     height = models.PositiveSmallIntegerField(verbose_name='키')
@@ -53,7 +53,7 @@ class SelfDateProfile(BaseModel):
     ideal_type = models.CharField(max_length=1000, validators=[MinLengthValidator(120)], verbose_name='이상형')
     chat_link = models.URLField(validators=[chat_link_validator], verbose_name='카카오톡 채팅링크')
 
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True, help_text='셀프 데이트 프로필 공개 여부')
 
     def __str__(self):
         return self.nickname
