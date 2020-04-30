@@ -10,22 +10,23 @@ from users.models import User, Profile
 class UserAdmin(admin.ModelAdmin):
     list_display = (
         'id', 'email', 'university_email', 'is_confirmed_student', 'student_id_card_image', 'user_code', 'is_staff',
-        'is_superuser', 'is_active', 'created_at', 'updated_at')
+        'is_superuser', 'is_active', 'created_at', 'updated_at',
+    )
     list_filter = ('is_active', 'is_confirmed_student',)
-    list_display_links = ('id', 'email')
-    search_fields = ('email', )
+    list_display_links = ('id', 'email',)
+    search_fields = ('email',)
     ordering = ('-id', 'student_id_card_image',)
     actions = ('confirm_users',)
 
     fieldsets = (
         ('이메일', {
-            'fields': ('email', 'university_email')
+            'fields': ('email', 'university_email',)
         }),
         ('학교인증여부', {
-            'fields': ('student_id_card_image', 'is_confirmed_student')
+            'fields': ('student_id_card_image', 'is_confirmed_student',)
         }),
         ('권한여부', {
-            'fields': ('is_staff', 'is_superuser', 'is_active')
+            'fields': ('is_staff', 'is_superuser', 'is_active',)
         })
     )
 
@@ -55,18 +56,18 @@ class ProfileAdmin(admin.ModelAdmin):
     list_per_page = 20
     list_display = (
         'id', 'nickname', 'gender', 'age', 'university', 'campus_location',
-        'scholarly_status', 'created_at')
+        'scholarly_status', 'created_at',)
     list_filter = ('university', 'campus_location',)
-    list_display_links = ('id', 'nickname')
-    search_fields = ('nickname', )
-    ordering = ('-id', 'nickname')
+    list_display_links = ('id', 'nickname',)
+    search_fields = ('nickname',)
+    ordering = ('-id', 'nickname',)
 
     fieldsets = (
         ('기본정보', {
-            'fields': ('user', 'nickname', 'gender', 'born_year')
+            'fields': ('user', 'nickname', 'gender', 'born_year',)
         }),
         ('대학정보', {
-            'fields': ('university', 'campus_location', 'scholarly_status')
+            'fields': ('university', 'campus_location', 'scholarly_status',)
         })
     )
     pass
