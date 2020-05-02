@@ -23,6 +23,10 @@ ALLOWED_HOSTS = []
 TEST = False
 
 
+# Deploy Info
+ENVIRONMENT = os.environ['ENVIRONMENT']
+
+
 # Application definition
 
 DJANGO_APPS = [
@@ -32,6 +36,7 @@ DJANGO_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.admindocs',
 ]
 
 PACKAGE_APPS = [

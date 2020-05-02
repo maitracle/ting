@@ -6,4 +6,9 @@ from coins.models import CoinHistory
 
 @register(CoinHistory)
 class SelfDateCoinHistoryAdmin(admin.ModelAdmin):
-    pass
+    list_display = (
+        'id', 'profile', 'rest_coin', 'reason', 'message', 'created_at', 'updated_at',
+    )
+    list_filter = ('reason', 'profile',)
+    search_fields = ('profile',)
+    ordering = ('-id',)

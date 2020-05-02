@@ -22,7 +22,7 @@ class IsHaveSelfDateProfileAndIsActive(permissions.BasePermission):
     message = 'Inactive users not allowed.'
 
     def has_permission(self, request, view):
-        return hasattr(request.user.profile, 'selfdateprofile') and request.user.profile.selfdateprofile.is_active
+        return hasattr(request.user.profile, 'self_date_profile') and request.user.profile.self_date_profile.is_active
 
 
 class SelfDateProfileViewSet(
@@ -48,7 +48,7 @@ class SelfDateProfileViewSet(
 
     def list_queryset(self, queryset):
         self_date_profile_right_queryset = SelfDateProfileRight.objects.filter(
-            buying_self_date_profile=self.request.user.profile.selfdateprofile
+            buying_self_date_profile=self.request.user.profile.self_date_profile
         ).filter(
             right_type=COIN_CHANGE_REASON.SELF_DATE_PROFILE_VIEW
         ).filter(
@@ -70,7 +70,7 @@ class SelfDateProfileViewSet(
         )
 
     def retrieve(self, request, *args, **kwargs):
-        request_self_date_profile = request.user.profile.selfdateprofile
+        request_self_date_profile = request.user.profile.self_date_profile
         target_self_date_profile = self.get_object()
 
         response_self_date_profile = request_self_date_profile.get_target_self_date_profile_to_retrieve(
@@ -82,7 +82,7 @@ class SelfDateProfileViewSet(
 
     @action(detail=True, methods=['get'], url_path='chat-link')
     def get_chat_link(self, request, *arg, **kwargs):
-        request_self_date_profile = request.user.profile.selfdateprofile
+        request_self_date_profile = request.user.profile.self_date_profile
         target_self_date_profile = self.get_object()
 
         response_target_chat_link = request_self_date_profile.get_target_chat_link(target_self_date_profile)
@@ -95,9 +95,9 @@ class SelfDateProfileViewSet(
     @action(detail=False, methods=['get'], url_path='my')
     def my(self, request, *arg, **kwargs):
         try:
-            self_date_profile = getattr(request.user.profile, 'selfdateprofile')
+            self_date_profile = getattr(request.user.profile, 'self_date_profile')
             my_self_date_profile_serializer = self.get_serializer(self_date_profile)
-        except Profile.selfdateprofile.RelatedObjectDoesNotExist:
+        except Profile.self_date_profile.RelatedObjectDoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         return Response(my_self_date_profile_serializer.data)
@@ -113,10 +113,10 @@ class SelfDateLikeViewSet(
     serializer_class = SelfDateLikeSerializer
 
     def list_queryset(self, queryset):
-        return queryset.filter(self_date_profile=self.request.user.profile.selfdateprofile)
+        return queryset.filter(self_date_profile=self.request.user.profile.self_date_profile)
 
     def get_liked_queryset(self, queryset):
-        return queryset.filter(liked_self_date_profile=self.request.user.profile.selfdateprofile)
+        return queryset.filter(liked_self_date_profile=self.request.user.profile.self_date_profile)
 
     @action(detail=False, methods=['get'], url_path='liked')
     def get_liked(self, request):
@@ -127,7 +127,7 @@ class SelfDateLikeViewSet(
 
     def create(self, request, *args, **kwargs):
         data = {
-            'self_date_profile': request.user.profile.selfdateprofile.id,
+            'self_date_profile': request.user.profile.self_date_profile.id,
             'liked_self_date_profile': request.data['liked_self_date_profile'],
         }
         serializer = self.get_serializer(data=data)

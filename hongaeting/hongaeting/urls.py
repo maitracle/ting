@@ -8,4 +8,5 @@ urlpatterns = [
     path('api/', include('hongaeting.api_urls')),
     path('admin/', admin.site.urls),
     path('health/', HealthView.as_view()),
+    path('doc/', include('django.contrib.admindocs.urls')),
 ]
