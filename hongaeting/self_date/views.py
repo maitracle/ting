@@ -1,7 +1,7 @@
 from django.db.models import Count, Case, When, Value, BooleanField, Subquery, OuterRef
 from django_filters.rest_framework import DjangoFilterBackend
 from django_rest_framework_mango.mixins import QuerysetMixin, SerializerMixin, PermissionMixin
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.mixins import DestroyModelMixin, CreateModelMixin, ListModelMixin, UpdateModelMixin, \
     RetrieveModelMixin
@@ -9,11 +9,20 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from common.constants import COIN_CHANGE_REASON
-from common.permissions import IsOwnerProfileOrReadonly, IsHaveSelfDateProfileAndIsActive
+from common.permissions import IsOwnerProfileOrReadonly, IsConfirmedUser
 from self_date.serializers import ListSelfDateProfileSerializer, UpdateSelfDateProfileSerializer, \
     RetrieveSelfDateProfileSerializer, SelfDateLikeSerializer, CreateSelfDateProfileSerializer
 from .models import SelfDateProfile, SelfDateProfileRight, SelfDateLike
 from users.models import Profile
+
+
+class IsHaveSelfDateProfileAndIsActive(permissions.BasePermission):
+    # 자신의 SelfDateProfile 이 존재하고 is_active가 True이면 retrieve 허용
+    # 거절되었을 때 보내주는 에러메세지
+    message = 'Inactive users not allowed.'
+
+    def has_permission(self, request, view):
+        return hasattr(request.user.profile, 'selfdateprofile') and request.user.profile.selfdateprofile.is_active
 
 
 class SelfDateProfileViewSet(
@@ -24,7 +33,7 @@ class SelfDateProfileViewSet(
     queryset = SelfDateProfile.objects.all()
     permission_classes = (IsOwnerProfileOrReadonly,)
     permission_by_actions = {
-        'retrieve': (IsHaveSelfDateProfileAndIsActive,),
+        'retrieve': (IsHaveSelfDateProfileAndIsActive, IsConfirmedUser),
     }
     serializer_class_by_actions = {
         'create': CreateSelfDateProfileSerializer,

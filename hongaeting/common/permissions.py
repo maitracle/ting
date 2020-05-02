@@ -34,11 +34,7 @@ class IsOwnerProfileOrReadonly(permissions.BasePermission):
         return obj.profile.user == request.user
 
 
-class IsHaveSelfDateProfileAndIsActive(permissions.BasePermission):
-    # 자신의 SelfDateProfile 이 존재하고 is_active가 True이면 retrieve 허용
-    # 거절되었을 때 보내주는 에러메세지
-    message = 'Inactive users not alloewed.'
-
+class IsConfirmedUser(permissions.BasePermission):
+    # 학생증 확인이 완료된 유저에게 허용
     def has_permission(self, request, view):
-        return bool(request.user.profile.selfdateprofile and
-                    request.user.profile.selfdateprofile.is_active)
+        return request.user.is_confirmed_student
