@@ -17,9 +17,6 @@ from users.models import Profile
 
 
 class IsHaveSelfDateProfileAndIsActive(permissions.BasePermission):
-    # 자신의 SelfDateProfile 이 존재하고 is_active가 True이면 retrieve 허용
-    # 거절되었을 때 보내주는 에러메세지
-    message = 'Inactive users not allowed.'
 
     def has_permission(self, request, view):
         return hasattr(request.user.profile, 'self_date_profile') and request.user.profile.self_date_profile.is_active
@@ -33,7 +30,7 @@ class SelfDateProfileViewSet(
     queryset = SelfDateProfile.objects.all()
     permission_classes = (IsOwnerProfileOrReadonly,)
     permission_by_actions = {
-        'retrieve': (IsHaveSelfDateProfileAndIsActive, IsConfirmedUser),
+        'retrieve': (IsConfirmedUser, IsHaveSelfDateProfileAndIsActive,),
     }
     serializer_class_by_actions = {
         'create': CreateSelfDateProfileSerializer,

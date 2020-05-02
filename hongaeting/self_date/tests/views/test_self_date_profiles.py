@@ -121,7 +121,7 @@ class SelfDateProfileTestCase(APITestCase):
 
     def test_should_get_retrieved_profile(self):
         # Given: coin이 충분한 request_self_date_profile과 target_self_date_profile이 주어진다.
-        request_self_date_profile = baker.make('self_date.SelfDateProfile')
+        request_self_date_profile = baker.make('self_date.SelfDateProfile', profile__user__is_confirmed_student=True)
         target_self_date_profile = baker.make('self_date.SelfDateProfile')
         coin_history = baker.make(
             'coins.CoinHistory',
@@ -156,7 +156,7 @@ class SelfDateProfileTestCase(APITestCase):
     def test_should_get_retrieved_profile_when_already_have_viewing_right(self):
         # Given: target에 대한 view 권한을 가진 request_self_date_profile이 주어진다.
         #        target_self_date_profile이 주어진다.
-        request_self_date_profile = baker.make('self_date.SelfDateProfile')
+        request_self_date_profile = baker.make('self_date.SelfDateProfile', profile__user__is_confirmed_student=True)
         target_self_date_profile = baker.make('self_date.SelfDateProfile')
 
         baker.make('self_date.SelfDateProfileRight',
@@ -182,7 +182,7 @@ class SelfDateProfileTestCase(APITestCase):
     def test_should_not_get_retrieved_profile_when_user_does_not_have_coin(self):
         # Given: target에 대한 view 권한을 가진 request_self_date_profile이 주어진다.
         #        target_self_date_profile이 주어진다.
-        request_self_date_profile = baker.make('self_date.SelfDateProfile')
+        request_self_date_profile = baker.make('self_date.SelfDateProfile', profile__user__is_confirmed_student=True)
         target_self_date_profile = baker.make('self_date.SelfDateProfile')
 
         expected_rest_coin = 0
