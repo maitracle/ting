@@ -36,5 +36,7 @@ class IsOwnerProfileOrReadonly(permissions.BasePermission):
 
 class IsConfirmedUser(permissions.BasePermission):
     # 학생증 확인이 완료된 유저에게 허용
+    message = 'Unconfirmed user is not allowed.'
+
     def has_permission(self, request, view):
         return request.user.is_confirmed_student

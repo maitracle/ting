@@ -200,6 +200,39 @@ class SelfDateProfileTestCase(APITestCase):
         rest_coin = CoinHistory.objects.filter(profile=request_self_date_profile.profile).last().rest_coin
         assert_that(rest_coin).is_equal_to(expected_rest_coin)
 
+    def test_should_not_get_retrieved_profile_when_user_is_not_confirmed(self):
+        # Given: is_confirmed_student가 false인  request_self_date_profile이 주어진다.
+        #        target_self_date_profile이 주어진다.
+        request_self_date_profile = baker.make('self_date.SelfDateProfile', profile__user__is_confirmed_student=False)
+        target_self_date_profile = baker.make('self_date.SelfDateProfile')
+
+        # When: request_self_date_profile의 user가 retrieve api를 호출한다.
+        self.client.force_authenticate(user=request_self_date_profile.profile.user)
+        response = self.client.get(f'/api/self-date-profiles/{target_self_date_profile.id}/')
+
+        # Then: status code 403이 반환된다.
+        #       Unconfirmed user를 알리는 에러메시지가 반환된다.
+
+        assert_that(response.status_code).is_equal_to(status.HTTP_403_FORBIDDEN)
+        assert_that(response.data['detail']).is_equal_to('Unconfirmed user is not allowed')
+
+    def test_should_not_get_retrieved_profile_when_user_is_not_active(self):
+        # Given: is_active가 false인 request_self_date_profile이 주어진다.
+        #        target_self_date_profile이 주어진다.
+        request_self_date_profile = baker.make('self_date.SelfDateProfile', profile__user__is_confirmed_student=True,
+                                               is_active=False)
+        target_self_date_profile = baker.make('self_date.SelfDateProfile')
+
+        # When: request_self_date_profile의 user가 retrieve api를 호출한다.
+        self.client.force_authenticate(user=request_self_date_profile.profile.user)
+        response = self.client.get(f'/api/self-date-profiles/{target_self_date_profile.id}/')
+
+        # Then: status code 403이 반환된다.
+        #       Inactive user임을 알리는 에러메시지가 반환된다.
+
+        assert_that(response.status_code).is_equal_to(status.HTTP_403_FORBIDDEN)
+        assert_that(response.data['detail']).is_equal_to('Inactive user is not allowed')
+
     def _check_response_and_expected(self, dictionary, instance):
         assert_that(dictionary['image']).is_equal_to(instance.image)
         assert_that(dictionary['nickname']).is_equal_to(instance.nickname)
