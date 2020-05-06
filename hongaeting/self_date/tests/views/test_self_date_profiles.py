@@ -11,8 +11,10 @@ from coins.models import CoinHistory
 from common.KakaoClient import KakaoClientWithTest
 from common.constants import UNIVERSITY_CHOICES, COIN_CHANGE_REASON, REWORD_COUNT, COST_COUNT
 from common.decorator import delete_media_root
+from common.permissions import IsConfirmedUser
 from common.utils import reformat_datetime
 from self_date.models import SelfDateProfile, SelfDateProfileRight
+from self_date.views import IsHaveSelfDateProfileAndIsActive
 from users.models import Profile
 
 
@@ -212,9 +214,8 @@ class SelfDateProfileTestCase(APITestCase):
 
         # Then: status code 403이 반환된다.
         #       Unconfirmed user를 알리는 에러메시지가 반환된다.
-
         assert_that(response.status_code).is_equal_to(status.HTTP_403_FORBIDDEN)
-        assert_that(response.data['detail']).is_equal_to('Unconfirmed user is not allowed')
+        assert_that(response.data['detail']).is_equal_to(IsConfirmedUser.message)
 
     def test_should_not_get_retrieved_profile_when_user_is_not_active(self):
         # Given: is_active가 false인 request_self_date_profile이 주어진다.
@@ -229,9 +230,8 @@ class SelfDateProfileTestCase(APITestCase):
 
         # Then: status code 403이 반환된다.
         #       Inactive user임을 알리는 에러메시지가 반환된다.
-
         assert_that(response.status_code).is_equal_to(status.HTTP_403_FORBIDDEN)
-        assert_that(response.data['detail']).is_equal_to('Inactive user is not allowed')
+        assert_that(response.data['detail']).is_equal_to(IsHaveSelfDateProfileAndIsActive.message)
 
     def _check_response_and_expected(self, dictionary, instance):
         assert_that(dictionary['image']).is_equal_to(instance.image)

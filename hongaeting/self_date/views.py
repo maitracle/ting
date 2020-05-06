@@ -17,7 +17,7 @@ from users.models import Profile
 
 
 class IsHaveSelfDateProfileAndIsActive(permissions.BasePermission):
-    message = 'Inactive user is not allowed.'
+    message = 'Activated self date profile is needed'
 
     def has_permission(self, request, view):
         return hasattr(request.user.profile, 'self_date_profile') and request.user.profile.self_date_profile.is_active
