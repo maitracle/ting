@@ -32,3 +32,11 @@ class IsOwnerProfileOrReadonly(permissions.BasePermission):
             return True
         # PUT, DELETE 요청에 한해, 작성자에게만 허용
         return obj.profile.user == request.user
+
+
+class IsConfirmedUser(permissions.BasePermission):
+    # 학생증 확인이 완료된 유저에게 허용
+    message = 'Unconfirmed user is not allowed.'
+
+    def has_permission(self, request, view):
+        return request.user.is_confirmed_student
