@@ -9,7 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from common.constants import COIN_CHANGE_REASON
-from common.permissions import IsOwnerProfileOrReadonly
+from common.permissions import IsOwnerProfileOrReadonly, IsConfirmedUser
 from self_date.serializers import ListSelfDateProfileSerializer, UpdateSelfDateProfileSerializer, \
     RetrieveSelfDateProfileSerializer, SelfDateLikeSerializer, CreateSelfDateProfileSerializer
 from .models import SelfDateProfile, SelfDateProfileRight, SelfDateLike
@@ -31,7 +31,7 @@ class SelfDateProfileViewSet(
     queryset = SelfDateProfile.objects.all()
     permission_classes = (IsOwnerProfileOrReadonly,)
     permission_by_actions = {
-        'retrieve': (IsHaveSelfDateProfileAndIsActive,),
+        'retrieve': (IsConfirmedUser, IsHaveSelfDateProfileAndIsActive,),
     }
     serializer_class_by_actions = {
         'create': CreateSelfDateProfileSerializer,
@@ -82,6 +82,7 @@ class SelfDateProfileViewSet(
     def get_chat_link(self, request, *arg, **kwargs):
         request_self_date_profile = request.user.profile.self_date_profile
         target_self_date_profile = self.get_object()
+
         response_target_chat_link = request_self_date_profile.get_target_chat_link(target_self_date_profile)
         chat_link = {
             'chat_link': response_target_chat_link,

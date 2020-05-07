@@ -11,8 +11,10 @@ from coins.models import CoinHistory
 from common.KakaoClient import KakaoClientWithTest
 from common.constants import UNIVERSITY_CHOICES, COIN_CHANGE_REASON, REWORD_COUNT, COST_COUNT
 from common.decorator import delete_media_root
+from common.permissions import IsConfirmedUser
 from common.utils import reformat_datetime
 from self_date.models import SelfDateProfile, SelfDateProfileRight
+from self_date.views import IsHaveSelfDateProfileAndIsActive
 from users.models import Profile
 
 
@@ -121,7 +123,7 @@ class SelfDateProfileTestCase(APITestCase):
 
     def test_should_get_retrieved_profile(self):
         # Given: coin이 충분한 request_self_date_profile과 target_self_date_profile이 주어진다.
-        request_self_date_profile = baker.make('self_date.SelfDateProfile')
+        request_self_date_profile = baker.make('self_date.SelfDateProfile', profile__user__is_confirmed_student=True)
         target_self_date_profile = baker.make('self_date.SelfDateProfile')
         coin_history = baker.make(
             'coins.CoinHistory',
@@ -156,7 +158,7 @@ class SelfDateProfileTestCase(APITestCase):
     def test_should_get_retrieved_profile_when_already_have_viewing_right(self):
         # Given: target에 대한 view 권한을 가진 request_self_date_profile이 주어진다.
         #        target_self_date_profile이 주어진다.
-        request_self_date_profile = baker.make('self_date.SelfDateProfile')
+        request_self_date_profile = baker.make('self_date.SelfDateProfile', profile__user__is_confirmed_student=True)
         target_self_date_profile = baker.make('self_date.SelfDateProfile')
 
         baker.make('self_date.SelfDateProfileRight',
@@ -182,7 +184,7 @@ class SelfDateProfileTestCase(APITestCase):
     def test_should_not_get_retrieved_profile_when_user_does_not_have_coin(self):
         # Given: target에 대한 view 권한을 가진 request_self_date_profile이 주어진다.
         #        target_self_date_profile이 주어진다.
-        request_self_date_profile = baker.make('self_date.SelfDateProfile')
+        request_self_date_profile = baker.make('self_date.SelfDateProfile', profile__user__is_confirmed_student=True)
         target_self_date_profile = baker.make('self_date.SelfDateProfile')
 
         expected_rest_coin = 0
@@ -199,6 +201,37 @@ class SelfDateProfileTestCase(APITestCase):
         assert_that(response.data['detail']).is_equal_to('코인 개수 부족으로 인한 permission denied')
         rest_coin = CoinHistory.objects.filter(profile=request_self_date_profile.profile).last().rest_coin
         assert_that(rest_coin).is_equal_to(expected_rest_coin)
+
+    def test_should_not_get_retrieved_profile_when_user_is_not_confirmed(self):
+        # Given: is_confirmed_student가 false인  request_self_date_profile이 주어진다.
+        #        target_self_date_profile이 주어진다.
+        request_self_date_profile = baker.make('self_date.SelfDateProfile', profile__user__is_confirmed_student=False)
+        target_self_date_profile = baker.make('self_date.SelfDateProfile')
+
+        # When: request_self_date_profile의 user가 retrieve api를 호출한다.
+        self.client.force_authenticate(user=request_self_date_profile.profile.user)
+        response = self.client.get(f'/api/self-date-profiles/{target_self_date_profile.id}/')
+
+        # Then: status code 403이 반환된다.
+        #       Unconfirmed user를 알리는 에러메시지가 반환된다.
+        assert_that(response.status_code).is_equal_to(status.HTTP_403_FORBIDDEN)
+        assert_that(response.data['detail']).is_equal_to(IsConfirmedUser.message)
+
+    def test_should_not_get_retrieved_profile_when_user_is_not_active(self):
+        # Given: is_active가 false인 request_self_date_profile이 주어진다.
+        #        target_self_date_profile이 주어진다.
+        request_self_date_profile = baker.make('self_date.SelfDateProfile', profile__user__is_confirmed_student=True,
+                                               is_active=False)
+        target_self_date_profile = baker.make('self_date.SelfDateProfile')
+
+        # When: request_self_date_profile의 user가 retrieve api를 호출한다.
+        self.client.force_authenticate(user=request_self_date_profile.profile.user)
+        response = self.client.get(f'/api/self-date-profiles/{target_self_date_profile.id}/')
+
+        # Then: status code 403이 반환된다.
+        #       Inactive user임을 알리는 에러메시지가 반환된다.
+        assert_that(response.status_code).is_equal_to(status.HTTP_403_FORBIDDEN)
+        assert_that(response.data['detail']).is_equal_to(IsHaveSelfDateProfileAndIsActive.message)
 
     def _check_response_and_expected(self, dictionary, instance):
         assert_that(dictionary['image']).is_equal_to(instance.image)
