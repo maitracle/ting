@@ -1,7 +1,7 @@
 from django.db.models import Count, Case, When, Value, BooleanField, Subquery, OuterRef
 from django_filters.rest_framework import DjangoFilterBackend
-from django_rest_framework_mango.mixins import QuerysetMixin, SerializerMixin
-from rest_framework import viewsets, status
+from django_rest_framework_mango.mixins import QuerysetMixin, SerializerMixin, PermissionMixin
+from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.mixins import DestroyModelMixin, CreateModelMixin, ListModelMixin, UpdateModelMixin, \
     RetrieveModelMixin
@@ -16,13 +16,23 @@ from .models import SelfDateProfile, SelfDateProfileRight, SelfDateLike
 from users.models import Profile
 
 
+class IsHaveSelfDateProfileAndIsActive(permissions.BasePermission):
+    message = 'Activated self date profile is needed'
+
+    def has_permission(self, request, view):
+        return hasattr(request.user.profile, 'self_date_profile') and request.user.profile.self_date_profile.is_active
+
+
 class SelfDateProfileViewSet(
-    QuerysetMixin, SerializerMixin,
+    QuerysetMixin, SerializerMixin, PermissionMixin,
     CreateModelMixin, UpdateModelMixin, ListModelMixin, RetrieveModelMixin,
     viewsets.GenericViewSet,
 ):
     queryset = SelfDateProfile.objects.all()
     permission_classes = (IsOwnerProfileOrReadonly,)
+    permission_by_actions = {
+        'retrieve': (IsHaveSelfDateProfileAndIsActive,),
+    }
     serializer_class_by_actions = {
         'create': CreateSelfDateProfileSerializer,
         'list': ListSelfDateProfileSerializer,
@@ -72,12 +82,10 @@ class SelfDateProfileViewSet(
     def get_chat_link(self, request, *arg, **kwargs):
         request_self_date_profile = request.user.profile.self_date_profile
         target_self_date_profile = self.get_object()
-
         response_target_chat_link = request_self_date_profile.get_target_chat_link(target_self_date_profile)
         chat_link = {
             'chat_link': response_target_chat_link,
         }
-
         return Response(chat_link)
 
     @action(detail=False, methods=['get'], url_path='my')

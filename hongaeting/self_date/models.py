@@ -79,6 +79,8 @@ class SelfDateProfile(BaseModel):
 
     def get_target_chat_link(self, target_self_date_profile):
         if not target_self_date_profile.is_valid_chat_link:
+            target_self_date_profile.is_active = False
+            target_self_date_profile.save()
             raise NotFound('상대방의 채팅방 삭제로 인한 not found')
 
         is_having_message_right = self.check_having_right(

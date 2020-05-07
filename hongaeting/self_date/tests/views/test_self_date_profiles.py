@@ -379,6 +379,30 @@ class SelfDateProfileTestCase(APITestCase):
 
         assert_that(CoinHistory.objects.filter(profile=profile).last().rest_coin).is_equal_to(rest_coin)
 
+    def test_should_not_get_chat_link_when_chat_link_is_invalid(self):
+        # Given: coin이 충분한 request_self_date_profile과
+        #        invalid한 chat_link를 가진 target_self_date_profile이 주어진다.
+        request_self_date_profile = baker.make('self_date.SelfDateProfile')
+        target_self_date_profile = baker.make('self_date.SelfDateProfile',
+                                              chat_link=KakaoClientWithTest.close_room_kakao_link)
+        baker.make(
+            'coins.CoinHistory',
+            profile=request_self_date_profile.profile,
+            reason=COIN_CHANGE_REASON.CONFIRM_USER,
+            rest_coin=REWORD_COUNT['CONFIRM_USER']
+        )
+
+        # When: 생성된 request_self_date_profile의 user로 로그인 후 send_massage api를 호출한다.
+        self.client.force_authenticate(user=request_self_date_profile.profile.user)
+        response = self.client.get(f'/api/self-date-profiles/{target_self_date_profile.id}/chat-link/')
+
+        # Then: status code 404이 반환된다.
+        #       채팅방 삭제로 인한 not found 에러 메세지가 반환된다.
+        #       target_self_date_profile의 is_active가 false가 된다.
+        assert_that(response.status_code).is_equal_to(status.HTTP_404_NOT_FOUND)
+        assert_that(response.data['detail']).is_equal_to('상대방의 채팅방 삭제로 인한 not found')
+        assert_that(SelfDateProfile.objects.get(id=target_self_date_profile.id).is_active).is_false()
+
     def test_should_create_self_date_profile(self):
         # Given: user와 profile이 하나씩 주어지고 SelfDataProfile data가 주어진다.
         user = baker.make('users.User')
