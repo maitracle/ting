@@ -87,7 +87,6 @@ class SelfDateProfileViewSet(
         chat_link = {
             'chat_link': response_target_chat_link,
         }
-
         return Response(chat_link)
 
     @action(detail=False, methods=['get'], url_path='my')
