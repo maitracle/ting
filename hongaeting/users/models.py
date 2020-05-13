@@ -69,6 +69,8 @@ class User(BaseModel, AbstractBaseUser):
                                               max_length=1000, verbose_name='학생증 사진')
     is_confirmed_student = models.BooleanField(default=False, help_text='학교 인증을 받았는지 여부')
 
+    student_number = models.CharField(max_length=20, null=True, blank=True, unique=True)
+
     user_code = models.CharField(max_length=10, blank=True)
 
     objects = UserManager()
