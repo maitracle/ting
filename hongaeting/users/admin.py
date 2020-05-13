@@ -9,11 +9,12 @@ from users.models import User, Profile
 @register(User)
 class UserAdmin(admin.ModelAdmin):
     list_display = (
-        'id', 'email', 'university_email', 'is_confirmed_student', 'student_id_card_image', 'user_code', 'is_staff',
-        'is_superuser', 'is_active', 'created_at', 'updated_at',
+        'id', 'email', 'university_email', 'is_confirmed_student', 'student_id_card_image', 'student_number',
+        'user_code', 'is_staff', 'is_superuser', 'is_active', 'created_at', 'updated_at',
     )
     list_filter = ('is_active', 'is_confirmed_student',)
     list_display_links = ('id', 'email',)
+    list_editable = ('student_number',)
     search_fields = ('email',)
     ordering = ('-id', 'student_id_card_image',)
     actions = ('confirm_users',)
@@ -23,7 +24,7 @@ class UserAdmin(admin.ModelAdmin):
             'fields': ('email', 'university_email',)
         }),
         ('학교인증여부', {
-            'fields': ('student_id_card_image', 'is_confirmed_student',)
+            'fields': ('student_id_card_image', 'student_number', 'is_confirmed_student',)
         }),
         ('권한여부', {
             'fields': ('is_staff', 'is_superuser', 'is_active',)
