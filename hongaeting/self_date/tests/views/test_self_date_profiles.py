@@ -39,7 +39,7 @@ class SelfDateProfileTestCase(APITestCase):
         expected_self_date_profile_list = [self_date_profile] + expected_self_date_profile_list
         expected_is_viewed_value = False
         for response_profile, expected_profile in zip(response.data, expected_self_date_profile_list):
-            self._check_response_and_expected(response_profile, expected_profile)
+            self._check_response_and_expected_when_call_list_api(response_profile, expected_profile)
             assert_that(response_profile['is_viewed']).is_equal_to(expected_is_viewed_value)
 
     def test_should_get_filtered_list(self):
@@ -81,7 +81,7 @@ class SelfDateProfileTestCase(APITestCase):
 
         expected_is_viewed_value = False
         for response in response.data:
-            self._check_response_and_expected(response, expected_profile)
+            self._check_response_and_expected_when_call_list_api(response, expected_profile)
             assert_that(response['is_viewed']).is_equal_to(expected_is_viewed_value)
 
     def test_is_viewed_in_list(self):
@@ -142,7 +142,7 @@ class SelfDateProfileTestCase(APITestCase):
         #       coin 개수가 줄어든다.
         assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
 
-        self._check_response_and_expected(response.data, target_self_date_profile)
+        self._check_response_and_expected_when_call_retrieve_api(response.data, target_self_date_profile)
 
         self_date_profile_right = SelfDateProfileRight.objects.filter(
             buying_self_date_profile=request_self_date_profile,
@@ -177,7 +177,7 @@ class SelfDateProfileTestCase(APITestCase):
         #       profile이 반환된다.
         #       coin 개수가 감소하지 않는다.
         assert_that(response.status_code).is_equal_to(status.HTTP_200_OK)
-        self._check_response_and_expected(response.data, target_self_date_profile)
+        self._check_response_and_expected_when_call_retrieve_api(response.data, target_self_date_profile)
         rest_coin = CoinHistory.objects.filter(profile=request_self_date_profile.profile).last().rest_coin
         assert_that(rest_coin).is_equal_to(expected_rest_coin)
 
@@ -233,20 +233,40 @@ class SelfDateProfileTestCase(APITestCase):
         assert_that(response.status_code).is_equal_to(status.HTTP_403_FORBIDDEN)
         assert_that(response.data['detail']).is_equal_to(IsHaveSelfDateProfileAndIsActive.message)
 
-    def _check_response_and_expected(self, dictionary, instance):
-        assert_that(dictionary['image']).is_equal_to(instance.image)
+    def _check_response_and_expected_when_call_retrieve_api(self, dictionary, instance):
+        assert_that(dictionary['id']).is_equal_to(instance.id)
         assert_that(dictionary['nickname']).is_equal_to(instance.nickname)
         assert_that(dictionary['height']).is_equal_to(instance.height)
         assert_that(dictionary['body_type']).is_equal_to(instance.body_type)
-        assert_that(dictionary['tags']).is_equal_to(instance.tags)
-        assert_that(dictionary['image']).is_equal_to(instance.image)
+        assert_that(dictionary['religion']).is_equal_to(instance.religion)
+        assert_that(dictionary['is_smoke']).is_equal_to(instance.is_smoke)
         assert_that(dictionary['appearance']).is_equal_to(instance.appearance)
         assert_that(dictionary['personality']).is_equal_to(instance.personality)
         assert_that(dictionary['hobby']).is_equal_to(instance.hobby)
-        assert_that(dictionary['religion']).is_equal_to(instance.religion)
         assert_that(dictionary['date_style']).is_equal_to(instance.date_style)
         assert_that(dictionary['ideal_type']).is_equal_to(instance.ideal_type)
         assert_that(dictionary['one_sentence']).is_equal_to(instance.one_sentence)
+        assert_that(dictionary['tags']).is_equal_to(instance.tags)
+        assert_that(dictionary['image']).is_equal_to(instance.image)
+        assert_that(dictionary['created_at']).is_equal_to(reformat_datetime(instance.created_at))
+        assert_that(dictionary['updated_at']).is_equal_to(reformat_datetime(instance.updated_at))
+
+        assert_that(dictionary['profile']['id']).is_equal_to(instance.profile.id)
+        assert_that(dictionary['profile']['user']).is_equal_to(instance.profile.user.id)
+        assert_that(dictionary['profile']['gender']).is_equal_to(instance.profile.gender)
+        assert_that(dictionary['profile']['age']).is_equal_to(instance.profile.age)
+        assert_that(dictionary['profile']['university']).is_equal_to(instance.profile.university)
+        assert_that(dictionary['profile']['campus_location']).is_equal_to(instance.profile.campus_location)
+        assert_that(dictionary['profile']['scholarly_status']).is_equal_to(instance.profile.scholarly_status)
+        assert_that(dictionary['profile']['created_at']).is_equal_to(reformat_datetime(instance.profile.created_at))
+        assert_that(dictionary['profile']['updated_at']).is_equal_to(reformat_datetime(instance.profile.updated_at))
+
+    def _check_response_and_expected_when_call_list_api(self, dictionary, instance):
+        assert_that(dictionary['id']).is_equal_to(instance.id)
+        assert_that(dictionary['nickname']).is_equal_to(instance.nickname)
+        assert_that(dictionary['one_sentence']).is_equal_to(instance.one_sentence)
+        assert_that(dictionary['tags']).is_equal_to(instance.tags)
+        assert_that(dictionary['image']).is_equal_to(instance.image)
         assert_that(dictionary['created_at']).is_equal_to(reformat_datetime(instance.created_at))
         assert_that(dictionary['updated_at']).is_equal_to(reformat_datetime(instance.updated_at))
 
